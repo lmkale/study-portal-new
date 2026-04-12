@@ -1,0 +1,3193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LMK Teacher Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  // ──────────────────────────────────────────────
+  // 🔧 PASTE YOUR FIREBASE CONFIG HERE
+  // ──────────────────────────────────────────────
+  const firebaseConfig = {
+   apiKey: "AIzaSyAQTdvwMUvBsa5HQVe3tC1S2BlFC4uebTo",
+  authDomain: "study-portal-ac6dd.firebaseapp.com",
+  projectId: "study-portal-ac6dd",
+  storageBucket: "study-portal-ac6dd.firebasestorage.app",
+  messagingSenderId: "610150735226",
+  appId: "1:610150735226:web:3cef55d4ba2cdb8f0acac3"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const db   = getFirestore(app);
+  const auth = getAuth(app);
+
+  async function loadCollection(name) {
+    const q = query(collection(db, name), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  async function addItem(col, data) {
+    await addDoc(collection(db, col), { ...data, createdAt: Date.now() });
+  }
+  async function removeItem(col, id) {
+    await deleteDoc(doc(db, col, id));
+  }
+
+  window.FB = { auth, loadCollection, addItem, removeItem,
+    signIn:  (email, pass) => signInWithEmailAndPassword(auth, email, pass),
+    signOut: () => signOut(auth),
+    onAuth:  (cb) => onAuthStateChanged(auth, cb)
+  };
+  window.dispatchEvent(new Event("fb-ready"));
+</script>
+
+<style>
+:root {
+  /* Orange-warm light palette */
+  --bg:         #fff8f2;
+  --surface:    #ffffff;
+  --surface2:   #fff3e8;
+  --orange:     #e8610a;
+  --orange-mid: #f07d2a;
+  --orange-lt:  #fde8d4;
+  --orange-dim: #fdf0e6;
+  --deep:       #7a2e00;
+  --ink:        #2d1a0e;
+  --ink2:       #5c3d28;
+  --muted:      #a07858;
+  --border:     #f0dece;
+  --border2:    #f7ece0;
+  --shadow:     rgba(232,97,10,.10);
+  --shadow2:    rgba(232,97,10,.18);
+
+  /* Admin — light warm palette */
+  --adm-bg:     #faf7f4;
+  --adm-srf:    #ffffff;
+  --adm-srf2:   #fff3eb;
+  --adm-border: #e8d5c4;
+  --adm-muted:  #8a6a58;
+  --adm-text:   #2d1a0e;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;background:var(--orange);color:#fff;
+  padding:.85rem 1.5rem;border-radius:10px;font-size:.86rem;font-weight:500;
+  transform:translateY(140%);transition:transform .3s;box-shadow:0 6px 24px var(--shadow2);}
+#toast.show{transform:translateY(0);}
+
+/* ── SPINNER ── */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ════════════ NAV ════════════ */
+header{
+  background:var(--surface);
+  position:sticky;top:0;z-index:200;
+  border-bottom:2px solid var(--border);
+  box-shadow:0 2px 20px rgba(232,97,10,.06);
+}
+.header-inner{
+  max-width:1280px;margin:0 auto;padding:0 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;height:66px;
+}
+.logo{
+  text-decoration:none;display:flex;align-items:center;gap:.7rem;cursor:pointer;
+}
+.logo-mark{
+  width:44px;height:44px;flex-shrink:0;
+  filter: drop-shadow(0 2px 8px rgba(232,97,10,.25));
+  transition: filter .2s, transform .2s;
+}
+.logo:hover .logo-mark{
+  filter: drop-shadow(0 4px 14px rgba(232,97,10,.4));
+  transform: scale(1.05);
+}
+.logo-text-wrap{display:flex;flex-direction:column;line-height:1;}
+.logo-name{
+  font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;
+  color:var(--ink);letter-spacing:.01em;
+}
+.logo-tagline{
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:.62rem;font-weight:600;
+  color:var(--orange);letter-spacing:.14em;text-transform:uppercase;margin-top:.15rem;
+}
+
+nav{display:flex;gap:.05rem;align-items:center;flex-wrap:wrap;}
+nav a{
+  color:var(--ink2);text-decoration:none;font-size:.77rem;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;padding:.45rem .75rem;
+  border-radius:6px;transition:all .2s;cursor:pointer;white-space:nowrap;
+}
+nav a:hover{color:var(--orange);background:var(--orange-dim);}
+nav a.active{color:var(--orange);background:var(--orange-lt);}
+.admin-btn{
+  background:var(--orange)!important;color:#fff!important;
+  margin-left:.5rem;border-radius:8px!important;
+}
+.admin-btn:hover{background:var(--deep)!important;color:#fff!important;}
+
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px;transition:all .3s;}
+
+/* ════════════ PAGES ════════════ */
+.page{display:none;animation:fadeUp .3s ease;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ════════════ HERO ════════════ */
+.hero{
+  background:linear-gradient(135deg, #fff2e6 0%, #ffe0c0 40%, #ffd0a0 100%);
+  padding:5rem 1.5rem 4.5rem;text-align:center;position:relative;overflow:hidden;
+  border-bottom:2px solid var(--border);
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle 600px at 70% 50%, rgba(232,97,10,.08), transparent);
+}
+.hero::after{
+  content:'';position:absolute;top:-80px;right:-80px;
+  width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle, rgba(240,125,42,.15), transparent 70%);
+}
+.hero-pill{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:#fff;border:1.5px solid var(--border);color:var(--orange);
+  font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  padding:.4rem 1rem;border-radius:100px;margin-bottom:1.6rem;
+  box-shadow:0 2px 12px var(--shadow);position:relative;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.8rem);
+  color:var(--ink);line-height:1.15;margin-bottom:1rem;position:relative;
+}
+.hero h1 em{color:var(--orange);font-style:italic;}
+.hero p{
+  color:var(--ink2);font-size:1rem;max-width:520px;margin:0 auto 2.8rem;
+  line-height:1.75;position:relative;
+}
+.hero-stats{display:flex;justify-content:center;gap:0;position:relative;}
+.stat{
+  padding:1.2rem 2.2rem;
+  border-right:1.5px solid var(--border);
+}
+.stat:last-child{border:none;}
+.stat-num{
+  font-family:'Playfair Display',serif;font-size:2rem;
+  color:var(--orange);display:block;line-height:1;
+}
+.stat-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.25rem;display:block;}
+.hero-stat-wrap{
+  background:#fff;border:1.5px solid var(--border);border-radius:16px;
+  display:inline-flex;box-shadow:0 4px 20px var(--shadow);
+}
+
+/* ════════════ PAGE HEADER ════════════ */
+.page-hdr{
+  background:linear-gradient(135deg,var(--orange) 0%,var(--orange-mid) 100%);
+  padding:2.8rem 1.5rem;text-align:center;position:relative;overflow:hidden;
+}
+.page-hdr::before{
+  content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;
+  border-radius:50%;background:rgba(255,255,255,.08);
+}
+.page-hdr h1{font-family:'Playfair Display',serif;color:#fff;font-size:clamp(1.5rem,3vw,2.4rem);margin-bottom:.4rem;}
+.page-hdr p{color:rgba(255,255,255,.75);font-size:.9rem;}
+
+/* ════════════ SECTION ════════════ */
+.section{max-width:1100px;margin:0 auto;padding:3.5rem 1.5rem;}
+.sec-tag{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--orange);
+  font-weight:700;display:block;margin-bottom:.5rem;}
+.sec-title{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,2.5vw,2.2rem);color:var(--ink);line-height:1.2;}
+.sec-title em{font-style:italic;color:var(--deep);}
+.divider{width:44px;height:3px;background:linear-gradient(90deg,var(--orange),var(--orange-mid));
+  margin-top:.8rem;border-radius:2px;}
+.sec-hdr{margin-bottom:2.5rem;}
+
+/* ════════════ CARDS ════════════ */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.4rem;}
+.card{
+  background:var(--surface);border:1.5px solid var(--border2);border-radius:16px;
+  padding:1.8rem;transition:all .25s;position:relative;overflow:hidden;
+}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--orange),var(--orange-mid));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+.card:hover{box-shadow:0 10px 36px var(--shadow2);transform:translateY(-4px);border-color:rgba(232,97,10,.2);}
+.card:hover::before{transform:scaleX(1);}
+.card-icon{
+  width:48px;height:48px;background:var(--orange-lt);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+  margin-bottom:1.1rem;
+}
+.card h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ink);margin-bottom:.5rem;}
+.card p{font-size:.86rem;color:var(--ink2);line-height:1.65;}
+.card-link{display:inline-flex;align-items:center;gap:.3rem;margin-top:1rem;font-size:.8rem;
+  font-weight:700;color:var(--orange);cursor:pointer;letter-spacing:.03em;text-decoration:none;}
+.card-link:hover{color:var(--deep);}
+
+/* ════════════ CLASS SUB-NAV ════════════ */
+.class-subnav{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem;
+  padding-bottom:1.2rem;border-bottom:2px solid var(--border);}
+.csn-btn{background:var(--surface);border:1.5px solid var(--border2);color:var(--ink2);
+  padding:.5rem 1rem;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;
+  transition:all .2s;letter-spacing:.03em;}
+.csn-btn:hover{color:var(--orange);border-color:var(--orange);background:var(--orange-dim);}
+.csn-btn.active{background:var(--orange);color:#fff;border-color:var(--orange);}
+.class-tab{display:none;}
+.class-tab.active{display:block;animation:fadeUp .3s ease;}
+
+/* ════════════ FOLDER GRID ════════════ */
+.folder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;}
+.folder-card{
+  background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;
+  padding:1.2rem 1rem;display:flex;flex-direction:column;align-items:center;
+  gap:.6rem;cursor:pointer;transition:all .22s;text-align:center;
+}
+.folder-card:hover{box-shadow:0 8px 24px var(--shadow2);transform:translateY(-3px);border-color:rgba(232,97,10,.25);}
+.folder-card .fc-icon{font-size:2.2rem;line-height:1;}
+.folder-card .fc-name{font-size:.82rem;font-weight:600;color:var(--ink2);word-break:break-word;}
+.folder-card .fc-count{font-size:.7rem;color:var(--muted);}
+.folder-back{background:var(--orange-dim);border-color:var(--border);}
+
+/* Breadcrumb */
+.breadcrumb-path{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;}
+.breadcrumb-path span{font-size:.82rem;color:var(--orange);cursor:pointer;font-weight:600;}
+.breadcrumb-path span:hover{text-decoration:underline;}
+.breadcrumb-path .bc-sep{color:var(--muted);font-size:.75rem;}
+.breadcrumb-path .bc-cur{color:var(--ink2);cursor:default;}
+.breadcrumb-path .bc-cur:hover{text-decoration:none;}
+
+/* File buttons */
+.file-btns{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.4rem;}
+.btn-view-file,.btn-dl-file{
+  display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;font-weight:700;
+  padding:.45rem .9rem;border-radius:7px;text-decoration:none;transition:all .2s;
+}
+.btn-view-file{color:#fff;background:linear-gradient(135deg,var(--orange),var(--orange-mid));}
+.btn-view-file:hover{background:var(--deep);}
+.btn-dl-file{color:var(--orange);border:1.5px solid var(--orange-lt);background:var(--orange-dim);}
+.btn-dl-file:hover{background:var(--orange-lt);}
+
+.empty-state{
+  text-align:center;padding:3rem;color:var(--muted);font-size:.9rem;
+  background:var(--orange-dim);border:1.5px dashed var(--border);border-radius:14px;
+}
+.empty-state .es-icon{font-size:2.5rem;margin-bottom:.8rem;display:block;opacity:.6;}
+
+/* ════════════ VIDEO GRID ════════════ */
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.4rem;}
+.v-card{background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;
+  overflow:hidden;transition:all .25s;cursor:pointer;}
+.v-card:hover{transform:translateY(-4px);box-shadow:0 10px 32px var(--shadow2);}
+.v-thumb{aspect-ratio:16/9;background:linear-gradient(135deg,#1a0800,#3d1800);
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.v-thumb img{width:100%;height:100%;object-fit:cover;opacity:.9;}
+.play-btn{position:absolute;width:52px;height:52px;
+  background:linear-gradient(135deg,var(--orange),var(--orange-mid));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  z-index:1;transition:transform .2s;box-shadow:0 4px 16px rgba(232,97,10,.5);}
+.v-card:hover .play-btn{transform:scale(1.12);}
+.play-btn::after{content:'';border:9px solid transparent;border-left:15px solid #fff;margin-left:4px;}
+.v-meta{padding:1.2rem;}
+.v-meta h4{font-family:'Playfair Display',serif;font-size:.98rem;color:var(--ink);margin-bottom:.35rem;}
+.v-meta p{font-size:.8rem;color:var(--muted);}
+
+/* ════════════ BLOG ════════════ */
+.blog-list{display:flex;flex-direction:column;gap:1.2rem;}
+.b-card{
+  background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;
+  padding:1.8rem;display:grid;grid-template-columns:auto 1fr;gap:1.5rem;
+  align-items:start;transition:all .25s;cursor:pointer;
+}
+.b-card:hover{box-shadow:0 8px 28px var(--shadow2);border-color:rgba(232,97,10,.25);transform:translateX(4px);}
+.b-date{
+  background:linear-gradient(135deg,var(--orange),var(--orange-mid));
+  color:#fff;text-align:center;padding:.8rem 1rem;border-radius:12px;min-width:60px;
+}
+.b-date .day{font-family:'Playfair Display',serif;font-size:1.7rem;line-height:1;display:block;}
+.b-date .mon{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;opacity:.85;display:block;margin-top:.2rem;}
+.b-content h3{font-family:'Playfair Display',serif;font-size:1.12rem;color:var(--ink);margin-bottom:.45rem;}
+.b-content p{font-size:.86rem;color:var(--ink2);line-height:1.65;}
+.b-tags{display:flex;gap:.45rem;margin-top:.75rem;flex-wrap:wrap;}
+.tag{font-size:.7rem;padding:.22rem .65rem;background:var(--orange-lt);color:var(--orange);
+  border-radius:100px;font-weight:600;}
+
+/* ════════════ TABLE ════════════ */
+.tbl-wrap{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead{background:linear-gradient(135deg,var(--orange),var(--orange-mid));}
+thead th{color:#fff;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;
+  padding:.95rem 1.2rem;text-align:left;font-weight:600;}
+tbody tr{border-bottom:1.5px solid var(--border2);transition:background .15s;}
+tbody tr:last-child{border:none;}
+tbody tr:hover{background:var(--orange-dim);}
+tbody td{padding:.95rem 1.2rem;font-size:.88rem;color:var(--ink2);}
+.badge{display:inline-block;padding:.22rem .75rem;border-radius:100px;font-size:.72rem;font-weight:600;}
+.badge-green{background:#dcf5e8;color:#1a7a44;}
+.badge-orange{background:var(--orange-lt);color:var(--orange);}
+.badge-blue{background:#e0edff;color:#1a55a4;}
+.pdf-link{color:var(--orange);font-size:.82rem;font-weight:700;text-decoration:none;}
+.pdf-link:hover{color:var(--deep);}
+
+/* ════════════ ACCORDION ════════════ */
+.accordion{display:flex;flex-direction:column;gap:.75rem;}
+.acc-item{background:var(--surface);border:1.5px solid var(--border2);border-radius:12px;overflow:hidden;}
+.acc-hdr{display:flex;justify-content:space-between;align-items:center;padding:1.15rem 1.5rem;
+  cursor:pointer;font-weight:600;color:var(--ink);font-size:.95rem;transition:background .15s;user-select:none;}
+.acc-hdr:hover{background:var(--orange-dim);}
+.acc-arrow{font-size:.7rem;color:var(--orange);transition:transform .3s;
+  background:var(--orange-lt);width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;}
+.acc-item.open .acc-arrow{transform:rotate(180deg);}
+.acc-item.open .acc-hdr{background:var(--orange-dim);}
+.acc-body{display:none;padding:1.2rem 1.5rem;font-size:.87rem;color:var(--ink2);
+  line-height:1.7;border-top:1.5px solid var(--border2);}
+.acc-item.open .acc-body{display:block;}
+.unit-list{list-style:none;}
+.unit-list li{padding:.38rem 0 .38rem 1.2rem;position:relative;}
+.unit-list li::before{content:'▸';position:absolute;left:0;color:var(--orange);font-size:.65rem;top:.55rem;}
+
+/* ════════════ STUDY MATERIAL ════════════ */
+.material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.3rem;}
+.mat-card{
+  background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;
+  padding:1.6rem;display:flex;flex-direction:column;gap:.8rem;transition:all .25s;
+}
+.mat-card:hover{box-shadow:0 8px 28px var(--shadow2);transform:translateY(-3px);border-color:rgba(232,97,10,.25);}
+.mat-type{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--orange);background:var(--orange-lt);padding:.3rem .75rem;
+  border-radius:100px;width:fit-content;
+}
+.mat-card h4{font-family:'Playfair Display',serif;font-size:1rem;color:var(--ink);}
+.mat-card p{font-size:.82rem;color:var(--muted);line-height:1.6;flex:1;}
+.mat-card a{
+  display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:700;
+  color:#fff;background:linear-gradient(135deg,var(--orange),var(--orange-mid));
+  padding:.55rem 1.1rem;border-radius:8px;text-decoration:none;width:fit-content;
+  transition:all .2s;margin-top:.2rem;
+}
+.mat-card a:hover{background:var(--deep);transform:scale(1.03);}
+
+
+
+
+
+
+
+  
+/* ════════════════════════════
+   ADMIN PANEL — dark orange
+════════════════════════════ */
+#admin-overlay{display:none;position:fixed;inset:0;z-index:500;background:var(--adm-bg);overflow-y:auto;overflow-x:hidden;}
+#admin-overlay.open{display:block;}
+
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:2rem;background:linear-gradient(135deg,#fff8f2 0%,#ffe8d0 100%);}
+.login-box{
+  background:#fff;border:1.5px solid var(--adm-border);border-radius:18px;
+  padding:2.8rem;width:100%;max-width:420px;
+  box-shadow:0 20px 60px rgba(232,97,10,.15);
+}
+.login-box .logo-big{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--ink);
+  margin-bottom:.4rem;display:flex;align-items:center;gap:.7rem;}
+.login-box p{color:var(--muted);font-size:.85rem;margin-bottom:2rem;}
+
+.field{margin-bottom:1.2rem;}
+.field label{display:block;font-size:.72rem;color:var(--ink2);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:.45rem;font-weight:600;}
+.field input,.field textarea,.field select{
+  width:100%;background:#fff;border:1.5px solid var(--border);border-radius:10px;
+  padding:.8rem 1rem;color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:.9rem;outline:none;transition:border .2s;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--orange);}
+.field textarea{resize:vertical;min-height:90px;}
+.field select option{background:#fff;color:var(--ink);}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  background:linear-gradient(135deg,var(--orange),var(--orange-mid));color:#fff;
+  font-weight:700;font-size:.85rem;letter-spacing:.04em;padding:.85rem 1.8rem;
+  border-radius:10px;border:none;cursor:pointer;transition:all .2s;width:100%;}
+.btn:hover{opacity:.9;transform:translateY(-1px);}
+.btn.btn-sm{width:auto;padding:.55rem 1.3rem;font-size:.78rem;border-radius:8px;}
+.btn.btn-ghost{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.btn.btn-ghost:hover{color:var(--ink);}
+.btn.btn-danger{background:#5a1a1a;color:#f88;border:1px solid #8a2a2a;}
+.btn.btn-danger:hover{background:#7a2020;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.login-err{color:#f87171;font-size:.82rem;margin-top:.7rem;display:none;padding:.6rem .9rem;
+  background:rgba(248,113,113,.1);border-radius:8px;border:1px solid rgba(248,113,113,.2);}
+
+/* Admin layout */
+.admin-layout{display:flex;min-height:100vh;}
+.admin-sidebar{
+  width:220px;background:#fff;padding:1.5rem 1rem;flex-shrink:0;
+  display:flex;flex-direction:column;gap:.15rem;border-right:1.5px solid var(--border);
+  box-shadow:2px 0 12px rgba(232,97,10,.06);
+}
+.admin-sidebar .s-logo{
+  font-family:'Playfair Display',serif;color:var(--ink);font-size:1.05rem;font-weight:600;
+  margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1.5px solid var(--border);
+  display:flex;align-items:center;gap:.6rem;
+}
+.sidebar-item{display:flex;align-items:center;gap:.65rem;padding:.7rem .9rem;border-radius:8px;
+  color:var(--ink2);font-size:.84rem;cursor:pointer;transition:all .2s;font-weight:500;}
+.sidebar-item:hover{background:var(--orange-dim);color:var(--orange);}
+.sidebar-item.active{background:var(--orange-lt);color:var(--orange);}
+.sidebar-item .si-icon{font-size:.95rem;width:18px;text-align:center;}
+.sidebar-section{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:.8rem .9rem .3rem;font-weight:700;}
+.sidebar-logout{margin-top:auto;padding-top:1rem;border-top:1.5px solid var(--border);}
+
+.admin-main{flex:1;padding:2rem 2.5rem;overflow-y:auto;background:linear-gradient(160deg,#fff8f2 0%,#fdf4ec 100%);overflow-x:hidden;min-width:0;}
+.admin-panel{display:none;}
+.admin-panel.active{display:block;}
+.admin-panel h2{font-family:'Playfair Display',serif;color:var(--ink);font-size:1.7rem;margin-bottom:.35rem;}
+.admin-panel > .panel-desc{color:var(--muted);font-size:.85rem;margin-bottom:2rem;
+  padding-bottom:1.2rem;border-bottom:1.5px solid var(--border);}
+
+.add-form{background:#fff;border:1.5px solid var(--border);border-radius:14px;
+  padding:1.8rem;margin-bottom:2rem;box-shadow:0 2px 12px rgba(232,97,10,.06);}
+.add-form h3{color:var(--orange);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:1.4rem;font-weight:700;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+
+.items-label{color:var(--muted);font-size:.7rem;letter-spacing:.12em;
+  text-transform:uppercase;margin-bottom:.8rem;display:block;font-weight:700;}
+.items-list{display:flex;flex-direction:column;gap:.7rem;}
+.item-row{background:#fff;border:1.5px solid var(--border);border-radius:10px;
+  padding:1rem 1.3rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  transition:background .15s;}
+.item-row:hover{background:var(--orange-dim);}
+.item-row-info h4{color:var(--ink);font-size:.9rem;margin-bottom:.2rem;}
+.item-row-info p{color:var(--muted);font-size:.76rem;}
+
+/* ════════════════════════════════════
+   PER-PANEL COLOUR THEMES
+════════════════════════════════════ */
+
+/* ── 🎬 VIDEOS — Purple / Violet ── */
+#videos-panel .add-form{border-color:#c4b5fd;border-left:4px solid #7c3aed;background:linear-gradient(135deg,#f5f3ff,#ede9fe);}
+#videos-panel .add-form h3{color:#6d28d9;}
+#videos-panel .panel-tag{color:#a78bfa;}
+#videos-panel .add-form .btn:not(.btn-danger):not(.btn-ghost):not(.btn-sm){background:linear-gradient(135deg,#7c3aed,#a855f7);}
+#videos-panel .add-form .btn.btn-sm{background:linear-gradient(135deg,#7c3aed,#a855f7);}
+#videos-panel .field input:focus,#videos-panel .field textarea:focus,#videos-panel .field select:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.15);}
+#videos-panel h2{background:linear-gradient(90deg,#6d28d9,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sidebar-item[onclick*="videos"].active{background:rgba(124,58,237,.2)!important;color:#a78bfa!important;}
+.sidebar-item[onclick*="videos"]:hover{color:#a78bfa;}
+
+/* ── ✍️ BLOG — Teal / Cyan ── */
+.sidebar-item[onclick*="blog"].active{background:rgba(13,148,136,.2)!important;color:#5eead4!important;}
+.sidebar-item[onclick*="blog"]:hover{color:#5eead4;}
+
+/* ── 📝 PAPERS — Blue / Indigo ── */
+.sidebar-item[onclick*="papers"].active{background:rgba(37,99,235,.2)!important;color:#93c5fd!important;}
+.sidebar-item[onclick*="papers"]:hover{color:#93c5fd;}
+
+/* ── 📂 MATERIAL — Emerald / Green ── */
+.sidebar-item[onclick*="material"].active{background:rgba(5,150,105,.2)!important;color:#6ee7b7!important;}
+.sidebar-item[onclick*="material"]:hover{color:#6ee7b7;}
+
+/* ── 📚 SYLLABUS — Rose / Pink ── */
+.sidebar-item[onclick*="syllabus"].active{background:rgba(225,29,72,.2)!important;color:#fda4af!important;}
+.sidebar-item[onclick*="syllabus"]:hover{color:#fda4af;}
+
+/* ── 📅 PLANNING — Amber / Gold ── */
+.sidebar-item[onclick*="planning"].active{background:rgba(217,119,6,.2)!important;color:#fcd34d!important;}
+.sidebar-item[onclick*="planning"]:hover{color:#fcd34d;}
+
+/* ════════════ PDF VIEWER MODAL ════════════ */
+#pdf-modal{
+  display:none;position:fixed;inset:0;z-index:800;
+  background:rgba(0,0,0,.82);backdrop-filter:blur(6px);
+}
+#pdf-modal.open{display:flex;align-items:center;justify-content:center;padding:1rem;}
+@media(max-width:600px){
+  #pdf-modal.open{padding:0;align-items:flex-end;}
+  .pdf-modal-box{border-radius:20px 20px 0 0;height:95vh;max-width:100%;}
+  .pdf-modal-header{padding:.75rem 1rem;}
+  .pdf-modal-title{font-size:.88rem;}
+  .pdf-modal-actions{gap:.3rem;}
+  .pdf-action-btn{padding:.42rem .75rem;font-size:.72rem;}
+  .pdf-modal-toolbar{padding:.45rem 1rem;}
+  .pdf-toolbar-hint{display:none;}
+}
+
+.pdf-modal-box{
+  background:#1a1a2e;border:1.5px solid rgba(255,255,255,.1);border-radius:20px;
+  width:100%;max-width:960px;height:90vh;display:flex;flex-direction:column;
+  box-shadow:0 30px 80px rgba(0,0,0,.7);overflow:hidden;
+  animation:slideUp .25s ease;
+}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+.pdf-modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 1.5rem;border-bottom:1.5px solid rgba(255,255,255,.08);
+  background:linear-gradient(135deg,#12122a,#1e1e3a);flex-shrink:0;
+}
+.pdf-modal-title-wrap{display:flex;align-items:center;gap:.75rem;min-width:0;flex:1;}
+.pdf-modal-title{
+  font-family:'Playfair Display',serif;font-size:1.05rem;color:#fff;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.pdf-file-icon{
+  width:38px;height:38px;background:linear-gradient(135deg,#e8610a,#f07d2a);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+}
+.pdf-modal-meta{font-size:.72rem;color:rgba(255,255,255,.35);margin-top:.1rem;font-family:'Plus Jakarta Sans',sans-serif;}
+
+.pdf-modal-actions{display:flex;align-items:center;gap:.5rem;flex-shrink:0;margin-left:1rem;}
+.pdf-action-btn{
+  display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;
+  border-radius:9px;font-size:.78rem;font-weight:700;cursor:pointer;border:none;
+  letter-spacing:.04em;transition:all .2s;text-decoration:none;
+}
+.pdf-action-btn.download{background:linear-gradient(135deg,#e8610a,#f07d2a);color:#fff;}
+.pdf-action-btn.download:hover{opacity:.85;transform:translateY(-1px);}
+.pdf-action-btn.newwin{background:rgba(255,255,255,.08);color:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.12);}
+.pdf-action-btn.newwin:hover{background:rgba(255,255,255,.14);color:#fff;}
+.pdf-close-btn{
+  width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);
+  font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.pdf-close-btn:hover{background:rgba(220,38,38,.3);color:#fff;border-color:#dc2626;}
+
+.pdf-modal-toolbar{
+  display:flex;align-items:center;gap:.6rem;padding:.55rem 1.5rem;
+  background:#0e0e20;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;
+}
+.pdf-type-badge{font-size:.67rem;padding:.22rem .65rem;border-radius:100px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+.pdf-type-badge.pdf{background:rgba(232,97,10,.18);color:#f07d2a;border:1px solid rgba(232,97,10,.3);}
+.pdf-type-badge.img{background:rgba(99,102,241,.18);color:#818cf8;border:1px solid rgba(99,102,241,.3);}
+.pdf-type-badge.doc{background:rgba(37,99,235,.18);color:#60a5fa;border:1px solid rgba(37,99,235,.3);}
+.pdf-type-badge.other{background:rgba(255,255,255,.07);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.1);}
+.pdf-toolbar-hint{font-size:.73rem;color:rgba(255,255,255,.25);margin-left:auto;}
+
+.pdf-modal-body{flex:1;overflow:hidden;position:relative;background:#0a0a18;}
+.pdf-modal-body iframe{width:100%;height:100%;border:none;display:block;}
+.pdf-modal-body img.preview-img{width:100%;height:100%;object-fit:contain;display:block;padding:1rem;}
+
+.pdf-loading{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:.9rem;color:rgba(255,255,255,.35);font-size:.88rem;
+  background:#0a0a18;z-index:2;
+}
+.pdf-loading .load-ring{
+  width:44px;height:44px;border:3px solid rgba(232,97,10,.15);
+  border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;
+}
+.pdf-no-preview{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:1.1rem;color:rgba(255,255,255,.45);text-align:center;padding:2.5rem;
+}
+.pdf-no-preview .np-icon{font-size:3.5rem;opacity:.4;display:block;}
+.pdf-no-preview h3{color:rgba(255,255,255,.6);font-size:1.05rem;font-family:'Playfair Display',serif;}
+.pdf-no-preview p{font-size:.85rem;line-height:1.65;max-width:380px;color:rgba(255,255,255,.3);}
+
+/* View / Download buttons on cards & table rows */
+.file-btns{display:flex;gap:.45rem;align-items:center;flex-wrap:wrap;}
+.btn-view-file{
+  display:inline-flex;align-items:center;gap:.35rem;
+  background:rgba(232,97,10,.1);color:var(--orange);
+  border:1.5px solid rgba(232,97,10,.3);border-radius:7px;
+  padding:.35rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;
+}
+.btn-view-file:hover{background:var(--orange);color:#fff;}
+.btn-dl-file{
+  display:inline-flex;align-items:center;gap:.35rem;
+  background:rgba(255,255,255,.04);color:var(--ink2);
+  border:1.5px solid var(--border);border-radius:7px;
+  padding:.35rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;
+}
+.btn-dl-file:hover{background:var(--orange-lt);color:var(--deep);border-color:var(--orange);}
+.mat-card .file-btns{margin-top:.85rem;}
+
+/* ── FOOTER ── */
+footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
+  font-size:.78rem;letter-spacing:.05em;}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  nav{display:none;flex-direction:column;position:absolute;top:66px;left:0;right:0;
+    background:var(--surface);padding:1rem;border-bottom:2px solid var(--border);
+    box-shadow:0 8px 24px var(--shadow);z-index:300;}
+  nav.open{display:flex;}
+  .hamburger{display:flex;}
+  .b-card{grid-template-columns:1fr;}
+  .hero-stats{gap:0;}
+  .stat{padding:.9rem 1.2rem;}
+  .form-row{grid-template-columns:1fr;}
+  .admin-layout{flex-direction:column;}
+  .admin-sidebar{width:100%;flex-direction:row;flex-wrap:wrap;padding:.8rem;gap:.3rem;border-right:none;border-bottom:1.5px solid var(--border);}
+  .admin-sidebar .s-logo,.sidebar-section,.sidebar-logout{width:100%;}
+  .admin-main{padding:1rem;min-width:0;}
+  /* Prevent horizontal scroll everywhere */
+  body{overflow-x:hidden;}
+  .section{padding:2rem 1rem;}
+  .hero{padding:3rem 1rem 2.5rem;}
+  .cards{grid-template-columns:1fr;}
+  .material-grid{grid-template-columns:1fr;}
+  /* Tables scroll horizontally within container, not whole page */
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table{min-width:500px;}
+  /* Papers table: stack buttons vertically */
+  .file-btns{flex-direction:column;align-items:flex-start;gap:.35rem;}
+  .btn-view-file,.btn-dl-file{width:100%;justify-content:center;}
+  /* Admin form */
+  .add-form{padding:1.2rem;}
+  .src-tabs{width:100%;}
+  .src-tab{flex:1;justify-content:center;font-size:.72rem;padding:.4rem .5rem;}
+}
+
+/* ════════════════════════════════════
+   QUILL RICH TEXT EDITOR — dark theme
+════════════════════════════════════ */
+.rich-editor-wrap { margin-bottom: 1.2rem; }
+.rich-editor-wrap label {
+  display:block;font-size:.72rem;color:var(--ink2);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:.45rem;font-weight:600;
+}
+.rich-editor-wrap .editor-hint {
+  font-size:.68rem;color:var(--muted);margin-top:.4rem;opacity:.8;
+}
+
+/* Quill toolbar */
+.ql-toolbar.ql-snow {
+  background: #fff !important;
+  border: 1.5px solid var(--border) !important;
+  border-bottom: 1px solid var(--adm-border) !important;
+  border-radius: 10px 10px 0 0 !important;
+  padding: 6px 10px !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.ql-toolbar.ql-snow .ql-formats {
+  margin-right: 6px;
+  border-right: 1px solid var(--adm-border);
+  padding-right: 6px;
+}
+.ql-toolbar.ql-snow .ql-formats:last-child { border-right: none; }
+.ql-toolbar.ql-snow button,
+.ql-toolbar.ql-snow .ql-picker-label {
+  color: var(--ink2) !important;
+  border-radius: 4px !important;
+  transition: background .15s, color .15s;
+}
+.ql-toolbar.ql-snow button:hover,
+.ql-toolbar.ql-snow .ql-picker-label:hover,
+.ql-toolbar.ql-snow button.ql-active,
+.ql-toolbar.ql-snow .ql-picker-label.ql-active {
+  background: rgba(232,97,10,.18) !important;
+  color: var(--orange) !important;
+}
+.ql-toolbar.ql-snow button svg,
+.ql-toolbar.ql-snow .ql-picker-label svg { color: inherit; }
+.ql-toolbar.ql-snow .ql-stroke { stroke: currentColor !important; }
+.ql-toolbar.ql-snow .ql-fill  { fill:   currentColor !important; }
+.ql-toolbar.ql-snow .ql-picker-options {
+  background: #fff !important;
+  border: 1px solid var(--adm-border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4) !important;
+}
+.ql-toolbar.ql-snow .ql-picker-item { color: var(--ink) !important; }
+.ql-toolbar.ql-snow .ql-picker-item:hover { color: var(--orange) !important; background: rgba(232,97,10,.1) !important; }
+/* Quill editor body */
+.ql-container.ql-snow {
+  background: var(--adm-bg) !important;
+  border: 1.5px solid var(--border) !important;
+  border-top: none !important;
+  border-radius: 0 0 10px 10px !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: .9rem !important;
+  color: var(--adm-text) !important;
+  min-height: 160px;
+}
+.ql-container.ql-snow.ql-sm { min-height: 90px; }
+.ql-editor { min-height: inherit; padding: .85rem 1rem; color: var(--ink) !important; line-height: 1.7; }
+.ql-editor.ql-blank::before { color: var(--muted) !important; font-style: normal !important; }
+.ql-editor h1,.ql-editor h2,.ql-editor h3 { color: var(--ink); font-family: 'Playfair Display', serif; margin: .6rem 0 .3rem; }
+.ql-editor strong { color: var(--ink); }
+.ql-editor a { color: var(--orange-mid) !important; }
+.ql-editor blockquote {
+  border-left: 3px solid var(--orange) !important;
+  margin: .5rem 0; padding-left: 1rem;
+  color: var(--adm-muted) !important;
+  font-style: italic;
+}
+.ql-editor ul, .ql-editor ol { padding-left: 1.5rem; }
+.ql-editor li { padding: .15rem 0; }
+.ql-editor code { background: rgba(232,97,10,.1); padding: .1rem .35rem; border-radius: 4px; font-size: .85em; }
+/* Focus glow */
+.ql-container.ql-snow:focus-within {
+  border-color: var(--orange) !important;
+  box-shadow: 0 0 0 3px rgba(232,97,10,.15) !important;
+}
+
+/* Per-panel Quill accent colours */
+
+
+
+
+/* ════════════════════════════════════
+   RICH CONTENT — public display
+════════════════════════════════════ */
+.rich-content { font-size:.88rem; color:var(--ink2); line-height:1.75; }
+.rich-content h1 { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--ink); margin:.6rem 0 .3rem; }
+.rich-content h2 { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--ink); margin:.5rem 0 .25rem; }
+.rich-content h3 { font-family:'Playfair Display',serif; font-size:1rem; color:var(--ink); margin:.4rem 0 .2rem; }
+.rich-content strong { color:var(--ink); font-weight:700; }
+.rich-content em { color:var(--deep); }
+.rich-content a { color:var(--orange); }
+.rich-content ul, .rich-content ol { padding-left:1.5rem; margin:.4rem 0; }
+.rich-content li { padding:.2rem 0; }
+.rich-content blockquote {
+  border-left:3px solid var(--orange); padding-left:1rem; margin:.5rem 0;
+  color:var(--muted); font-style:italic;
+}
+.rich-content p { margin-bottom:.4rem; }
+.acc-body .rich-content { color:var(--ink2); }
+.acc-body .rich-content ul { list-style:disc; }
+.acc-body .rich-content ol { list-style:decimal; }
+
+/* ════════════ BLOG MEDIA TOOLBAR ════════════ */
+.blog-media-bar {
+  display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;
+  padding:.55rem .75rem;background:#f0fdf9;border:1.5px solid #99f6e4;
+  border-bottom:none;border-radius:8px 8px 0 0;
+}
+.blog-media-bar .mb-label {
+  font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:#0f766e;margin-right:.2rem;white-space:nowrap;
+}
+.mb-btn {
+  display:inline-flex;align-items:center;gap:.3rem;padding:.32rem .7rem;
+  font-size:.75rem;font-weight:700;border-radius:6px;cursor:pointer;border:1.5px solid;
+  transition:all .18s;white-space:nowrap;background:#fff;
+}
+.mb-btn:hover { transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.12); }
+.mb-btn.img  { color:#7c3aed;border-color:#c4b5fd; }
+.mb-btn.img:hover  { background:#ede9fe; }
+.mb-btn.tbl  { color:#1d4ed8;border-color:#bfdbfe; }
+.mb-btn.tbl:hover  { background:#dbeafe; }
+.mb-btn.chart{ color:#059669;border-color:#a7f3d0; }
+.mb-btn.chart:hover{ background:#d1fae5; }
+.mb-btn.div  { color:#92400e;border-color:#fde68a; }
+.mb-btn.div:hover  { background:#fef3c7; }
+
+/* Media upload progress inside editor */
+.blog-img-progress {
+  display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;
+  background:#f0fdf9;border:1.5px solid #6ee7b7;border-radius:8px;margin:.4rem 0;
+  font-size:.8rem;color:#065f46;
+}
+.blog-img-progress .bar-bg {
+  flex:1;height:6px;background:#d1fae5;border-radius:100px;overflow:hidden;
+}
+.blog-img-progress .bar-fill {
+  height:100%;background:#059669;border-radius:100px;transition:width .2s;
+}
+
+/* ════════════ MODAL OVERLAY (shared for table/chart/divider builders) ════════════ */
+
+/* Image size select custom toggle */
+#img-custom-wrap { transition: all .2s; }
+.blog-modal-overlay {
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:1rem;
+}
+.blog-modal-overlay.open { display:flex; }
+.blog-modal-box {
+  background:#fff;border-radius:16px;padding:1.8rem;width:100%;max-width:520px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);max-height:90vh;overflow-y:auto;
+}
+.blog-modal-box h3 {
+  font-family:'Playfair Display',serif;color:var(--ink);font-size:1.2rem;
+  margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;
+}
+.bm-field { margin-bottom:1rem; }
+.bm-field label {
+  display:block;font-size:.72rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink2);margin-bottom:.35rem;
+}
+.bm-field input, .bm-field select, .bm-field textarea {
+  width:100%;padding:.65rem .9rem;border:1.5px solid var(--border);
+  border-radius:8px;font-size:.88rem;color:var(--ink);outline:none;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:border .2s;
+}
+.bm-field input:focus,.bm-field select:focus,.bm-field textarea:focus {
+  border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,97,10,.1);
+}
+.bm-field textarea { resize:vertical;min-height:70px; }
+.bm-row { display:grid;grid-template-columns:1fr 1fr;gap:.75rem; }
+.bm-actions { display:flex;gap:.6rem;margin-top:1.4rem;justify-content:flex-end; }
+.bm-actions button {
+  padding:.55rem 1.3rem;border-radius:8px;font-size:.82rem;font-weight:700;
+  cursor:pointer;border:none;transition:all .18s;
+}
+.bm-btn-cancel { background:var(--border);color:var(--ink2); }
+.bm-btn-cancel:hover { background:var(--border2); }
+.bm-btn-insert { background:linear-gradient(135deg,var(--orange),var(--orange-mid));color:#fff; }
+.bm-btn-insert:hover { opacity:.9;transform:translateY(-1px); }
+
+/* Chart preview inside modal */
+#chart-preview-canvas { max-width:100%;margin:.8rem 0;border-radius:8px;border:1.5px solid var(--border); }
+
+/* ════════════ RICH CONTENT — images, tables, charts ════════════ */
+.rich-content img {
+  max-width:100%;height:auto;border-radius:8px;
+  margin:.6rem 0;box-shadow:0 4px 16px rgba(0,0,0,.12);display:block;
+}
+.rich-content table {
+  width:100%;border-collapse:collapse;margin:.8rem 0;
+  border-radius:8px;overflow:hidden;font-size:.86rem;
+}
+.rich-content table th {
+  background:linear-gradient(135deg,var(--orange),var(--orange-mid));
+  color:#fff;padding:.65rem 1rem;text-align:left;font-weight:700;font-size:.8rem;
+}
+.rich-content table td {
+  padding:.6rem 1rem;border-bottom:1px solid var(--border2);color:var(--ink2);
+}
+.rich-content table tr:last-child td { border-bottom:none; }
+.rich-content table tr:nth-child(even) td { background:var(--orange-dim); }
+.rich-content .blog-chart-wrap {
+  margin:.8rem 0;text-align:center;
+}
+.rich-content .blog-chart-wrap canvas {
+  max-width:100%;border-radius:8px;border:1px solid var(--border);
+}
+.rich-content .blog-divider {
+  display:flex;align-items:center;gap:.75rem;margin:1.2rem 0;color:var(--muted);
+  font-size:.78rem;font-style:italic;
+}
+.rich-content .blog-divider::before,.rich-content .blog-divider::after {
+  content:'';flex:1;height:1.5px;background:var(--border);
+}
+.rich-content .blog-video-wrap {
+  position:relative;padding-bottom:56.25%;height:0;overflow:hidden;
+  border-radius:10px;margin:.8rem 0;
+}
+.rich-content .blog-video-wrap iframe {
+  position:absolute;top:0;left:0;width:100%;height:100%;border:none;
+}
+/* Mobile: make blog images responsive */
+@media(max-width:768px) {
+  .rich-content table { font-size:.78rem; }
+  .rich-content table th, .rich-content table td { padding:.45rem .6rem; }
+}
+
+
+/* ════════════════════════════════════
+   FILE UPLOAD UI
+════════════════════════════════════ */
+/* Source toggle tabs */
+.src-tabs { display:flex; gap:0; margin-bottom:.75rem; border-radius:8px; overflow:hidden;
+  border:1.5px solid var(--adm-border); width:fit-content; }
+.src-tab { padding:.42rem 1.1rem; font-size:.75rem; font-weight:700; letter-spacing:.05em;
+  cursor:pointer; transition:all .18s; color:var(--adm-muted); background:var(--adm-bg);
+  border:none; display:flex; align-items:center; gap:.4rem; user-select:none; }
+.src-tab:first-child { border-right:1.5px solid var(--adm-border); }
+.src-tab.active { background:var(--orange); color:#fff; }
+.src-tab:hover:not(.active) { background:var(--adm-srf2); color:var(--adm-text); }
+
+/* Per-panel tab active colours */
+
+/* Drop zone */
+.drop-zone {
+  border:2px dashed var(--border); border-radius:10px;
+  padding:1.6rem 1rem; text-align:center; cursor:pointer;
+  transition:all .2s; background:var(--orange-dim); position:relative;
+}
+.drop-zone:hover, .drop-zone.drag-over {
+  border-color:var(--orange); background:rgba(232,97,10,.06);
+}
+.drop-zone input[type=file] {
+  position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+}
+.drop-zone-icon { font-size:2rem; display:block; margin-bottom:.5rem; opacity:.6; }
+.drop-zone-text { font-size:.82rem; color:var(--ink2); line-height:1.6; }
+.drop-zone-text strong { color:var(--orange); }
+.drop-zone-file-name {
+  margin-top:.6rem; font-size:.8rem; color:var(--adm-text); font-weight:600;
+  background:rgba(232,97,10,.1); padding:.3rem .8rem; border-radius:6px;
+  display:inline-block; max-width:90%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+/* Per-panel drop zone colours */
+
+/* Upload progress bar */
+.upload-progress-wrap { margin-top:.75rem; display:none; }
+.upload-progress-wrap.show { display:block; }
+.upload-progress-bar-bg {
+  background:var(--adm-border); border-radius:100px; height:6px; overflow:hidden;
+}
+.upload-progress-bar-fill {
+  height:100%; border-radius:100px; width:0%;
+  background:linear-gradient(90deg, var(--orange), var(--orange-mid));
+  transition:width .2s;
+}
+.upload-progress-label {
+  font-size:.72rem; color:var(--adm-muted); margin-top:.3rem; display:flex;
+  justify-content:space-between; align-items:center;
+}
+.upload-progress-label span { color:var(--orange); font-weight:700; }
+
+/* URL source section */
+.url-source { display:none; }
+.url-source.show { display:block; }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- ══════════ HEADER ══════════ -->
+<header>
+  <div class="header-inner">
+    <a class="logo" onclick="showPage('home')">
+      <svg class="logo-mark" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22 2 L40 9 L40 24 C40 33 32 40 22 43 C12 40 4 33 4 24 L4 9 Z" fill="url(#lgA)"/>
+        <path d="M22 5.5 L37.5 11.5 L37.5 24 C37.5 31.8 30.8 37.8 22 40.5 C13.2 37.8 6.5 31.8 6.5 24 L6.5 11.5 Z" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <text x="22" y="31" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="14.5" fill="white" letter-spacing="1">LMK</text>
+        <circle cx="22" cy="12" r="2" fill="rgba(255,220,140,0.9)"/>
+        <defs>
+          <linearGradient id="lgA" x1="4" y1="2" x2="40" y2="44" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#f5943a"/>
+            <stop offset="55%" stop-color="#e8610a"/>
+            <stop offset="100%" stop-color="#6e2600"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="logo-text-wrap">
+        <span class="logo-name">LMK Portal</span>
+        <span class="logo-tagline">Educator</span>
+      </div>
+    </a>
+    <nav id="mainNav">
+      <a class="active" onclick="showPage('home',this)">Home</a>
+      <a onclick="showPage('grammar',this)">Grammar</a>
+      <a onclick="showPage('class11',this)">Class 11</a>
+      <a onclick="showPage('class12',this)">Class 12</a>
+      <a class="admin-btn" onclick="openAdmin()">⚙ Admin</a>
+    </nav>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════ HOME ══════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-pill">🎓 Welcome to my classroom</div>
+    <!-- Hero LMK Logo Badge -->
+    <div style="display:flex;justify-content:center;margin-bottom:1.2rem;">
+      <svg style="width:68px;height:68px;filter:drop-shadow(0 6px 18px rgba(232,97,10,.35));" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22 2 L40 9 L40 24 C40 33 32 40 22 43 C12 40 4 33 4 24 L4 9 Z" fill="url(#lgH)"/>
+        <path d="M22 5.5 L37.5 11.5 L37.5 24 C37.5 31.8 30.8 37.8 22 40.5 C13.2 37.8 6.5 31.8 6.5 24 L6.5 11.5 Z" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <text x="22" y="31" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="14.5" fill="white" letter-spacing="1">LMK</text>
+        <circle cx="22" cy="12" r="2" fill="rgba(255,220,140,0.95)"/>
+        <defs>
+          <linearGradient id="lgH" x1="4" y1="2" x2="40" y2="44" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#f5943a"/>
+            <stop offset="55%" stop-color="#e8610a"/>
+            <stop offset="100%" stop-color="#6e2600"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <h1>Inspiring Minds,<br><em>Shaping Futures</em></h1>
+    <p>Your one-stop destination for study materials, video lectures, question papers, and everything you need to excel.</p>
+    <div class="hero-stat-wrap">
+      <div class="stat"><span class="stat-num">15+</span><span class="stat-label">Years Teaching</span></div>
+      <div class="stat"><span class="stat-num">1200+</span><span class="stat-label">Students</span></div>
+      <div class="stat"><span class="stat-num">98%</span><span class="stat-label">Pass Rate</span></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-hdr">
+      <span class="sec-tag">Quick Access</span>
+      <h2 class="sec-title">Everything You <em>Need</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="card-icon">📖</div><h3>Grammar</h3><p>Grammar resources, documents, and study materials for students.</p><span class="card-link" onclick="showPage('grammar')">View Grammar →</span></div>
+      <div class="card"><div class="card-icon">📚</div><h3>Class 11</h3><p>Syllabus, study materials, question papers, videos and more for Class 11.</p><span class="card-link" onclick="showPage('class11')">Go to Class 11 →</span></div>
+      <div class="card"><div class="card-icon">🎓</div><h3>Class 12</h3><p>Syllabus, study materials, question papers, videos and more for Class 12.</p><span class="card-link" onclick="showPage('class12')">Go to Class 12 →</span></div>
+    </div>
+  </div>
+</div>
+
+ <div id="page-grammar" class="page">
+  <div class="page-hdr"><h1>📖 Grammar</h1><p>Grammar resources, documents and study materials</p></div>
+  <div class="section">
+    <div class="sec-hdr">
+      <span class="sec-tag">Resources</span>
+      <h2 class="sec-title">Grammar <em>Materials</em></h2>
+      <div class="divider"></div>
+    </div>
+    <!-- Folder browser for Grammar -->
+    <div id="grammar-folder-nav" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+      <span style="font-size:.78rem;color:var(--muted);">📁</span>
+      <span id="grammar-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+    </div>
+    <div id="grammar-folders" class="folder-grid"></div>
+    <div id="grammar-files" class="material-grid" style="margin-top:1.2rem;"></div>
+  </div>
+</div>
+
+<!-- ══════════ CLASS 11 ══════════ -->
+<div class="page" id="page-class11">
+  <div class="page-hdr"><h1>📚 Class 11</h1><p>All resources for Class 11 students</p></div>
+  <div class="section">
+    <!-- Sub-nav tabs for Class 11 -->
+    <div class="class-subnav" id="c11-subnav">
+      <button class="csn-btn active" onclick="showClassTab('c11','syllabus',this)">📚 Syllabus</button>
+      <button class="csn-btn" onclick="showClassTab('c11','planning',this)">📅 Annual Plan</button>
+      <button class="csn-btn" onclick="showClassTab('c11','material',this)">📂 Study Material</button>
+      <button class="csn-btn" onclick="showClassTab('c11','papers',this)">📝 Papers</button>
+      <button class="csn-btn" onclick="showClassTab('c11','videos',this)">🎬 Videos</button>
+      <button class="csn-btn" onclick="showClassTab('c11','blog',this)">✍️ Blog</button>
+    </div>
+
+    <!-- SYLLABUS -->
+    <div class="class-tab active" id="c11-syllabus">
+      <div class="sec-hdr"><span class="sec-tag">Class 11</span><h2 class="sec-title">Unit-wise <em>Syllabus</em></h2><div class="divider"></div></div>
+      <div class="accordion" id="c11-syllabus-list"><div class="empty-state"><span class="es-icon">📚</span>Syllabus will appear here once added by the teacher.</div></div>
+    </div>
+
+    <!-- ANNUAL PLANNING -->
+    <div class="class-tab" id="c11-planning">
+      <div class="sec-hdr"><span class="sec-tag">Academic Year</span><h2 class="sec-title">Lesson Plan <em>Calendar</em></h2><div class="divider"></div></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Month</th><th>Topics Covered</th><th>Chapter(s)</th><th>Status</th></tr></thead>
+        <tbody id="c11-planning-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No entries yet.</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- STUDY MATERIAL (with folders) -->
+    <div class="class-tab" id="c11-material">
+      <div class="sec-hdr"><span class="sec-tag">Resources</span><h2 class="sec-title">Download & <em>Learn</em></h2><div class="divider"></div></div>
+      <div id="c11-mat-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+        <span style="font-size:.78rem;color:var(--muted);">📁</span>
+        <span id="c11-mat-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+      </div>
+      <div id="c11-mat-folders" class="folder-grid"></div>
+      <div id="c11-material-list" class="material-grid" style="margin-top:1.2rem;">
+        <div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>Study materials will appear here once uploaded by the teacher.</div>
+      </div>
+    </div>
+
+    <!-- PAPERS (with folders) -->
+    <div class="class-tab" id="c11-papers">
+      <div class="sec-hdr"><span class="sec-tag">Downloads</span><h2 class="sec-title">Practice <em>Papers</em></h2><div class="divider"></div></div>
+      <div id="c11-papers-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+        <span style="font-size:.78rem;color:var(--muted);">📁</span>
+        <span id="c11-papers-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+      </div>
+      <div id="c11-papers-folders" class="folder-grid"></div>
+      <div class="tbl-wrap" style="margin-top:1.2rem;">
+        <table><thead><tr><th>Paper Title</th><th>Subject</th><th>Year</th><th>Download</th></tr></thead>
+        <tbody id="c11-papers-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No papers yet.</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- VIDEOS -->
+    <div class="class-tab" id="c11-videos">
+      <div class="sec-hdr"><span class="sec-tag">Library</span><h2 class="sec-title">Watch & <em>Learn</em></h2><div class="divider"></div></div>
+      <div class="video-grid" id="c11-videos-list"><div class="empty-state"><span class="es-icon">🎬</span>No videos added yet.</div></div>
+    </div>
+
+    <!-- BLOG -->
+    <div class="class-tab" id="c11-blog">
+      <div class="sec-hdr"><span class="sec-tag">Latest Posts</span><h2 class="sec-title">Thoughts & <em>Insights</em></h2><div class="divider"></div></div>
+      <div class="blog-list" id="c11-blog-list"><div class="empty-state"><span class="es-icon">✍️</span>No blog posts yet.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CLASS 12 ══════════ -->
+<div class="page" id="page-class12">
+  <div class="page-hdr"><h1>📚 Class 12</h1><p>All resources for Class 12 students</p></div>
+  <div class="section">
+    <div class="class-subnav" id="c12-subnav">
+      <button class="csn-btn active" onclick="showClassTab('c12','syllabus',this)">📚 Syllabus</button>
+      <button class="csn-btn" onclick="showClassTab('c12','planning',this)">📅 Annual Plan</button>
+      <button class="csn-btn" onclick="showClassTab('c12','material',this)">📂 Study Material</button>
+      <button class="csn-btn" onclick="showClassTab('c12','papers',this)">📝 Papers</button>
+      <button class="csn-btn" onclick="showClassTab('c12','videos',this)">🎬 Videos</button>
+      <button class="csn-btn" onclick="showClassTab('c12','blog',this)">✍️ Blog</button>
+    </div>
+
+    <div class="class-tab active" id="c12-syllabus">
+      <div class="sec-hdr"><span class="sec-tag">Class 12</span><h2 class="sec-title">Unit-wise <em>Syllabus</em></h2><div class="divider"></div></div>
+      <div class="accordion" id="c12-syllabus-list"><div class="empty-state"><span class="es-icon">📚</span>Syllabus will appear here once added by the teacher.</div></div>
+    </div>
+
+    <div class="class-tab" id="c12-planning">
+      <div class="sec-hdr"><span class="sec-tag">Academic Year</span><h2 class="sec-title">Lesson Plan <em>Calendar</em></h2><div class="divider"></div></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Month</th><th>Topics Covered</th><th>Chapter(s)</th><th>Status</th></tr></thead>
+        <tbody id="c12-planning-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No entries yet.</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <div class="class-tab" id="c12-material">
+      <div class="sec-hdr"><span class="sec-tag">Resources</span><h2 class="sec-title">Download & <em>Learn</em></h2><div class="divider"></div></div>
+      <div id="c12-mat-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+        <span style="font-size:.78rem;color:var(--muted);">📁</span>
+        <span id="c12-mat-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+      </div>
+      <div id="c12-mat-folders" class="folder-grid"></div>
+      <div id="c12-material-list" class="material-grid" style="margin-top:1.2rem;">
+        <div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>Study materials will appear here once uploaded by the teacher.</div>
+      </div>
+    </div>
+
+    <div class="class-tab" id="c12-papers">
+      <div class="sec-hdr"><span class="sec-tag">Downloads</span><h2 class="sec-title">Practice <em>Papers</em></h2><div class="divider"></div></div>
+      <div id="c12-papers-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+        <span style="font-size:.78rem;color:var(--muted);">📁</span>
+        <span id="c12-papers-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+      </div>
+      <div id="c12-papers-folders" class="folder-grid"></div>
+      <div class="tbl-wrap" style="margin-top:1.2rem;">
+        <table><thead><tr><th>Paper Title</th><th>Subject</th><th>Year</th><th>Download</th></tr></thead>
+        <tbody id="c12-papers-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No papers yet.</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <div class="class-tab" id="c12-videos">
+      <div class="sec-hdr"><span class="sec-tag">Library</span><h2 class="sec-title">Watch & <em>Learn</em></h2><div class="divider"></div></div>
+      <div class="video-grid" id="c12-videos-list"><div class="empty-state"><span class="es-icon">🎬</span>No videos added yet.</div></div>
+    </div>
+
+    <div class="class-tab" id="c12-blog">
+      <div class="sec-hdr"><span class="sec-tag">Latest Posts</span><h2 class="sec-title">Thoughts & <em>Insights</em></h2><div class="divider"></div></div>
+      <div class="blog-list" id="c12-blog-list"><div class="empty-state"><span class="es-icon">✍️</span>No blog posts yet.</div></div>
+    </div>
+  </div>
+</div>
+  
+<footer>© 2025 LMK. Portal · Educator · All rights reserved</footer>
+
+
+<!-- ══════════════════════════════
+     ADMIN OVERLAY
+══════════════════════════════ -->
+<div id="admin-overlay">
+
+  <!-- LOGIN -->
+  <div id="admin-login" class="login-wrap">
+    <div class="login-box">
+      <div class="logo-big">
+        <svg style="width:42px;height:42px;flex-shrink:0;" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 2 L40 9 L40 24 C40 33 32 40 22 43 C12 40 4 33 4 24 L4 9 Z" fill="url(#lgB)"/>
+          <path d="M22 5.5 L37.5 11.5 L37.5 24 C37.5 31.8 30.8 37.8 22 40.5 C13.2 37.8 6.5 31.8 6.5 24 L6.5 11.5 Z" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          <text x="22" y="31" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="14.5" fill="white" letter-spacing="1">LMK</text>
+          <circle cx="22" cy="12" r="2" fill="rgba(255,220,140,0.9)"/>
+          <defs>
+            <linearGradient id="lgB" x1="4" y1="2" x2="40" y2="44" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#f5943a"/><stop offset="55%" stop-color="#e8610a"/><stop offset="100%" stop-color="#6e2600"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        Admin Panel
+      </div>
+      <p>Teacher access only. Students please go back to the website.</p>
+      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+      <div class="login-err" id="login-err">❌ Incorrect email or password.</div>
+      <br>
+      <button class="btn" id="login-btn" onclick="doLogin()">Sign In to Admin</button>
+      <br><br>
+      <button class="btn btn-ghost" onclick="closeAdmin()">← Back to Website</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="admin-dashboard" style="display:none;">
+    <div class="admin-layout">
+
+      <div class="admin-sidebar">
+        <div class="s-logo">
+          <svg style="width:28px;height:28px;flex-shrink:0;" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 2 L40 9 L40 24 C40 33 32 40 22 43 C12 40 4 33 4 24 L4 9 Z" fill="url(#lgC)"/>
+            <text x="22" y="31" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="14.5" fill="white" letter-spacing="1">LMK</text>
+            <defs>
+              <linearGradient id="lgC" x1="4" y1="2" x2="40" y2="44" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#f5943a"/><stop offset="100%" stop-color="#6e2600"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span>LMK Admin</span>
+        </div>
+        <div class="sidebar-section">Grammar</div>
+        <div class="sidebar-item active" onclick="switchPanel('grammar-admin-panel',this)"><span class="si-icon">📖</span>Grammar</div>
+        <div class="sidebar-section">Class 11</div>
+        <div class="sidebar-item" onclick="switchPanel('c11-videos-panel',this)"><span class="si-icon">🎬</span>Videos</div>
+        <div class="sidebar-item" onclick="switchPanel('c11-blog-panel',this)"><span class="si-icon">✍️</span>Blog</div>
+        <div class="sidebar-item" onclick="switchPanel('c11-papers-panel',this)"><span class="si-icon">📝</span>Papers</div>
+        <div class="sidebar-item" onclick="switchPanel('c11-material-panel',this)"><span class="si-icon">📂</span>Study Material</div>
+        <div class="sidebar-item" onclick="switchPanel('c11-syllabus-panel',this)"><span class="si-icon">📚</span>Syllabus</div>
+        <div class="sidebar-item" onclick="switchPanel('c11-planning-panel',this)"><span class="si-icon">📅</span>Planning</div>
+        <div class="sidebar-section">Class 12</div>
+        <div class="sidebar-item" onclick="switchPanel('c12-videos-panel',this)"><span class="si-icon">🎬</span>Videos</div>
+        <div class="sidebar-item" onclick="switchPanel('c12-blog-panel',this)"><span class="si-icon">✍️</span>Blog</div>
+        <div class="sidebar-item" onclick="switchPanel('c12-papers-panel',this)"><span class="si-icon">📝</span>Papers</div>
+        <div class="sidebar-item" onclick="switchPanel('c12-material-panel',this)"><span class="si-icon">📂</span>Study Material</div>
+        <div class="sidebar-item" onclick="switchPanel('c12-syllabus-panel',this)"><span class="si-icon">📚</span>Syllabus</div>
+        <div class="sidebar-item" onclick="switchPanel('c12-planning-panel',this)"><span class="si-icon">📅</span>Planning</div>
+        <div class="sidebar-logout">
+          <div class="sidebar-item" onclick="closeAdmin()"><span class="si-icon">👁</span>View Site</div>
+          <div class="sidebar-item" onclick="doLogout()"><span class="si-icon">🚪</span>Logout</div>
+        </div>
+      </div>
+
+      <div class="admin-main">
+
+        <!-- ══ GRAMMAR PANEL ══ -->
+        <div class="admin-panel active" id="grammar-admin-panel">
+          <h2>📖 Grammar</h2>
+          <p class="panel-desc">Create folders/subfolders and upload any documents to the Grammar section.</p>
+
+          <!-- Folder Manager -->
+          <div class="add-form">
+            <h3>📁 Create Folder</h3>
+            <div class="form-row">
+              <div class="field"><label>Parent Folder</label>
+                <select id="gram-parent-folder"><option value="">— Root (top level) —</option></select>
+              </div>
+              <div class="field"><label>New Folder Name</label>
+                <input id="gram-new-folder" placeholder="e.g. Tenses, Comprehension…">
+              </div>
+            </div>
+            <button class="btn btn-sm" onclick="adminCreateFolder('grammar')">Create Folder</button>
+          </div>
+
+          <!-- Upload file -->
+          <div class="add-form" style="margin-top:1rem;">
+            <h3>+ Upload Document</h3>
+            <div class="field"><label>Title</label><input id="gram-title" placeholder="e.g. Tense Chart PDF"></div>
+            <div class="field"><label>Upload to Folder</label>
+              <select id="gram-folder-target"><option value="">— Root —</option></select>
+            </div>
+            <div class="drop-zone" id="gram-drop-zone"
+              ondragover="dzDragOver(event,'gram-drop-zone')"
+              ondragleave="dzDragLeave('gram-drop-zone')"
+              ondrop="dzDrop(event,'gram-file-input','gram-drop-zone','gram-file-name')">
+              <input type="file" id="gram-file-input"
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.txt,.csv"
+                onchange="dzPick(this,'gram-file-name')">
+              <span class="drop-zone-icon">📎</span>
+              <div class="drop-zone-text">
+                <strong>Click to browse</strong> or drag &amp; drop<br>
+                <small>PDF, Word, PPT, Excel, Images, ZIP, TXT · Max 25 MB</small>
+              </div>
+              <div class="drop-zone-file-name" id="gram-file-name" style="display:none"></div>
+            </div>
+            <div class="upload-progress-wrap" id="gram-progress-wrap">
+              <div class="upload-progress-bar-bg"><div class="upload-progress-bar-fill" id="gram-progress-fill"></div></div>
+              <div class="upload-progress-label">Uploading… <span id="gram-progress-pct">0%</span></div>
+            </div>
+            <br>
+            <button class="btn btn-sm" onclick="adminAddGrammarFile()">Upload File</button>
+          </div>
+
+          <span class="items-label">Folders & Files</span>
+          <div class="items-list" id="admin-grammar-list"></div>
+        </div>
+
+        <!-- ══ CLASS 11 PANELS ══ -->
+        <!-- C11 VIDEOS -->
+        <div class="admin-panel" id="c11-videos-panel">
+          <h2>🎬 Class 11 — Videos</h2>
+          <p class="panel-desc">Add YouTube video links for Class 11 students.</p>
+          <div class="add-form"><h3>+ Add Video</h3>
+            <div class="field"><label>Title</label><input id="c11-v-title" placeholder="e.g. Chapter 1 Introduction"></div>
+            <div class="form-row">
+              <div class="field"><label>YouTube Link</label><input id="c11-v-url" placeholder="https://youtube.com/watch?v=…"></div>
+              <div class="field"><label>Subject</label><input id="c11-v-subject" placeholder="e.g. English Grammar"></div>
+            </div>
+            <button class="btn btn-sm" onclick="adminAddVideo('c11')">Add Video</button>
+          </div>
+          <span class="items-label">Saved Videos</span>
+          <div class="items-list" id="admin-c11-videos-list"></div>
+        </div>
+
+        <!-- C11 BLOG -->
+        <div class="admin-panel" id="c11-blog-panel">
+          <h2>✍️ Class 11 — Blog</h2>
+          <p class="panel-desc">Write articles for Class 11 students.</p>
+          <div class="add-form"><h3>+ Write Post</h3>
+            <div class="field"><label>Post Title</label><input id="c11-b-title" placeholder="e.g. How to prepare for exams"></div>
+            <div class="rich-editor-wrap">
+              <label>Content</label>
+              <div class="blog-media-bar">
+                <span class="mb-label">Insert:</span>
+                <button type="button" class="mb-btn img" onclick="blogInsertImage('c11-b-content-editor')">🖼️ Image</button>
+                <button type="button" class="mb-btn tbl" onclick="blogOpenTableModal()">📋 Table</button>
+                <button type="button" class="mb-btn chart" onclick="blogOpenChartModal()">📊 Chart</button>
+                <button type="button" class="mb-btn div" onclick="blogInsertDivider()">— Divider</button>
+              </div>
+              <input type="file" id="c11-b-img-input" accept="image/*" style="display:none" onchange="blogHandleImageUpload(this,'_qC11Blog')">
+              <div id="c11-b-content-editor"></div>
+            </div>
+            <div class="field"><label>Tags</label><input id="c11-b-tags" placeholder="e.g. Exam Tips, Grammar"></div>
+            <button class="btn btn-sm" onclick="adminAddBlog('c11')">Publish Post</button>
+          </div>
+          <span class="items-label">Published Posts</span>
+          <div class="items-list" id="admin-c11-blog-list"></div>
+        </div>
+
+        <!-- C11 PAPERS -->
+        <div class="admin-panel" id="c11-papers-panel">
+          <h2>📝 Class 11 — Papers</h2>
+          <p class="panel-desc">Upload papers or paste links. Optionally organise into folders.</p>
+          <div class="add-form"><h3>📁 Create Folder</h3>
+            <div class="form-row">
+              <div class="field"><label>Parent Folder</label>
+                <select id="c11-papers-parent-folder"><option value="">— Root —</option></select>
+              </div>
+              <div class="field"><label>Folder Name</label>
+                <input id="c11-papers-new-folder" placeholder="e.g. Mid-Term, Finals…">
+              </div>
+            </div>
+            <button class="btn btn-sm" onclick="adminCreateFolder('c11-papers')">Create Folder</button>
+          </div>
+          <div class="add-form" style="margin-top:1rem;"><h3>+ Add Paper</h3>
+            <div class="field"><label>Paper Title</label><input id="c11-p-title" placeholder="e.g. Mid-Term 2024"></div>
+            <div class="form-row">
+              <div class="field"><label>Subject</label><input id="c11-p-subject" placeholder="e.g. English"></div>
+              <div class="field"><label>Year</label><input id="c11-p-year" placeholder="e.g. 2024" style="max-width:180px"></div>
+            </div>
+            <div class="field"><label>Upload to Folder</label>
+              <select id="c11-papers-folder-target"><option value="">— Root —</option></select>
+            </div>
+            <div class="src-tabs">
+              <button class="src-tab active" onclick="srcSwitch('c11p','upload',this)">📎 Upload</button>
+              <button class="src-tab" onclick="srcSwitch('c11p','link',this)">🔗 Paste Link</button>
+            </div>
+            <div id="c11p-upload-zone-wrap">
+              <div class="drop-zone" id="c11p-drop-zone"
+                ondragover="dzDragOver(event,'c11p-drop-zone')"
+                ondragleave="dzDragLeave('c11p-drop-zone')"
+                ondrop="dzDrop(event,'c11p-file-input','c11p-drop-zone','c11p-file-name')">
+                <input type="file" id="c11p-file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png"
+                  onchange="dzPick(this,'c11p-file-name')">
+                <span class="drop-zone-icon">📄</span>
+                <div class="drop-zone-text"><strong>Click to browse</strong> or drag &amp; drop<br><small>PDF, Word, PPT, Excel, Images · Max 25 MB</small></div>
+                <div class="drop-zone-file-name" id="c11p-file-name" style="display:none"></div>
+              </div>
+              <div class="upload-progress-wrap" id="c11p-progress-wrap">
+                <div class="upload-progress-bar-bg"><div class="upload-progress-bar-fill" id="c11p-progress-fill"></div></div>
+                <div class="upload-progress-label">Uploading… <span id="c11p-progress-pct">0%</span></div>
+              </div>
+            </div>
+            <div class="url-source" id="c11p-link-wrap">
+              <div class="field"><label>Link</label><input id="c11p-url" placeholder="https://drive.google.com/…"></div>
+            </div>
+            <br><button class="btn btn-sm" onclick="adminAddPaper('c11')">Add Paper</button>
+          </div>
+          <span class="items-label">Uploaded Papers</span>
+          <div class="items-list" id="admin-c11-papers-list"></div>
+        </div>
+
+        <!-- C11 MATERIAL -->
+        <div class="admin-panel" id="c11-material-panel">
+          <h2>📂 Class 11 — Study Material</h2>
+          <p class="panel-desc">Upload notes, worksheets or resources. Organise into folders.</p>
+          <div class="add-form"><h3>📁 Create Folder</h3>
+            <div class="form-row">
+              <div class="field"><label>Parent Folder</label>
+                <select id="c11-mat-parent-folder"><option value="">— Root —</option></select>
+              </div>
+              <div class="field"><label>Folder Name</label>
+                <input id="c11-mat-new-folder" placeholder="e.g. Chapter 1, Grammar Notes…">
+              </div>
+            </div>
+            <button class="btn btn-sm" onclick="adminCreateFolder('c11-material')">Create Folder</button>
+          </div>
+          <div class="add-form" style="margin-top:1rem;"><h3>+ Add Material</h3>
+            <div class="field"><label>Title</label><input id="c11-m-title" placeholder="e.g. Ch1 Notes"></div>
+            <div class="form-row">
+              <div class="field"><label>Type</label>
+                <select id="c11-m-type">
+                  <option value="Notes">📄 Notes</option><option value="Worksheet">📋 Worksheet</option>
+                  <option value="Reference">📘 Reference</option><option value="Formula Sheet">🔢 Formula Sheet</option>
+                  <option value="Assignment">✏️ Assignment</option>
+                </select>
+              </div>
+              <div class="field"><label>Subject</label><input id="c11-m-subject" placeholder="e.g. English"></div>
+            </div>
+            <div class="field"><label>Upload to Folder</label>
+              <select id="c11-mat-folder-target"><option value="">— Root —</option></select>
+            </div>
+            <div class="src-tabs">
+              <button class="src-tab active" onclick="srcSwitch('c11m','upload',this)">📎 Upload</button>
+              <button class="src-tab" onclick="srcSwitch('c11m','link',this)">🔗 Paste Link</button>
+            </div>
+            <div id="c11m-upload-zone-wrap">
+              <div class="drop-zone" id="c11m-drop-zone"
+                ondragover="dzDragOver(event,'c11m-drop-zone')"
+                ondragleave="dzDragLeave('c11m-drop-zone')"
+                ondrop="dzDrop(event,'c11m-file-input','c11m-drop-zone','c11m-file-name')">
+                <input type="file" id="c11m-file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip"
+                  onchange="dzPick(this,'c11m-file-name')">
+                <span class="drop-zone-icon">📂</span>
+                <div class="drop-zone-text"><strong>Click to browse</strong> or drag &amp; drop<br><small>PDF, Word, PPT, Excel, Images, ZIP · Max 25 MB</small></div>
+                <div class="drop-zone-file-name" id="c11m-file-name" style="display:none"></div>
+              </div>
+              <div class="upload-progress-wrap" id="c11m-progress-wrap">
+                <div class="upload-progress-bar-bg"><div class="upload-progress-bar-fill" id="c11m-progress-fill"></div></div>
+                <div class="upload-progress-label">Uploading… <span id="c11m-progress-pct">0%</span></div>
+              </div>
+            </div>
+            <div class="url-source" id="c11m-link-wrap">
+              <div class="field"><label>Link</label><input id="c11m-url" placeholder="https://drive.google.com/…"></div>
+            </div>
+            <br><button class="btn btn-sm" onclick="adminAddMaterial('c11')">Add Material</button>
+          </div>
+          <span class="items-label">Saved Materials</span>
+          <div class="items-list" id="admin-c11-material-list"></div>
+        </div>
+
+        <!-- C11 SYLLABUS -->
+        <div class="admin-panel" id="c11-syllabus-panel">
+          <h2>📚 Class 11 — Syllabus</h2>
+          <p class="panel-desc">Each entry becomes an expandable unit on the Class 11 Syllabus tab.</p>
+          <div class="add-form"><h3>+ Add Unit</h3>
+            <div class="field"><label>Unit / Chapter Title</label><input id="c11-s-title" placeholder="e.g. Unit 1: Prose"></div>
+            <div class="rich-editor-wrap">
+              <label>Topics &amp; Content</label>
+              <div id="c11-s-topics-editor"></div>
+            </div>
+            <button class="btn btn-sm" onclick="adminAddSyllabus('c11')">Add Unit</button>
+          </div>
+          <span class="items-label">Saved Units</span>
+          <div class="items-list" id="admin-c11-syllabus-list"></div>
+        </div>
+
+        <!-- C11 PLANNING -->
+        <div class="admin-panel" id="c11-planning-panel">
+          <h2>📅 Class 11 — Annual Planning</h2>
+          <p class="panel-desc">Add month-wise entries for Class 11.</p>
+          <div class="add-form"><h3>+ Add Month Entry</h3>
+            <div class="form-row">
+              <div class="field"><label>Month</label><input id="c11-pl-month" placeholder="e.g. June"></div>
+              <div class="field"><label>Chapter(s)</label><input id="c11-pl-chapter" placeholder="e.g. Ch. 1–2"></div>
+            </div>
+            <div class="rich-editor-wrap">
+              <label>Topics Covered</label>
+              <div id="c11-pl-topics-editor"></div>
+            </div>
+            <div class="field"><label>Status</label>
+              <select id="c11-pl-status">
+                <option value="completed">✅ Completed</option>
+                <option value="progress">🔄 In Progress</option>
+                <option value="upcoming">📌 Upcoming</option>
+              </select>
+            </div>
+            <button class="btn btn-sm" onclick="adminAddPlanning('c11')">Add Entry</button>
+          </div>
+          <span class="items-label">Planning Entries</span>
+          <div class="items-list" id="admin-c11-planning-list"></div>
+        </div>
+
+        <!-- ══ CLASS 12 PANELS ══ -->
+        <!-- C12 VIDEOS -->
+        <div class="admin-panel" id="c12-videos-panel">
+          <h2>🎬 Class 12 — Videos</h2>
+          <p class="panel-desc">Add YouTube video links for Class 12 students.</p>
+          <div class="add-form"><h3>+ Add Video</h3>
+            <div class="field"><label>Title</label><input id="c12-v-title" placeholder="e.g. Chapter 1 Introduction"></div>
+            <div class="form-row">
+              <div class="field"><label>YouTube Link</label><input id="c12-v-url" placeholder="https://youtube.com/watch?v=…"></div>
+              <div class="field"><label>Subject</label><input id="c12-v-subject" placeholder="e.g. English Grammar"></div>
+            </div>
+            <button class="btn btn-sm" onclick="adminAddVideo('c12')">Add Video</button>
+          </div>
+          <span class="items-label">Saved Videos</span>
+          <div class="items-list" id="admin-c12-videos-list"></div>
+        </div>
+
+        <!-- C12 BLOG -->
+        <div class="admin-panel" id="c12-blog-panel">
+          <h2>✍️ Class 12 — Blog</h2>
+          <p class="panel-desc">Write articles for Class 12 students.</p>
+          <div class="add-form"><h3>+ Write Post</h3>
+            <div class="field"><label>Post Title</label><input id="c12-b-title" placeholder="e.g. Board exam preparation tips"></div>
+            <div class="rich-editor-wrap">
+              <label>Content</label>
+              <div class="blog-media-bar">
+                <span class="mb-label">Insert:</span>
+                <button type="button" class="mb-btn img" onclick="blogInsertImage('c12-b-content-editor')">🖼️ Image</button>
+                <button type="button" class="mb-btn tbl" onclick="blogOpenTableModal()">📋 Table</button>
+                <button type="button" class="mb-btn chart" onclick="blogOpenChartModal()">📊 Chart</button>
+                <button type="button" class="mb-btn div" onclick="blogInsertDivider()">— Divider</button>
+              </div>
+              <input type="file" id="c12-b-img-input" accept="image/*" style="display:none" onchange="blogHandleImageUpload(this,'_qC12Blog')">
+              <div id="c12-b-content-editor"></div>
+            </div>
+            <div class="field"><label>Tags</label><input id="c12-b-tags" placeholder="e.g. Board Exam, Tips"></div>
+            <button class="btn btn-sm" onclick="adminAddBlog('c12')">Publish Post</button>
+          </div>
+          <span class="items-label">Published Posts</span>
+          <div class="items-list" id="admin-c12-blog-list"></div>
+        </div>
+
+        <!-- C12 PAPERS -->
+        <div class="admin-panel" id="c12-papers-panel">
+          <h2>📝 Class 12 — Papers</h2>
+          <p class="panel-desc">Upload papers or paste links for Class 12.</p>
+          <div class="add-form"><h3>📁 Create Folder</h3>
+            <div class="form-row">
+              <div class="field"><label>Parent Folder</label>
+                <select id="c12-papers-parent-folder"><option value="">— Root —</option></select>
+              </div>
+              <div class="field"><label>Folder Name</label>
+                <input id="c12-papers-new-folder" placeholder="e.g. Mid-Term, Finals…">
+              </div>
+            </div>
+            <button class="btn btn-sm" onclick="adminCreateFolder('c12-papers')">Create Folder</button>
+          </div>
+          <div class="add-form" style="margin-top:1rem;"><h3>+ Add Paper</h3>
+            <div class="field"><label>Paper Title</label><input id="c12-p-title" placeholder="e.g. Board Exam 2024"></div>
+            <div class="form-row">
+              <div class="field"><label>Subject</label><input id="c12-p-subject" placeholder="e.g. English"></div>
+              <div class="field"><label>Year</label><input id="c12-p-year" placeholder="e.g. 2024"></div>
+            </div>
+            <div class="field"><label>Upload to Folder</label>
+              <select id="c12-papers-folder-target"><option value="">— Root —</option></select>
+            </div>
+            <div class="src-tabs">
+              <button class="src-tab active" onclick="srcSwitch('c12p','upload',this)">📎 Upload</button>
+              <button class="src-tab" onclick="srcSwitch('c12p','link',this)">🔗 Paste Link</button>
+            </div>
+            <div id="c12p-upload-zone-wrap">
+              <div class="drop-zone" id="c12p-drop-zone"
+                ondragover="dzDragOver(event,'c12p-drop-zone')"
+                ondragleave="dzDragLeave('c12p-drop-zone')"
+                ondrop="dzDrop(event,'c12p-file-input','c12p-drop-zone','c12p-file-name')">
+                <input type="file" id="c12p-file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png"
+                  onchange="dzPick(this,'c12p-file-name')">
+                <span class="drop-zone-icon">📄</span>
+                <div class="drop-zone-text"><strong>Click to browse</strong> or drag &amp; drop<br><small>PDF, Word, PPT, Excel, Images · Max 25 MB</small></div>
+                <div class="drop-zone-file-name" id="c12p-file-name" style="display:none"></div>
+              </div>
+              <div class="upload-progress-wrap" id="c12p-progress-wrap">
+                <div class="upload-progress-bar-bg"><div class="upload-progress-bar-fill" id="c12p-progress-fill"></div></div>
+                <div class="upload-progress-label">Uploading… <span id="c12p-progress-pct">0%</span></div>
+              </div>
+            </div>
+            <div class="url-source" id="c12p-link-wrap">
+              <div class="field"><label>Link</label><input id="c12p-url" placeholder="https://drive.google.com/…"></div>
+            </div>
+            <br><button class="btn btn-sm" onclick="adminAddPaper('c12')">Add Paper</button>
+          </div>
+          <span class="items-label">Uploaded Papers</span>
+          <div class="items-list" id="admin-c12-papers-list"></div>
+        </div>
+
+        <!-- C12 MATERIAL -->
+        <div class="admin-panel" id="c12-material-panel">
+          <h2>📂 Class 12 — Study Material</h2>
+          <p class="panel-desc">Upload notes, worksheets or resources for Class 12.</p>
+          <div class="add-form"><h3>📁 Create Folder</h3>
+            <div class="form-row">
+              <div class="field"><label>Parent Folder</label>
+                <select id="c12-mat-parent-folder"><option value="">— Root —</option></select>
+              </div>
+              <div class="field"><label>Folder Name</label>
+                <input id="c12-mat-new-folder" placeholder="e.g. Chapter 1…">
+              </div>
+            </div>
+            <button class="btn btn-sm" onclick="adminCreateFolder('c12-material')">Create Folder</button>
+          </div>
+          <div class="add-form" style="margin-top:1rem;"><h3>+ Add Material</h3>
+            <div class="field"><label>Title</label><input id="c12-m-title" placeholder="e.g. Ch1 Notes"></div>
+            <div class="form-row">
+              <div class="field"><label>Type</label>
+                <select id="c12-m-type">
+                  <option value="Notes">📄 Notes</option><option value="Worksheet">📋 Worksheet</option>
+                  <option value="Reference">📘 Reference</option><option value="Formula Sheet">🔢 Formula Sheet</option>
+                  <option value="Assignment">✏️ Assignment</option>
+                </select>
+              </div>
+              <div class="field"><label>Subject</label><input id="c12-m-subject" placeholder="e.g. English"></div>
+            </div>
+            <div class="field"><label>Upload to Folder</label>
+              <select id="c12-mat-folder-target"><option value="">— Root —</option></select>
+            </div>
+            <div class="src-tabs">
+              <button class="src-tab active" onclick="srcSwitch('c12m','upload',this)">📎 Upload</button>
+              <button class="src-tab" onclick="srcSwitch('c12m','link',this)">🔗 Paste Link</button>
+            </div>
+            <div id="c12m-upload-zone-wrap">
+              <div class="drop-zone" id="c12m-drop-zone"
+                ondragover="dzDragOver(event,'c12m-drop-zone')"
+                ondragleave="dzDragLeave('c12m-drop-zone')"
+                ondrop="dzDrop(event,'c12m-file-input','c12m-drop-zone','c12m-file-name')">
+                <input type="file" id="c12m-file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip"
+                  onchange="dzPick(this,'c12m-file-name')">
+                <span class="drop-zone-icon">📂</span>
+                <div class="drop-zone-text"><strong>Click to browse</strong> or drag &amp; drop<br><small>PDF, Word, PPT, Excel, Images, ZIP · Max 25 MB</small></div>
+                <div class="drop-zone-file-name" id="c12m-file-name" style="display:none"></div>
+              </div>
+              <div class="upload-progress-wrap" id="c12m-progress-wrap">
+                <div class="upload-progress-bar-bg"><div class="upload-progress-bar-fill" id="c12m-progress-fill"></div></div>
+                <div class="upload-progress-label">Uploading… <span id="c12m-progress-pct">0%</span></div>
+              </div>
+            </div>
+            <div class="url-source" id="c12m-link-wrap">
+              <div class="field"><label>Link</label><input id="c12m-url" placeholder="https://drive.google.com/…"></div>
+            </div>
+            <br><button class="btn btn-sm" onclick="adminAddMaterial('c12')">Add Material</button>
+          </div>
+          <span class="items-label">Saved Materials</span>
+          <div class="items-list" id="admin-c12-material-list"></div>
+        </div>
+
+        <!-- C12 SYLLABUS -->
+        <div class="admin-panel" id="c12-syllabus-panel">
+          <h2>📚 Class 12 — Syllabus</h2>
+          <p class="panel-desc">Each entry becomes an expandable unit on the Class 12 Syllabus tab.</p>
+          <div class="add-form"><h3>+ Add Unit</h3>
+            <div class="field"><label>Unit / Chapter Title</label><input id="c12-s-title" placeholder="e.g. Unit 1: Flamingo"></div>
+            <div class="rich-editor-wrap">
+              <label>Topics &amp; Content</label>
+              <div id="c12-s-topics-editor"></div>
+            </div>
+            <button class="btn btn-sm" onclick="adminAddSyllabus('c12')">Add Unit</button>
+          </div>
+          <span class="items-label">Saved Units</span>
+          <div class="items-list" id="admin-c12-syllabus-list"></div>
+        </div>
+
+        <!-- C12 PLANNING -->
+        <div class="admin-panel" id="c12-planning-panel">
+          <h2>📅 Class 12 — Annual Planning</h2>
+          <p class="panel-desc">Add month-wise entries for Class 12.</p>
+          <div class="add-form"><h3>+ Add Month Entry</h3>
+            <div class="form-row">
+              <div class="field"><label>Month</label><input id="c12-pl-month" placeholder="e.g. June"></div>
+              <div class="field"><label>Chapter(s)</label><input id="c12-pl-chapter" placeholder="e.g. Ch. 1–2"></div>
+            </div>
+            <div class="rich-editor-wrap">
+              <label>Topics Covered</label>
+              <div id="c12-pl-topics-editor"></div>
+            </div>
+            <div class="field"><label>Status</label>
+              <select id="c12-pl-status">
+                <option value="completed">✅ Completed</option>
+                <option value="progress">🔄 In Progress</option>
+                <option value="upcoming">📌 Upcoming</option>
+              </select>
+            </div>
+            <button class="btn btn-sm" onclick="adminAddPlanning('c12')">Add Entry</button>
+          </div>
+          <span class="items-label">Planning Entries</span>
+          <div class="items-list" id="admin-c12-planning-list"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div><!-- /admin-overlay -->
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ── NAV ──
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pageEl = document.getElementById('page-' + id);
+  if(pageEl) pageEl.classList.add('active');
+
+  document.querySelectorAll('nav a:not(.admin-btn)').forEach(a => a.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('mainNav').classList.remove('open');
+}
+
+function toggleMenu() {
+  document.getElementById('mainNav').classList.toggle('open');
+}
+
+// ── TOAST ──
+function toast(msg, ok=true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = ok ? 'var(--orange)' : '#c0392b';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── ADMIN OPEN/CLOSE ──
+function openAdmin() {
+  document.getElementById('admin-overlay').classList.add('open');
+  window._loggedIn ? showDashboard() : showLoginScreen();
+}
+function closeAdmin() { document.getElementById('admin-overlay').classList.remove('open'); }
+function showLoginScreen() {
+  document.getElementById('admin-login').style.display = 'flex';
+  document.getElementById('admin-dashboard').style.display = 'none';
+}
+function showDashboard() {
+  document.getElementById('admin-login').style.display = 'none';
+  document.getElementById('admin-dashboard').style.display = 'block';
+  loadAllAdmin();
+}
+
+// ── AUTH ──
+window._loggedIn = false;
+window.addEventListener('fb-ready', () => {
+  loadAllPublic();
+});
+
+async function doLogin() {
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-err');
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  err.style.display = 'none';
+  btn.innerHTML = '<span class="spinner"></span> Signing in…';
+  btn.disabled = true;
+  // ── Hardcoded admin credentials ──
+  const ADMIN_EMAIL    = 'lmkalehsc2026@gmail.com';
+  const ADMIN_PASSWORD = 'lmkale2026';
+  if (email !== ADMIN_EMAIL || pass !== ADMIN_PASSWORD) {
+    err.style.display = 'block';
+    btn.innerHTML = 'Sign In to Admin'; btn.disabled = false;
+    return;
+  }
+  try {
+    await window.FB.signIn(email, pass);
+  } catch(e) {
+    console.warn('Firebase Auth sign-in skipped:', e.message);
+  }
+  window._loggedIn = true;
+  showDashboard(); toast('Welcome back! 👋');
+  btn.innerHTML = 'Sign In to Admin'; btn.disabled = false;
+}
+async function doLogout() {
+  try { await window.FB.signOut(); } catch(e) { console.warn('Signout:', e.message); }
+  window._loggedIn = false;
+  showLoginScreen(); closeAdmin(); toast('Logged out.');
+}
+
+// ── SWITCH PANEL ──
+function switchPanel(id, el) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── YOUTUBE ──
+function ytThumb(url) {
+  const m = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
+  return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : '';
+}
+function ytEmbed(url) {
+  const m = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
+  return m ? `https://www.youtube.com/watch?v=${m[1]}` : url;
+}
+
+// ── LOAD PUBLIC ──
+async function loadAllPublic() {
+  if (!window.FB) return;
+  try {
+    await Promise.all([
+      loadPublicClassVideos('c11'), loadPublicClassBlog('c11'),
+      loadPublicClassPapers('c11'), loadPublicClassMaterial('c11'),
+      loadPublicClassSyllabus('c11'), loadPublicClassPlanning('c11'),
+      loadPublicClassVideos('c12'), loadPublicClassBlog('c12'),
+      loadPublicClassPapers('c12'), loadPublicClassMaterial('c12'),
+      loadPublicClassSyllabus('c12'), loadPublicClassPlanning('c12'),
+      loadPublicGrammarFolders(''), loadPublicGrammarFiles('')
+    ]);
+  } catch(e) { console.log('Firebase not configured yet.'); }
+}
+
+// ─── PUBLIC: CLASS VIDEOS ───
+async function loadPublicClassVideos(cls) {
+  const items = await window.FB.loadCollection(cls+'-videos');
+  const el = document.getElementById(cls+'-videos-list');
+  if(!el) return;
+  if (!items.length) { el.innerHTML='<div class="empty-state"><span class="es-icon">🎬</span>No videos yet.</div>'; return; }
+  el.innerHTML = items.map(v=>`
+    <div class="v-card" onclick="window.open('${ytEmbed(v.url)}','_blank')">
+      <div class="v-thumb">${ytThumb(v.url)?`<img src="${ytThumb(v.url)}" alt="">`:''}<div class="play-btn"></div></div>
+      <div class="v-meta"><h4>${v.title}</h4><p>${v.subject||''}</p></div>
+    </div>`).join('');
+}
+
+// ─── PUBLIC: CLASS BLOG ───
+async function loadPublicClassBlog(cls) {
+  const items = await window.FB.loadCollection(cls+'-blog');
+  const el = document.getElementById(cls+'-blog-list');
+  if(!el) return;
+  if (!items.length) { el.innerHTML='<div class="empty-state"><span class="es-icon">✍️</span>No blog posts yet.</div>'; return; }
+  el.innerHTML = items.map(b=>{
+    const d=new Date(b.createdAt||0);
+    const day=d.getDate()||'—'; const mon=d.toLocaleString('default',{month:'short'})||'';
+    const tags=(b.tags||'').split(',').filter(Boolean).map(t=>`<span class="tag">${t.trim()}</span>`).join('');
+    return `<div class="b-card"><div class="b-date"><span class="day">${day}</span><span class="mon">${mon}</span></div>
+      <div class="b-content"><h3>${b.title}</h3><div class="rich-content">${b.content||''}</div>
+      <div class="b-tags">${tags}</div></div></div>`;
+  }).join('');
+}
+
+// ─── PUBLIC: CLASS PAPERS (folder-aware) ───
+async function loadPublicClassPapers(cls, folderId='') {
+  const allItems = await window.FB.loadCollection(cls+'-papers');
+  const allFolders = await window.FB.loadCollection(cls+'-papers-folders');
+  const curFolders = allFolders.filter(f=>(f.parent||'')===(folderId||''));
+  const curItems = allItems.filter(p=>(p.folder||'')===(folderId||''));
+
+  const foldersEl = document.getElementById(cls+'-papers-folders');
+  const listEl = document.getElementById(cls+'-papers-list');
+  const bcEl = document.getElementById(cls+'-papers-breadcrumb');
+  if(!foldersEl||!listEl) return;
+
+  // Build breadcrumb
+  const trail = await buildBreadcrumb(cls+'-papers-folders', folderId);
+  bcEl.innerHTML = renderBreadcrumb(trail, (id)=>loadPublicClassPapers(cls,id));
+
+  // Folders
+  let fHtml = '';
+  if(folderId) fHtml += `<div class="folder-card folder-back" onclick="loadPublicClassPapers('${cls}','${(await getParentFolder(cls+'-papers-folders',folderId))}')">
+    <div class="fc-icon">⬅️</div><div class="fc-name">Back</div></div>`;
+  fHtml += curFolders.map(f=>`<div class="folder-card" onclick="loadPublicClassPapers('${cls}','${f.id}')">
+    <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
+  foldersEl.innerHTML = fHtml;
+
+  // Papers table
+  const icons={Notes:'📄',Worksheet:'📋',Reference:'📘','Formula Sheet':'🔢',Assignment:'✏️'};
+  if (!curItems.length) {
+    listEl.innerHTML='<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No papers in this folder.</td></tr>';
+  } else {
+    listEl.innerHTML = curItems.map(p=>`<tr>
+      <td><strong>${p.title}</strong></td><td>${p.subject||''}</td><td>${p.year||''}</td>
+      <td class="file-btns">
+        ${p.url?`<a class="btn-view-file" href="${buildViewUrl(p.url)}" target="_blank">👁 View</a>
+        <a class="btn-dl-file" href="${buildDlUrl(p.url)}" target="_blank">↓ Get</a>`:'—'}
+      </td></tr>`).join('');
+  }
+}
+
+// ─── PUBLIC: CLASS MATERIAL (folder-aware) ───
+async function loadPublicClassMaterial(cls, folderId='') {
+  const allItems = await window.FB.loadCollection(cls+'-material');
+  const allFolders = await window.FB.loadCollection(cls+'-mat-folders');
+  const curFolders = allFolders.filter(f=>(f.parent||'')===(folderId||''));
+  const curItems = allItems.filter(m=>(m.folder||'')===(folderId||''));
+
+  const foldersEl = document.getElementById(cls+'-mat-folders');
+  const listEl = document.getElementById(cls+'-material-list');
+  const bcEl = document.getElementById(cls+'-mat-breadcrumb');
+  if(!foldersEl||!listEl) return;
+
+  const trail = await buildBreadcrumb(cls+'-mat-folders', folderId);
+  bcEl.innerHTML = renderBreadcrumb(trail, (id)=>loadPublicClassMaterial(cls,id));
+
+  let fHtml = '';
+  if(folderId) fHtml += `<div class="folder-card folder-back" onclick="loadPublicClassMaterial('${cls}','${(await getParentFolder(cls+'-mat-folders',folderId))}')">
+    <div class="fc-icon">⬅️</div><div class="fc-name">Back</div></div>`;
+  fHtml += curFolders.map(f=>`<div class="folder-card" onclick="loadPublicClassMaterial('${cls}','${f.id}')">
+    <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
+  foldersEl.innerHTML = fHtml;
+
+  const icons={Notes:'📄',Worksheet:'📋',Reference:'📘','Formula Sheet':'🔢',Assignment:'✏️'};
+  if (!curItems.length) {
+    listEl.innerHTML='<div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>No materials in this folder.</div>';
+  } else {
+    listEl.innerHTML = curItems.map(m=>`<div class="mat-card">
+      <div class="mat-type">${icons[m.type]||'📄'} ${m.type||'Notes'}</div>
+      <h4>${m.title}</h4><p>${m.subject||''}</p>
+      ${m.url?`<div class="file-btns">
+        <a class="btn-view-file" href="${buildViewUrl(m.url)}" target="_blank">👁 View</a>
+        <a class="btn-dl-file" href="${buildDlUrl(m.url)}" target="_blank">↓ Download</a>
+      </div>`:''}
+    </div>`).join('');
+  }
+}
+
+// ─── PUBLIC: CLASS SYLLABUS ───
+async function loadPublicClassSyllabus(cls) {
+  const items = await window.FB.loadCollection(cls+'-syllabus');
+  const el = document.getElementById(cls+'-syllabus-list');
+  if(!el) return;
+  if (!items.length) { el.innerHTML='<div class="empty-state"><span class="es-icon">📚</span>Syllabus will appear here once added.</div>'; return; }
+  el.innerHTML = items.map((s,i)=>{
+    const topicsHtml = (s.topics||'').trim().startsWith('<')
+      ? `<div class="rich-content">${s.topics}</div>`
+      : `<ul class="unit-list">${(s.topics||'').split('\n').filter(Boolean).map(t=>`<li>${t}</li>`).join('')}</ul>`;
+    return `<div class="acc-item${i===0?' open':''}">
+      <div class="acc-hdr" onclick="toggleAcc(this)">${s.title}<span class="acc-arrow">▼</span></div>
+      <div class="acc-body">${topicsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── PUBLIC: CLASS PLANNING ───
+async function loadPublicClassPlanning(cls) {
+  const items = await window.FB.loadCollection(cls+'-planning');
+  const el = document.getElementById(cls+'-planning-list');
+  if(!el) return;
+  if (!items.length) { el.innerHTML='<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No entries yet.</td></tr>'; return; }
+  const bm={completed:'badge-green',progress:'badge-orange',upcoming:'badge-blue'};
+  const lm={completed:'Completed',progress:'In Progress',upcoming:'Upcoming'};
+  el.innerHTML = items.map(p=>{
+    const isHtml=(p.topics||'').trim().startsWith('<');
+    const td=isHtml?`<div class="rich-content" style="font-size:.82rem">${p.topics}</div>`:p.topics;
+    return `<tr><td><strong>${p.month}</strong></td><td>${td}</td><td>${p.chapter}</td>
+      <td><span class="badge ${bm[p.status]||'badge-blue'}">${lm[p.status]||p.status}</span></td></tr>`;
+  }).join('');
+}
+
+// ─── PUBLIC: GRAMMAR (folder-aware) ───
+async function loadPublicGrammarFolders(folderId='') {
+  const allFolders = await window.FB.loadCollection('grammar-folders');
+  const curFolders = allFolders.filter(f=>(f.parent||'')===(folderId||''));
+  const foldersEl = document.getElementById('grammar-folders');
+  const bcEl = document.getElementById('grammar-breadcrumb');
+  if(!foldersEl) return;
+  const trail = await buildBreadcrumb('grammar-folders', folderId);
+  bcEl.innerHTML = renderBreadcrumb(trail, (id)=>{ loadPublicGrammarFolders(id); loadPublicGrammarFiles(id); });
+  let fHtml='';
+  if(folderId) fHtml+=`<div class="folder-card folder-back" onclick="(async()=>{const p=await getParentFolder('grammar-folders','${folderId}');loadPublicGrammarFolders(p);loadPublicGrammarFiles(p);})()">
+    <div class="fc-icon">⬅️</div><div class="fc-name">Back</div></div>`;
+  fHtml+=curFolders.map(f=>`<div class="folder-card" onclick="loadPublicGrammarFolders('${f.id}');loadPublicGrammarFiles('${f.id}')">
+    <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
+  foldersEl.innerHTML=fHtml;
+}
+
+async function loadPublicGrammarFiles(folderId='') {
+  const allItems = await window.FB.loadCollection('grammar-files');
+  const curItems = allItems.filter(f=>(f.folder||'')===(folderId||''));
+  const listEl = document.getElementById('grammar-files');
+  if(!listEl) return;
+  const icons={pdf:'📄',ppt:'📊',pptx:'📊',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',jpg:'🖼️',jpeg:'🖼️',png:'🖼️',zip:'🗜️',txt:'📃'};
+  if(!curItems.length){ listEl.innerHTML='<div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>No files in this folder yet.</div>'; return; }
+  listEl.innerHTML=curItems.map(f=>{
+    const ext=(f.title||'').split('.').pop().toLowerCase();
+    const icon=icons[ext]||'📎';
+    return `<div class="mat-card">
+      <div class="mat-type">${icon} Grammar</div>
+      <h4>${f.title}</h4>
+      ${f.url?`<div class="file-btns">
+        <a class="btn-view-file" href="${buildViewUrl(f.url)}" target="_blank">👁 View</a>
+        <a class="btn-dl-file" href="${buildDlUrl(f.url)}" target="_blank">↓ Download</a>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── ADMIN LOADERS ──
+async function loadAllAdmin() {
+  try {
+    await Promise.all([
+      loadAdminClassVideos('c11'), loadAdminClassBlog('c11'),
+      loadAdminClassPapers('c11'), loadAdminClassMaterial('c11'),
+      loadAdminClassSyllabus('c11'), loadAdminClassPlanning('c11'),
+      loadAdminClassVideos('c12'), loadAdminClassBlog('c12'),
+      loadAdminClassPapers('c12'), loadAdminClassMaterial('c12'),
+      loadAdminClassSyllabus('c12'), loadAdminClassPlanning('c12'),
+      loadAdminGrammar(),
+      refreshFolderSelects()
+    ]);
+  } catch(e) { console.log('Admin load error:', e); }
+}
+
+const emptyAdm = '<div class="empty-state">Nothing added yet.</div>';
+
+async function loadAdminClassVideos(cls) {
+  const items = await window.FB.loadCollection(cls+'-videos');
+  const el = document.getElementById('admin-'+cls+'-videos-list');
+  if(!el) return;
+  el.innerHTML = !items.length ? emptyAdm : items.map(v=>`
+    <div class="item-row">
+      <div class="item-row-info"><h4>${v.title}</h4><p>${v.subject||v.url}</p></div>
+      <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-videos','${v.id}',()=>loadAdminClassVideos('${cls}'),()=>loadPublicClassVideos('${cls}'))">Delete</button>
+    </div>`).join('');
+}
+
+async function loadAdminClassBlog(cls) {
+  const items = await window.FB.loadCollection(cls+'-blog');
+  const el = document.getElementById('admin-'+cls+'-blog-list');
+  if(!el) return;
+  el.innerHTML = !items.length ? emptyAdm : items.map(b=>`
+    <div class="item-row">
+      <div class="item-row-info"><h4>${b.title}</h4><p>${(b.content||'').replace(/<[^>]+>/g,'').substring(0,70)}…</p></div>
+      <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-blog','${b.id}',()=>loadAdminClassBlog('${cls}'),()=>loadPublicClassBlog('${cls}'))">Delete</button>
+    </div>`).join('');
+}
+
+async function loadAdminClassPapers(cls) {
+  const items = await window.FB.loadCollection(cls+'-papers');
+  const el = document.getElementById('admin-'+cls+'-papers-list');
+  if(!el) return;
+  el.innerHTML = !items.length ? emptyAdm : items.map(p=>`
+    <div class="item-row">
+      <div class="item-row-info"><h4>${p.title}</h4><p>${p.subject||''} · ${p.year||''} · 📁 ${p.folderName||'Root'}</p></div>
+      <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers','${p.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
+    </div>`).join('');
+}
+
+async function loadAdminClassMaterial(cls) {
+  const items = await window.FB.loadCollection(cls+'-material');
+  const el = document.getElementById('admin-'+cls+'-material-list');
+  if(!el) return;
+  el.innerHTML = !items.length ? emptyAdm : items.map(m=>`
+    <div class="item-row">
+      <div class="item-row-info"><h4>${m.title}</h4><p>${m.type||''} · ${m.subject||''} · 📁 ${m.folderName||'Root'}</p></div>
+      <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-material','${m.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
+    </div>`).join('');
+}
+
+async function loadAdminClassSyllabus(cls) {
+  const items = await window.FB.loadCollection(cls+'-syllabus');
+  const el = document.getElementById('admin-'+cls+'-syllabus-list');
+  if(!el) return;
+  el.innerHTML = !items.length ? emptyAdm : items.map(s=>`
+    <div class="item-row">
+      <div class="item-row-info"><h4>${s.title}</h4></div>
+      <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-syllabus','${s.id}',()=>loadAdminClassSyllabus('${cls}'),()=>loadPublicClassSyllabus('${cls}'))">Delete</button>
+    </div>`).join('');
+}
+
+async function loadAdminClassPlanning(cls) {
+  const items = await window.FB.loadCollection(cls+'-planning');
+  const el = document.getElementById('admin-'+cls+'-planning-list');
+  if(!el) return;
+  el.innerHTML = !items.length ? emptyAdm : items.map(p=>`
+    <div class="item-row">
+      <div class="item-row-info"><h4>${p.month}</h4><p>${(p.topics||'').replace(/<[^>]+>/g,'').substring(0,80)}</p></div>
+      <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-planning','${p.id}',()=>loadAdminClassPlanning('${cls}'),()=>loadPublicClassPlanning('${cls}'))">Delete</button>
+    </div>`).join('');
+}
+
+async function loadAdminGrammar() {
+  const folders = await window.FB.loadCollection('grammar-folders');
+  const files = await window.FB.loadCollection('grammar-files');
+  const el = document.getElementById('admin-grammar-list');
+  if(!el) return;
+  let html='';
+  if(!folders.length && !files.length){ el.innerHTML=emptyAdm; return; }
+  folders.forEach(f=>{
+    html+=`<div class="item-row">
+      <div class="item-row-info"><h4>📁 ${f.name}</h4><p>Folder · Parent: ${f.parentName||'Root'}</p></div>
+      <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-folders','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFolders(''))">Delete</button>
+    </div>`;
+  });
+  files.forEach(f=>{
+    html+=`<div class="item-row">
+      <div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 ${f.folderName||'Root'}</p></div>
+      <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-files','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFiles(''))">Delete</button>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+async function delClassItem(col,id,rA,rP) {
+  if(!confirm('Delete this item?')) return;
+  try {
+    await window.FB.removeItem(col,id); toast('Deleted.');
+    await rA(); rP();
+  } catch(e) { toast('Error deleting: '+e.message, false); }
+}
+
+// ── FOLDER HELPERS ──
+async function buildBreadcrumb(col, folderId) {
+  const trail=[];
+  let cur=folderId;
+  while(cur) {
+    try {
+      const all=await window.FB.loadCollection(col);
+      const f=all.find(x=>x.id===cur);
+      if(!f) break;
+      trail.unshift({id:f.id,name:f.name});
+      cur=f.parent||'';
+    } catch(e){ break; }
+  }
+  return trail;
+}
+
+function renderBreadcrumb(trail, onClickFn) {
+  let html='<div class="breadcrumb-path">';
+  html+=`<span onclick="(${onClickFn.toString()})('')">📁 Root</span>`;
+  trail.forEach((t,i)=>{
+    html+=`<span class="bc-sep">›</span>`;
+    if(i===trail.length-1) html+=`<span class="bc-cur">${t.name}</span>`;
+    else html+=`<span onclick="(${onClickFn.toString()})('${t.id}')">${t.name}</span>`;
+  });
+  html+='</div>';
+  return html;
+}
+
+async function getParentFolder(col, folderId) {
+  if(!folderId) return '';
+  try {
+    const all=await window.FB.loadCollection(col);
+    const f=all.find(x=>x.id===folderId);
+    return f ? (f.parent||'') : '';
+  } catch(e){ return ''; }
+}
+
+// ── REFRESH FOLDER SELECTS (admin dropdowns) ──
+async function refreshFolderSelects() {
+  async function fillSelect(col, selId, parentSelId) {
+    const folders=await window.FB.loadCollection(col);
+    [selId, parentSelId].filter(Boolean).forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      el.innerHTML='<option value="">— Root (top level) —</option>';
+      // Build hierarchy display
+      folders.forEach(f=>{
+        el.innerHTML+=`<option value="${f.id}">${f.parentName?'  └ ':''} ${f.name}</option>`;
+      });
+    });
+  }
+  await fillSelect('grammar-folders','gram-parent-folder','gram-folder-target');
+  await fillSelect('c11-papers-folders','c11-papers-parent-folder','c11-papers-folder-target');
+  await fillSelect('c11-mat-folders','c11-mat-parent-folder','c11-mat-folder-target');
+  await fillSelect('c12-papers-folders','c12-papers-parent-folder','c12-papers-folder-target');
+  await fillSelect('c12-mat-folders','c12-mat-parent-folder','c12-mat-folder-target');
+}
+
+// ── CREATE FOLDER ──
+async function adminCreateFolder(section) {
+  const configs={
+    'grammar':      {nameId:'gram-new-folder',    parentId:'gram-parent-folder',    col:'grammar-folders'},
+    'c11-papers':   {nameId:'c11-papers-new-folder',parentId:'c11-papers-parent-folder',col:'c11-papers-folders'},
+    'c11-material': {nameId:'c11-mat-new-folder',  parentId:'c11-mat-parent-folder',  col:'c11-mat-folders'},
+    'c12-papers':   {nameId:'c12-papers-new-folder',parentId:'c12-papers-parent-folder',col:'c12-papers-folders'},
+    'c12-material': {nameId:'c12-mat-new-folder',  parentId:'c12-mat-parent-folder',  col:'c12-mat-folders'},
+  };
+  const cfg=configs[section];
+  if(!cfg) return;
+  const name=document.getElementById(cfg.nameId).value.trim();
+  if(!name){ toast('Enter a folder name',false); return; }
+  const parentId=document.getElementById(cfg.parentId).value;
+  // Get parent name for display
+  let parentName='';
+  if(parentId) {
+    const all=await window.FB.loadCollection(cfg.col);
+    const p=all.find(x=>x.id===parentId);
+    parentName=p?p.name:'';
+  }
+  try {
+    await window.FB.addItem(cfg.col,{name,parent:parentId,parentName});
+    document.getElementById(cfg.nameId).value='';
+    toast('Folder created! 📁'); await loadAdminGrammar(); await refreshFolderSelects();
+  } catch(e){ toast('Error: '+e.message,false); }
+}
+
+// ── ADD GRAMMAR FILE ──
+async function adminAddGrammarFile() {
+  const t=document.getElementById('gram-title').value.trim();
+  if(!t){ toast('Enter a title',false); return; }
+  const folderId=document.getElementById('gram-folder-target').value;
+  let folderName='Root';
+  if(folderId){ const all=await window.FB.loadCollection('grammar-folders'); const f=all.find(x=>x.id===folderId); folderName=f?f.name:'Root'; }
+  const file=document.getElementById('gram-file-input').files[0];
+  if(!file){ toast('Select a file to upload',false); return; }
+  if(file.size>25*1024*1024){ toast('File too large — max 25 MB',false); return; }
+  try {
+    showProgress('gram',0);
+    const url=await uploadToCloudinary(file,pct=>showProgress('gram',pct));
+    hideProgress('gram');
+    await window.FB.addItem('grammar-files',{title:t,url,folder:folderId,folderName});
+    document.getElementById('gram-title').value='';
+    document.getElementById('gram-file-input').value='';
+    document.getElementById('gram-file-name').style.display='none';
+    toast('File uploaded! ✅'); await loadAdminGrammar();
+    loadPublicGrammarFiles(folderId);
+  } catch(e){ hideProgress('gram'); toast('Upload failed: '+e.message,false); }
+}
+
+// ── ADD CLASS FUNCTIONS ──
+async function adminAddVideo(cls) {
+  const t=document.getElementById(cls+'-v-title').value.trim();
+  const u=document.getElementById(cls+'-v-url').value.trim();
+  const s=document.getElementById(cls+'-v-subject').value.trim();
+  if(!t||!u){toast('Fill title and URL',false);return;}
+  try {
+    await window.FB.addItem(cls+'-videos',{title:t,url:u,subject:s});
+    [cls+'-v-title',cls+'-v-url',cls+'-v-subject'].forEach(id=>document.getElementById(id).value='');
+    toast('Video added! ✅'); await loadAdminClassVideos(cls); loadPublicClassVideos(cls);
+  } catch(e){ toast('Error: '+e.message,false); }
+}
+
+async function adminAddBlog(cls) {
+  const t=document.getElementById(cls+'-b-title').value.trim();
+  const qKey=cls==='c11'?'_qC11Blog':'_qC12Blog';
+  const c=window[qKey]?window[qKey].root.innerHTML:'';
+  const g=document.getElementById(cls+'-b-tags').value.trim();
+  if(!t||!c.replace(/<[^>]*>/g,'').trim()){toast('Fill title and content',false);return;}
+  try {
+    await window.FB.addItem(cls+'-blog',{title:t,content:c,tags:g});
+    document.getElementById(cls+'-b-title').value='';
+    document.getElementById(cls+'-b-tags').value='';
+    if(window[qKey]) window[qKey].setContents([]);
+    toast('Post published! ✅'); await loadAdminClassBlog(cls); loadPublicClassBlog(cls);
+  } catch(e){ toast('Error: '+e.message,false); }
+}
+
+async function adminAddPaper(cls) {
+  const t=document.getElementById(cls+'-p-title').value.trim();
+  if(!t){toast('Fill in the paper title',false);return;}
+  const prefix=cls==='c11'?'c11p':'c12p';
+  const folderId=document.getElementById(cls+'-papers-folder-target').value;
+  let folderName='Root';
+  if(folderId){ const all=await window.FB.loadCollection(cls+'-papers-folders'); const f=all.find(x=>x.id===folderId); folderName=f?f.name:'Root'; }
+  const uploadWrap=document.getElementById(prefix+'-upload-zone-wrap');
+  const isUpload=uploadWrap&&!uploadWrap.classList.contains('hidden-src');
+  let url='';
+  if(isUpload){
+    const file=document.getElementById(prefix+'-file-input').files[0];
+    if(!file){toast('Select a file or switch to Paste Link',false);return;}
+    try{ showProgress(prefix,0); url=await uploadToCloudinary(file,pct=>showProgress(prefix,pct)); hideProgress(prefix); }
+    catch(e){ hideProgress(prefix); toast('Upload failed: '+e.message,false); return; }
+  } else {
+    url=sanitizeUrl(document.getElementById(prefix+'-url').value);
+    if(!validateUrl(url,'Paper link')) return;
+  }
+  try {
+    await window.FB.addItem(cls+'-papers',{title:t,subject:document.getElementById(cls+'-p-subject').value.trim(),
+      year:document.getElementById(cls+'-p-year').value.trim(),url,folder:folderId,folderName});
+    [cls+'-p-title',cls+'-p-subject',cls+'-p-year'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+    document.getElementById(prefix+'-file-input').value='';
+    document.getElementById(prefix+'-file-name').style.display='none';
+    toast('Paper added! ✅'); await loadAdminClassPapers(cls); loadPublicClassPapers(cls);
+  } catch(e){ toast('Error: '+e.message,false); }
+}
+
+async function adminAddMaterial(cls) {
+  const t=document.getElementById(cls+'-m-title').value.trim();
+  if(!t){toast('Fill in the title',false);return;}
+  const prefix=cls==='c11'?'c11m':'c12m';
+  const folderId=document.getElementById(cls+'-mat-folder-target').value;
+  let folderName='Root';
+  if(folderId){ const all=await window.FB.loadCollection(cls+'-mat-folders'); const f=all.find(x=>x.id===folderId); folderName=f?f.name:'Root'; }
+  const uploadWrap=document.getElementById(prefix+'-upload-zone-wrap');
+  const isUpload=uploadWrap&&!uploadWrap.classList.contains('hidden-src');
+  let url='';
+  if(isUpload){
+    const file=document.getElementById(prefix+'-file-input').files[0];
+    if(!file){toast('Select a file or switch to Paste Link',false);return;}
+    try{ showProgress(prefix,0); url=await uploadToCloudinary(file,pct=>showProgress(prefix,pct)); hideProgress(prefix); }
+    catch(e){ hideProgress(prefix); toast('Upload failed: '+e.message,false); return; }
+  } else {
+    url=sanitizeUrl(document.getElementById(prefix+'-url').value);
+    if(!validateUrl(url,'Material link')) return;
+  }
+  try {
+    await window.FB.addItem(cls+'-material',{title:t,type:document.getElementById(cls+'-m-type').value,
+      subject:document.getElementById(cls+'-m-subject').value.trim(),url,folder:folderId,folderName});
+    [cls+'-m-title',cls+'-m-subject'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+    document.getElementById(prefix+'-file-input').value='';
+    document.getElementById(prefix+'-file-name').style.display='none';
+    toast('Material added! ✅'); await loadAdminClassMaterial(cls); loadPublicClassMaterial(cls);
+  } catch(e){ toast('Error: '+e.message,false); }
+}
+
+async function adminAddSyllabus(cls) {
+  const t=document.getElementById(cls+'-s-title').value.trim();
+  const qKey=cls==='c11'?'_qC11Syllabus':'_qC12Syllabus';
+  const tp=window[qKey]?window[qKey].root.innerHTML:'';
+  if(!t||!tp.replace(/<[^>]*>/g,'').trim()){toast('Fill title and topics',false);return;}
+  try {
+    await window.FB.addItem(cls+'-syllabus',{title:t,topics:tp});
+    document.getElementById(cls+'-s-title').value='';
+    if(window[qKey]) window[qKey].setContents([]);
+    toast('Unit added! ✅'); await loadAdminClassSyllabus(cls); loadPublicClassSyllabus(cls);
+  } catch(e){ toast('Error: '+e.message,false); }
+}
+
+async function adminAddPlanning(cls) {
+  const m=document.getElementById(cls+'-pl-month').value.trim();
+  const qKey=cls==='c11'?'_qC11Planning':'_qC12Planning';
+  const tp=window[qKey]?window[qKey].root.innerHTML:'';
+  if(!m||!tp.replace(/<[^>]*>/g,'').trim()){toast('Fill month and topics',false);return;}
+  try {
+    await window.FB.addItem(cls+'-planning',{month:m,topics:tp,
+      chapter:document.getElementById(cls+'-pl-chapter').value.trim(),
+      status:document.getElementById(cls+'-pl-status').value});
+    [cls+'-pl-month',cls+'-pl-chapter'].forEach(id=>document.getElementById(id).value='');
+    if(window[qKey]) window[qKey].setContents([]);
+    toast('Entry added! ✅'); await loadAdminClassPlanning(cls); loadPublicClassPlanning(cls);
+  } catch(e){ toast('Error: '+e.message,false); }
+}
+
+// ── CLASS TAB SWITCHER ──
+function showClassTab(cls, tab, btn) {
+  document.querySelectorAll('#page-'+cls+' .class-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(cls+'-'+tab).classList.add('active');
+  document.querySelectorAll('#'+cls+'-subnav .csn-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── URL sanitizer — strips any accidentally pasted extra text ──────────────
+function sanitizeUrl(raw) {
+  if (!raw) return '';
+  // Trim whitespace
+  let u = raw.trim();
+  // Remove surrounding quotes if present
+  u = u.replace(/^["']+|["']+$/g, '');
+  // Extract just the URL — stop at first whitespace or quote after the scheme
+  const m = u.match(/https?:\/\/[^\s"'<>]+/i);
+  if (m) u = m[0];
+  // Remove any trailing punctuation like . , ) ] >
+  u = u.replace(/[.,)>\]]+$/, '');
+  return u;
+}
+
+// ── URL validator — shows clear error if URL looks wrong ────────────────────
+function validateUrl(url, fieldLabel) {
+  if (!url) { toast(`${fieldLabel}: please paste a valid URL or upload a file`, false); return false; }
+  if (!url.startsWith('http')) { toast(`${fieldLabel}: URL must start with https://`, false); return false; }
+  if (url.includes(' ')) { toast(`${fieldLabel}: URL contains spaces — please paste just the link`, false); return false; }
+  return true;
+}
+
+// ══════════════════════════════════════════════
+//  ☁️ CLOUDINARY CONFIG  (FREE — no credit card)
+//  1. Go to cloudinary.com → sign up free
+//  2. Dashboard → copy your "Cloud name"
+//  3. Settings → Upload → Add upload preset → mode: Unsigned → copy preset name
+//  4. Paste both values below
+// ══════════════════════════════════════════════
+const CLOUDINARY_CLOUD = 'dg6e31bqg';   // ← replace this
+const CLOUDINARY_PRESET = 'LMK_portal'; // ← replace this
+
+function uploadToCloudinary(file, onProgress) {
+  return new Promise((resolve, reject) => {
+    if (CLOUDINARY_CLOUD === 'YOUR_CLOUD_NAME') {
+      reject(new Error('Cloudinary not configured yet — add your Cloud Name and Upload Preset in the code'));
+      return;
+    }
+    // Decide resource_type:
+    // images → 'image' endpoint, everything else (PDF/doc/etc) → 'raw' endpoint
+    const isImage = /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(file.name);
+    const resourceType = isImage ? 'image' : 'raw';
+
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', CLOUDINARY_PRESET);
+    fd.append('folder', 'LMK_portal');
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/${resourceType}/upload`);
+
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable && onProgress) onProgress(Math.round(e.loaded / e.total * 100));
+    };
+    xhr.onload = () => {
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if (res.secure_url) resolve(sanitizeUrl(res.secure_url));
+        else reject(new Error(res.error?.message || 'Upload failed — check your Cloud Name and Upload Preset are correct'));
+      } catch(e) { reject(e); }
+    };
+    xhr.onerror = () => reject(new Error('Network error — check internet connection and Cloudinary config'));
+    xhr.send(fd);
+  });
+}
+
+
+// ════════════════════════════════════════════════════════
+//  BLOG MEDIA FUNCTIONS
+// ════════════════════════════════════════════════════════
+
+// ── Helpers ─────────────────────────────────────────────
+function blogGetEditor() { return window[_blogActiveEditor||'_qBlog']; }
+
+function blogCloseModals() {
+  ['blog-table-modal','blog-chart-modal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('open');
+  });
+}
+
+function blogInsertHTML(htmlStr) {
+  var q = blogGetEditor();
+  if (!q) return;
+  var range = q.getSelection(true);
+  var idx = range ? range.index : q.getLength();
+  q.clipboard.dangerouslyPasteHTML(idx, htmlStr);
+  q.setSelection(idx + 1);
+}
+
+// blogInsertDOM: writes HTML directly into the editor DOM — works for
+// elements that Quill strips (tables, complex divs, etc.)
+function blogInsertDOM(htmlStr) {
+  var q = blogGetEditor();
+  if (!q) return;
+  var editor = q.root; // the contenteditable .ql-editor div
+
+  // Create a temporary container to parse the HTML
+  var tmp = document.createElement('div');
+  tmp.innerHTML = htmlStr;
+
+  // Insert each child node at the end of the editor
+  // then add a blank paragraph so cursor stays after the element
+  Array.from(tmp.childNodes).forEach(function(node) {
+    editor.appendChild(node.cloneNode(true));
+  });
+
+  // Append a clean paragraph for continued typing
+  var p = document.createElement('p');
+  p.innerHTML = '<br>';
+  editor.appendChild(p);
+
+  // Move Quill cursor to end
+  q.setSelection(q.getLength(), 0);
+}
+
+// ── IMAGE UPLOAD (two-step: upload → options modal → insert) ─────────────────
+var _blogImgUrl = null;
+var _blogActiveEditor = null;
+
+function blogInsertImage(editorId) {
+  // Track which editor the image is for
+  if(editorId) {
+    const selMap = {'c11-b-content-editor': '_qC11Blog', 'c12-b-content-editor': '_qC12Blog', 'b-content-editor': '_qBlog'};
+    _blogActiveEditor = selMap[editorId] || '_qBlog';
+  } else {
+    _blogActiveEditor = '_qBlog';
+  }
+  document.getElementById('blog-img-input').click();
+}
+
+async function blogHandleImageUpload(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) { toast('Image too large — max 10 MB', false); return; }
+
+  // Open modal immediately showing uploading state
+  var modal    = document.getElementById('blog-img-modal');
+  var preview  = document.getElementById('blog-img-preview');
+  var uploading= document.getElementById('blog-img-uploading');
+  var insertBtn= document.getElementById('img-insert-btn');
+  var caption  = document.getElementById('img-caption');
+
+  _blogImgUrl = null;
+  preview.style.display   = 'none';
+  uploading.style.display = 'block';
+  uploading.textContent   = 'Uploading... 0%';
+  insertBtn.disabled      = true;
+  caption.value           = '';
+  modal.classList.add('open');
+
+  // Show local preview immediately
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    preview.src           = e.target.result;
+    preview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+
+  try {
+    var url = await uploadToCloudinary(file, function(pct) {
+      uploading.textContent = 'Uploading... ' + pct + '%';
+    });
+    _blogImgUrl             = url;
+    uploading.style.display = 'none';
+    preview.src             = url;
+    insertBtn.disabled      = false;
+    toast('Upload done — set options and click Insert Image');
+  } catch(e) {
+    modal.classList.remove('open');
+    toast('Image upload failed: ' + e.message, false);
+  }
+  input.value = '';
+}
+
+function blogInsertImageFinal() {
+  if (!_blogImgUrl) return;
+  var size    = document.getElementById('img-size').value;
+  var align   = document.getElementById('img-align').value;
+  var caption = document.getElementById('img-caption').value.trim();
+  var customPx= document.getElementById('img-custom-px').value;
+
+  var width = (size === 'custom') ? (customPx ? customPx + 'px' : '100%') : size;
+
+  // Build wrapper style based on alignment
+  var wrapStyle = 'display:block;margin:.6rem 0;';
+  var imgStyle  = 'width:' + width + ';border-radius:8px;box-shadow:0 3px 12px rgba(0,0,0,.15);';
+  if (align === 'center') {
+    wrapStyle += 'text-align:center;';
+  } else if (align === 'right') {
+    wrapStyle += 'text-align:right;';
+  }
+
+  var imgHtml =
+    '<div style="' + wrapStyle + '">' +
+    '<img src="' + _blogImgUrl + '" style="' + imgStyle + '" alt="image">' +
+    (caption ? '<p style="font-size:.75rem;color:#a07858;margin-top:.3rem;font-style:italic;">' + caption + '</p>' : '') +
+    '</div>';
+
+  blogInsertDOM(imgHtml);
+  blogCloseModals();
+  _blogImgUrl = null;
+  toast('Image inserted! ✅');
+}
+
+// Toggle custom size input
+document.addEventListener('change', function(e) {
+  if (e.target.id === 'img-size') {
+    document.getElementById('img-custom-wrap').style.display =
+      e.target.value === 'custom' ? 'block' : 'none';
+  }
+});
+
+// ── TABLE BUILDER ────────────────────────────────────────
+function blogOpenTableModal() {
+  document.getElementById('blog-table-modal').classList.add('open');
+}
+
+function blogInsertTable() {
+  var rows  = parseInt(document.getElementById('tbl-rows').value) || 3;
+  var cols  = parseInt(document.getElementById('tbl-cols').value) || 3;
+  var hdrs  = document.getElementById('tbl-headers').value.trim();
+  var style = document.getElementById('tbl-style').value;
+
+  var headerColors = {
+    orange: 'background:linear-gradient(135deg,#e8610a,#f07d2a);color:#fff;',
+    blue:   'background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;',
+    green:  'background:linear-gradient(135deg,#059669,#10b981);color:#fff;',
+    plain:  'background:#f8f8f8;color:#333;border-bottom:2px solid #ddd;',
+  };
+  var hStyle = headerColors[style] || headerColors.orange;
+  var headerList = hdrs ? hdrs.split(',').map(function(h){ return h.trim(); }) : [];
+
+  var tbl = '<table style="width:100%;border-collapse:collapse;margin:.8rem 0;border-radius:8px;overflow:hidden;">';
+
+  // Header row
+  tbl += '<thead><tr>';
+  for (var c = 0; c < cols; c++) {
+    var hText = headerList[c] || ('Column ' + (c+1));
+    tbl += '<th style="' + hStyle + 'padding:.65rem 1rem;text-align:left;font-size:.82rem;font-weight:700;">' + hText + '</th>';
+  }
+  tbl += '</tr></thead><tbody>';
+
+  // Data rows
+  for (var r = 0; r < rows; r++) {
+    var rowBg = (r % 2 === 0) ? 'background:#fff;' : 'background:#fdf8f4;';
+    tbl += '<tr>';
+    for (var cc = 0; cc < cols; cc++) {
+      tbl += '<td style="' + rowBg + 'padding:.6rem 1rem;border-bottom:1px solid #f0dece;color:#5c3d28;font-size:.86rem;" contenteditable="false">&nbsp;</td>';
+    }
+    tbl += '</tr>';
+  }
+  tbl += '</tbody></table><p><br></p>';
+
+  blogInsertDOM(tbl);
+  blogCloseModals();
+  toast('Table inserted! ✅', true);
+}
+
+// ── CHART BUILDER ────────────────────────────────────────
+var _chartPreviewInstance = null;
+
+function blogOpenChartModal() {
+  document.getElementById('blog-chart-modal').classList.add('open');
+  setTimeout(blogUpdateChartPreview, 100);
+}
+
+function blogUpdateChartPreview() {
+  if (typeof Chart === 'undefined') {
+    // Load Chart.js if not loaded
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+    s.onload = function() { blogUpdateChartPreview(); };
+    document.head.appendChild(s);
+    return;
+  }
+  var canvas = document.getElementById('chart-preview-canvas');
+  if (!canvas) return;
+
+  var type    = document.getElementById('chart-type').value;
+  var title   = document.getElementById('chart-title').value || 'Chart';
+  var rawLbls = document.getElementById('chart-labels').value;
+  var rawVals = document.getElementById('chart-values').value;
+  var labels  = rawLbls.split(',').map(function(l){ return l.trim(); });
+  var values  = rawVals.split(',').map(function(v){ return parseFloat(v.trim()) || 0; });
+
+  var colors = ['#e8610a','#f07d2a','#7c3aed','#059669','#1d4ed8','#d97706','#e11d48','#0d9488'];
+  var bgColors = type === 'bar' || type === 'line'
+    ? colors.slice(0, values.length).map(function(c){ return c + '33'; })
+    : colors.slice(0, values.length);
+
+  if (_chartPreviewInstance) { _chartPreviewInstance.destroy(); _chartPreviewInstance = null; }
+
+  _chartPreviewInstance = new Chart(canvas.getContext('2d'), {
+    type: type,
+    data: {
+      labels: labels,
+      datasets: [{
+        label: title,
+        data: values,
+        backgroundColor: bgColors,
+        borderColor: type === 'line' ? '#e8610a' : colors.slice(0, values.length),
+        borderWidth: 2,
+        fill: type === 'line',
+        tension: 0.4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: type === 'pie' || type === 'doughnut' },
+        title:  { display: !!title, text: title },
+      },
+      scales: (type === 'pie' || type === 'doughnut') ? {} : {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+function blogInsertChart() {
+  if (_chartPreviewInstance) {
+    // Capture chart as image and embed it
+    var canvas = document.getElementById('chart-preview-canvas');
+    var imgData = canvas.toDataURL('image/png');
+    var title   = document.getElementById('chart-title').value || 'Chart';
+    blogInsertDOM(
+      '<div class="blog-chart-wrap">' +
+      '<img src="' + imgData + '" alt="' + title + '" style="max-width:100%;border-radius:8px;">' +
+      '<p style="font-size:.75rem;color:#a07858;text-align:center;margin-top:.3rem;">' + title + '</p>' +
+      '</div><p><br></p>'
+    );
+    blogCloseModals();
+    toast('Chart inserted! ✅');
+  }
+}
+
+
+// ── DIVIDER ──────────────────────────────────────────────
+function blogInsertDivider() {
+  blogInsertDOM('<div class="blog-divider">* * *</div>');
+}
+
+// Close modals on backdrop click
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('blog-modal-overlay')) blogCloseModals();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') blogCloseModals();
+});
+
+// ── Upload UI helpers ──
+function previewUrl(raw, previewId) {
+  const el = document.getElementById(previewId);
+  if (!el) return;
+  const clean = sanitizeUrl(raw);
+  if (clean && clean.startsWith('http')) {
+    el.textContent = '✅ URL detected: ' + clean;
+    el.style.display = 'block';
+    el.style.color = '#6ee7b7';
+  } else if (raw.trim()) {
+    el.textContent = '⚠️ Does not look like a valid URL — paste just the link';
+    el.style.display = 'block';
+    el.style.color = '#f87171';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function srcSwitch(prefix, mode, btn) {
+  const uploadWrap = document.getElementById(prefix+'-upload-zone-wrap');
+  const linkWrap   = document.getElementById(prefix+'-link-wrap');
+  const tabs = btn.closest('.src-tabs').querySelectorAll('.src-tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  if(mode === 'upload') {
+    uploadWrap.style.display = ''; uploadWrap.classList.remove('hidden-src');
+    linkWrap.classList.remove('show');
+  } else {
+    uploadWrap.style.display = 'none'; uploadWrap.classList.add('hidden-src');
+    linkWrap.classList.add('show');
+  }
+}
+function dzDragOver(e, zoneId) { e.preventDefault(); document.getElementById(zoneId).classList.add('drag-over'); }
+function dzDragLeave(zoneId)   { document.getElementById(zoneId).classList.remove('drag-over'); }
+function dzDrop(e, inputId, zoneId, nameId) {
+  e.preventDefault();
+  document.getElementById(zoneId).classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if(!file) return;
+  const inp = document.getElementById(inputId);
+  // Assign dropped file to the input via DataTransfer
+  const dt = new DataTransfer(); dt.items.add(file); inp.files = dt.files;
+  dzPick(inp, nameId);
+}
+function dzPick(input, nameId) {
+  const nameEl = document.getElementById(nameId);
+  if(input.files[0]) { nameEl.textContent = input.files[0].name; nameEl.style.display='inline-block'; }
+  else { nameEl.style.display='none'; }
+}
+function showProgress(prefix, pct) {
+  document.getElementById(prefix+'-progress-wrap').classList.add('show');
+  document.getElementById(prefix+'-progress-fill').style.width = pct+'%';
+  document.getElementById(prefix+'-progress-pct').textContent  = pct+'%';
+}
+function hideProgress(prefix) {
+  document.getElementById(prefix+'-progress-wrap').classList.remove('show');
+  document.getElementById(prefix+'-progress-fill').style.width = '0%';
+}
+async function delItem(col,id,rA,rP) {
+  if(!confirm('Delete this item?')) return;
+  try {
+    await window.FB.removeItem(col,id); toast('Deleted.');
+    await rA(); rP();
+  } catch(e) { toast('Error deleting: '+e.message, false); console.error(e); }
+}
+
+function toggleAcc(hdr){ hdr.parentElement.classList.toggle('open'); }
+
+// ══════════════════════════════
+//  PDF VIEWER MODAL
+// ══════════════════════════════
+// ── Detect file type from URL ──────────────────────────────────────────────
+// ── Build view URL: opens cleanly in new tab ────────────────────────────────
+// ── Clean Cloudinary URL — remove any restricted folder prefix ───────────────
+function cleanCloudinaryUrl(url) {
+  if (!url || !url.includes('res.cloudinary.com')) return url;
+  // Strip restricted "samples/ecommerce/" folder prefix from public_id part
+  // e.g. /raw/upload/v123/samples/ecommerce/file.pdf -> /raw/upload/v123/file.pdf
+  url = url.replace(/\/upload\/(v\d+\/)?samples\/ecommerce\//,
+                    function(m, v) { return '/upload/' + (v||''); });
+  url = url.replace(/\/upload\/(v\d+\/)?samples\//,
+                    function(m, v) { return '/upload/' + (v||''); });
+  return url;
+}
+
+function buildViewUrl(url) {
+  if (!url) return '#';
+  url = cleanCloudinaryUrl(url.trim().replace(/^["']+|["']+$/g, ''));
+  if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
+    var m1 = url.match(/\/file\/d\/([^/]+)/);
+    var m2 = url.match(/[?&]id=([^&]+)/);
+    var id  = m1 ? m1[1] : (m2 ? m2[1] : null);
+    if (id) return 'https://drive.google.com/file/d/' + id + '/view';
+  }
+  if (/\.(doc|docx|ppt|pptx|xls|xlsx)$/i.test(url.split('?')[0])) {
+    return 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(url);
+  }
+  return url;
+}
+
+// ── Build download URL ────────────────────────────────────────────────────────
+function buildDlUrl(url) {
+  if (!url) return '#';
+  url = cleanCloudinaryUrl(url.trim().replace(/^["']+|["']+$/g, ''));
+  if (url.includes('res.cloudinary.com')) {
+    // fl_attachment forces Content-Disposition: attachment (download dialog)
+    return url.replace('/upload/', '/upload/fl_attachment/');
+  }
+  if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
+    var m1 = url.match(/\/file\/d\/([^/]+)/);
+    var m2 = url.match(/[?&]id=([^&]+)/);
+    var id  = m1 ? m1[1] : (m2 ? m2[1] : null);
+    if (id) return 'https://drive.google.com/uc?export=download&id=' + id;
+  }
+  return url;
+}
+
+// ── Sanitize URL ─────────────────────────────────────────────────────────────
+function sanitizeUrl(raw) {
+  if (!raw) return '';
+  var u = String(raw).trim().replace(/^["']+|["']+$/g, '');
+  var m = u.match(/https?:\/\/[^\s"'<>]+/i);
+  if (m) u = m[0];
+  return u.replace(/[.,)>\]]+$/, '');
+}
+
+// ── triggerDownload: anchor click — never blocked ────────────────────────────
+function triggerDownload(rawUrl, filename) {
+  var url = buildDlUrl(sanitizeUrl(rawUrl));
+  var a   = document.createElement('a');
+  a.href  = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ a.remove(); }, 300);
+}
+
+// ── openPdfModal: action card with real <a> links ────────────────────────────
+function openPdfModal(rawUrl, title, meta) {
+  var url     = sanitizeUrl(rawUrl);
+  var viewUrl = buildViewUrl(url);
+  var dlUrl   = buildDlUrl(url);
+  var isImage = /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(url.split('?')[0]) ||
+                (url.includes('res.cloudinary.com') && url.includes('/image/upload/'));
+
+  var modal   = document.getElementById('pdf-modal');
+  var body    = document.getElementById('pdf-modal-body');
+  var titleEl = document.getElementById('pdf-modal-title');
+  var metaEl  = document.getElementById('pdf-modal-meta');
+  var badge   = document.getElementById('pdf-type-badge');
+  var hint    = document.getElementById('pdf-toolbar-hint');
+  var iconEl  = document.getElementById('pdf-file-icon');
+  var dlBtn   = document.getElementById('pdf-download-btn');
+  var nwBtn   = document.getElementById('pdf-newwin-btn');
+
+  titleEl.textContent = title || 'Document';
+  metaEl.textContent  = meta  || '';
+  badge.textContent   = isImage ? 'Image' : 'Document';
+  badge.className     = isImage ? 'pdf-type-badge img' : 'pdf-type-badge pdf';
+  iconEl.textContent  = isImage ? 'IMG' : 'DOC';
+  hint.textContent    = 'Opens in a new tab';
+
+  nwBtn.href = viewUrl;
+  if (dlBtn.tagName === 'A') { dlBtn.href = dlUrl; dlBtn.target = '_blank'; dlBtn.rel = 'noopener'; }
+  else dlBtn.onclick = function(){ window.open(dlUrl, '_blank', 'noopener'); };
+
+  body.innerHTML = '';
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  if (isImage) {
+    var img = document.createElement('img');
+    img.className = 'preview-img'; img.src = url;
+    body.appendChild(img);
+  } else {
+    body.innerHTML =
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;' +
+      'align-items:center;justify-content:center;gap:1.6rem;padding:2rem;' +
+      'background:linear-gradient(135deg,#0a0a18,#12122a);text-align:center;">' +
+
+      '<div style="width:80px;height:80px;border-radius:20px;display:flex;' +
+      'align-items:center;justify-content:center;font-size:2.6rem;' +
+      'background:linear-gradient(135deg,#e8610a,#f07d2a);' +
+      'box-shadow:0 8px 32px rgba(232,97,10,.45);">PDF</div>' +
+
+      '<div><p style="color:#fff;font-size:1.1rem;font-weight:700;' +
+      'font-family:Playfair Display,serif;margin-bottom:.4rem;">' +
+      (title || 'Document') + '</p>' +
+      (meta ? '<p style="color:rgba(255,255,255,.4);font-size:.8rem;">' + meta + '</p>' : '') +
+      '</div>' +
+
+      '<div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">' +
+
+      '<a href="' + viewUrl + '" target="_blank" rel="noopener" ' +
+      'style="display:inline-flex;align-items:center;gap:.6rem;padding:.9rem 2rem;' +
+      'border-radius:12px;font-size:.92rem;font-weight:700;text-decoration:none;' +
+      'background:linear-gradient(135deg,#e8610a,#f07d2a);color:#fff;' +
+      'box-shadow:0 6px 20px rgba(232,97,10,.45);">View File</a>' +
+
+      '<a href="' + dlUrl + '" target="_blank" rel="noopener" ' +
+      'style="display:inline-flex;align-items:center;gap:.6rem;padding:.9rem 2rem;' +
+      'border-radius:12px;font-size:.92rem;font-weight:700;text-decoration:none;' +
+      'background:rgba(255,255,255,.12);color:#fff;' +
+      'border:1.5px solid rgba(255,255,255,.25);">Download</a>' +
+
+      '</div>' +
+
+      '<p style="color:rgba(255,255,255,.3);font-size:.75rem;max-width:280px;line-height:1.6;">' +
+      'Opens in a new tab. Use browser back button to return.</p>' +
+      '</div>';
+  }
+}
+
+function closePdfModal() {
+  document.getElementById('pdf-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('pdf-modal-body').innerHTML = '';
+}
+
+
+// Close on backdrop click + Escape — wait for DOM
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pdf-modal').addEventListener('click', function(e){
+    if (e.target === this) closePdfModal();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePdfModal(); });
+});
+
+</script>
+
+<!-- ══════════════════════════════
+     PDF VIEWER MODAL
+══════════════════════════════ -->
+<div id="pdf-modal">
+  <div class="pdf-modal-box">
+    <div class="pdf-modal-header">
+      <div class="pdf-modal-title-wrap">
+        <div class="pdf-file-icon" id="pdf-file-icon">📄</div>
+        <div>
+          <div class="pdf-modal-title" id="pdf-modal-title">Document</div>
+          <div class="pdf-modal-meta" id="pdf-modal-meta"></div>
+        </div>
+      </div>
+      <div class="pdf-modal-actions">
+        <a class="pdf-action-btn newwin" id="pdf-newwin-btn" href="#" target="_blank">↗ Open in New Tab</a>
+        <a class="pdf-action-btn download" id="pdf-download-btn" href="#" target="_blank" rel="noopener">↓ Download</a>
+        <button class="pdf-close-btn" onclick="closePdfModal()">✕</button>
+      </div>
+    </div>
+    <div class="pdf-modal-toolbar">
+      <span class="pdf-type-badge" id="pdf-type-badge">PDF</span>
+      <span class="pdf-toolbar-hint" id="pdf-toolbar-hint">Use browser controls to zoom · scroll to navigate</span>
+    </div>
+    <div class="pdf-modal-body" id="pdf-modal-body">
+      <div class="pdf-loading" id="pdf-loading">
+        <div class="load-ring"></div>
+        <span>Loading document…</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     QUILL RICH TEXT EDITOR
+     Primary CDN: unpkg (reliable)
+     Fallback CDN: cdnjs
+══════════════════════════════ -->
+<link rel="stylesheet" href="https://unpkg.com/quill@1.3.7/dist/quill.snow.css">
+<script>
+// Load Quill JS dynamically with fallback CDN
+(function loadQuillThenInit() {
+  var PRIMARY  = 'https://unpkg.com/quill@1.3.7/dist/quill.min.js';
+  var FALLBACK = 'https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js';
+
+  function initEditors() {
+    if (typeof Quill === 'undefined') {
+      console.error('Quill failed to load from all CDNs');
+      return;
+    }
+    var FULL_TB = [
+      [{ header: [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ color: [] }, { background: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ indent: '-1' }, { indent: '+1' }],
+      [{ align: [] }],
+      ['blockquote', 'link'],
+      ['clean']
+    ];
+    var MINI_TB = [
+      ['bold', 'italic', 'underline'],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ align: [] }],
+      ['link', 'clean']
+    ];
+    try {
+      window._qBlog     = new Quill('#b-content-editor',  { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Write your article here...' });
+      window._qSyllabus = new Quill('#s-topics-editor',   { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Enter topics, sub-topics, notes with full formatting...' });
+      window._qMDesc    = new Quill('#m-desc-editor',     { theme:'snow', modules:{toolbar:MINI_TB}, placeholder:'Brief description of this material...' });
+      window._qPlanning = new Quill('#pl-topics-editor',  { theme:'snow', modules:{toolbar:MINI_TB}, placeholder:'Topics covered this month...' });
+      // Class 11 editors
+      window._qC11Blog     = new Quill('#c11-b-content-editor', { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Write for Class 11...' });
+      window._qC11Syllabus = new Quill('#c11-s-topics-editor',  { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Enter topics...' });
+      window._qC11Planning = new Quill('#c11-pl-topics-editor',  { theme:'snow', modules:{toolbar:MINI_TB}, placeholder:'Topics covered this month...' });
+      // Class 12 editors
+      window._qC12Blog     = new Quill('#c12-b-content-editor', { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Write for Class 12...' });
+      window._qC12Syllabus = new Quill('#c12-s-topics-editor',  { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Enter topics...' });
+      window._qC12Planning = new Quill('#c12-pl-topics-editor',  { theme:'snow', modules:{toolbar:MINI_TB}, placeholder:'Topics covered this month...' });
+      ['#m-desc-editor .ql-editor', '#pl-topics-editor .ql-editor',
+       '#c11-pl-topics-editor .ql-editor','#c12-pl-topics-editor .ql-editor'].forEach(function(sel) {
+        var el = document.querySelector(sel);
+        if (el) el.style.minHeight = '80px';
+      });
+      console.log('Quill editors initialized');
+    } catch(e) {
+      console.error('Quill init error:', e);
+    }
+  }
+
+  function loadScript(src, onSuccess, onFail) {
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload = onSuccess;
+    s.onerror = onFail;
+    document.head.appendChild(s);
+  }
+
+  // Try primary CDN, fall back to secondary if it fails
+  loadScript(PRIMARY,
+    function() { initEditors(); },
+    function() {
+      console.warn('Quill primary CDN failed, trying fallback...');
+      loadScript(FALLBACK,
+        function() { initEditors(); },
+        function() { console.error('Both Quill CDNs failed.'); }
+      );
+    }
+  );
+})();
+</script>
+
+<!-- ══════════════════════════════
+     BLOG IMAGE OPTIONS MODAL
+══════════════════════════════ -->
+<div class="blog-modal-overlay" id="blog-img-modal">
+  <div class="blog-modal-box">
+    <h3>🖼️ Image Options</h3>
+    <div id="blog-img-preview-wrap" style="text-align:center;margin-bottom:1rem;">
+      <img id="blog-img-preview" src="" alt="preview"
+        style="max-width:100%;max-height:160px;border-radius:8px;border:1.5px solid var(--border);display:none;">
+      <p id="blog-img-uploading" style="color:var(--muted);font-size:.82rem;padding:1rem 0;">Uploading image...</p>
+    </div>
+    <div class="bm-row">
+      <div class="bm-field">
+        <label>Width</label>
+        <select id="img-size">
+          <option value="25%">Small (25%)</option>
+          <option value="50%">Medium (50%)</option>
+          <option value="75%">Large (75%)</option>
+          <option value="100%" selected>Full width (100%)</option>
+          <option value="custom">Custom px...</option>
+        </select>
+      </div>
+      <div class="bm-field">
+        <label>Alignment</label>
+        <select id="img-align">
+          <option value="left">Left</option>
+          <option value="center" selected>Center</option>
+          <option value="right">Right</option>
+        </select>
+      </div>
+    </div>
+    <div class="bm-field" id="img-custom-wrap" style="display:none">
+      <label>Custom width (px)</label>
+      <input type="number" id="img-custom-px" placeholder="e.g. 300" min="50" max="1200">
+    </div>
+    <div class="bm-field">
+      <label>Caption (optional)</label>
+      <input type="text" id="img-caption" placeholder="e.g. Figure 1: Diagram of the water cycle">
+    </div>
+    <div class="bm-actions">
+      <button class="bm-btn-cancel" onclick="blogCloseModals()">Cancel</button>
+      <button class="bm-btn-insert" id="img-insert-btn" onclick="blogInsertImageFinal()" disabled>
+        Insert Image
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     BLOG TABLE BUILDER MODAL
+══════════════════════════════ -->
+<div class="blog-modal-overlay" id="blog-table-modal">
+  <div class="blog-modal-box">
+    <h3>📋 Insert Table</h3>
+    <div class="bm-row">
+      <div class="bm-field">
+        <label>Rows</label>
+        <input type="number" id="tbl-rows" value="3" min="1" max="20">
+      </div>
+      <div class="bm-field">
+        <label>Columns</label>
+        <input type="number" id="tbl-cols" value="3" min="1" max="10">
+      </div>
+    </div>
+    <div class="bm-field">
+      <label>Header Row</label>
+      <input type="text" id="tbl-headers" placeholder="e.g. Name, Marks, Grade (comma separated)">
+    </div>
+    <div class="bm-field">
+      <label>Style</label>
+      <select id="tbl-style">
+        <option value="orange">Orange Header (default)</option>
+        <option value="blue">Blue Header</option>
+        <option value="green">Green Header</option>
+        <option value="plain">Plain / No colour</option>
+      </select>
+    </div>
+    <div class="bm-actions">
+      <button class="bm-btn-cancel" onclick="blogCloseModals()">Cancel</button>
+      <button class="bm-btn-insert" onclick="blogInsertTable()">Insert Table</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     BLOG CHART BUILDER MODAL
+══════════════════════════════ -->
+<div class="blog-modal-overlay" id="blog-chart-modal">
+  <div class="blog-modal-box">
+    <h3>📊 Insert Chart</h3>
+    <div class="bm-row">
+      <div class="bm-field">
+        <label>Chart Type</label>
+        <select id="chart-type" onchange="blogUpdateChartPreview()">
+          <option value="bar">Bar Chart</option>
+          <option value="line">Line Chart</option>
+          <option value="pie">Pie Chart</option>
+          <option value="doughnut">Doughnut Chart</option>
+        </select>
+      </div>
+      <div class="bm-field">
+        <label>Chart Title</label>
+        <input type="text" id="chart-title" placeholder="e.g. Monthly Test Scores"
+          oninput="blogUpdateChartPreview()">
+      </div>
+    </div>
+    <div class="bm-field">
+      <label>Labels (comma separated)</label>
+      <input type="text" id="chart-labels" value="Jan, Feb, Mar, Apr, May"
+        oninput="blogUpdateChartPreview()">
+    </div>
+    <div class="bm-field">
+      <label>Values (comma separated numbers)</label>
+      <input type="text" id="chart-values" value="85, 78, 92, 88, 95"
+        oninput="blogUpdateChartPreview()">
+    </div>
+    <div class="bm-field">
+      <label>Live Preview</label>
+      <canvas id="chart-preview-canvas" height="180"></canvas>
+    </div>
+    <div class="bm-actions">
+      <button class="bm-btn-cancel" onclick="blogCloseModals()">Cancel</button>
+      <button class="bm-btn-insert" onclick="blogInsertChart()">Insert Chart</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     BLOG YOUTUBE EMBED MODAL
+══════════════════════════════ -->
+<div class="blog-modal-overlay" id="blog-yt-modal">
+  <div class="blog-modal-box">
+    <h3>▶️ Embed YouTube Video</h3>
+    <div class="bm-field">
+      <label>YouTube Link</label>
+      <input type="text" id="yt-url" placeholder="https://youtube.com/watch?v=... or youtu.be/...">
+    </div>
+    <div class="bm-field">
+      <label>Caption (optional)</label>
+      <input type="text" id="yt-caption" placeholder="e.g. Chapter 5 Explanation Video">
+    </div>
+    <div class="bm-actions">
+      <button class="bm-btn-cancel" onclick="blogCloseModals()">Cancel</button>
+      <button class="bm-btn-insert" onclick="blogInsertYouTube()">Embed Video</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
