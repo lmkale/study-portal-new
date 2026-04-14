@@ -41,8 +41,12 @@
   async function removeItem(col, id) {
     await deleteDoc(doc(db, col, id));
   }
+  async function updateItem(col, id, data) {
+    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    await updateDoc(doc(db, col, id), data);
+  }
 
-  window.FB = { auth, loadCollection, addItem, removeItem,
+  window.FB = { auth, loadCollection, addItem, removeItem, updateItem,
     signIn:  (email, pass) => signInWithEmailAndPassword(auth, email, pass),
     signOut: () => signOut(auth),
     onAuth:  (cb) => onAuthStateChanged(auth, cb)
@@ -1288,31 +1292,55 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
 
           <!-- Upload file -->
           <div class="add-form" style="margin-top:1rem;">
-            <h3>+ Upload Document</h3>
+            <h3>+ Add Document</h3>
             <div class="field"><label>Title</label><input id="gram-title" placeholder="e.g. Tense Chart PDF"></div>
             <div class="field"><label>Upload to Folder</label>
               <select id="gram-folder-target"><option value="">— Root —</option></select>
             </div>
-            <div class="drop-zone" id="gram-drop-zone"
-              ondragover="dzDragOver(event,'gram-drop-zone')"
-              ondragleave="dzDragLeave('gram-drop-zone')"
-              ondrop="dzDrop(event,'gram-file-input','gram-drop-zone','gram-file-name')">
-              <input type="file" id="gram-file-input"
-                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.txt,.csv"
-                onchange="dzPick(this,'gram-file-name')">
-              <span class="drop-zone-icon">📎</span>
-              <div class="drop-zone-text">
-                <strong>Click to browse</strong> or drag &amp; drop<br>
-                <small>PDF, Word, PPT, Excel, Images, ZIP, TXT · Max 25 MB</small>
+
+            <!-- Source toggle: Upload or Link -->
+            <div style="margin-bottom:.5rem">
+              <label style="display:block;font-size:.72rem;color:var(--adm-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;font-weight:600;">File / Document</label>
+              <div class="src-tabs">
+                <button class="src-tab active" onclick="srcSwitch('gram','upload',this)">📎 Upload from Device</button>
+                <button class="src-tab"        onclick="srcSwitch('gram','link',this)">🔗 Paste Link</button>
               </div>
-              <div class="drop-zone-file-name" id="gram-file-name" style="display:none"></div>
             </div>
-            <div class="upload-progress-wrap" id="gram-progress-wrap">
-              <div class="upload-progress-bar-bg"><div class="upload-progress-bar-fill" id="gram-progress-fill"></div></div>
-              <div class="upload-progress-label">Uploading… <span id="gram-progress-pct">0%</span></div>
+
+            <!-- Upload zone (default shown) -->
+            <div id="gram-upload-zone-wrap">
+              <div class="drop-zone" id="gram-drop-zone"
+                ondragover="dzDragOver(event,'gram-drop-zone')"
+                ondragleave="dzDragLeave('gram-drop-zone')"
+                ondrop="dzDrop(event,'gram-file-input','gram-drop-zone','gram-file-name')">
+                <input type="file" id="gram-file-input"
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.txt,.csv"
+                  onchange="dzPick(this,'gram-file-name')">
+                <span class="drop-zone-icon">📎</span>
+                <div class="drop-zone-text">
+                  <strong>Click to browse</strong> or drag &amp; drop<br>
+                  <small>PDF, Word, PPT, Excel, Images, ZIP, TXT · Max 25 MB</small>
+                </div>
+                <div class="drop-zone-file-name" id="gram-file-name" style="display:none"></div>
+              </div>
+              <div class="upload-progress-wrap" id="gram-progress-wrap">
+                <div class="upload-progress-bar-bg"><div class="upload-progress-bar-fill" id="gram-progress-fill"></div></div>
+                <div class="upload-progress-label">Uploading… <span id="gram-progress-pct">0%</span></div>
+              </div>
             </div>
+
+            <!-- Link input (hidden by default) -->
+            <div class="url-source" id="gram-link-wrap">
+              <div class="field" style="margin-bottom:0">
+                <label style="margin-bottom:.4rem">File / Document Link</label>
+                <input id="gram-url" placeholder="https://drive.google.com/… or any direct link"
+                  oninput="previewUrl(this.value,'gram-url-preview')">
+                <div id="gram-url-preview" style="font-size:.7rem;margin-top:.4rem;color:var(--orange);word-break:break-all;display:none"></div>
+              </div>
+            </div>
+
             <br>
-            <button class="btn btn-sm" onclick="adminAddGrammarFile()">Upload File</button>
+            <button class="btn btn-sm" onclick="adminAddGrammarFile()">Add Document</button>
           </div>
 
           <span class="items-label">Folders & Files</span>
@@ -2047,25 +2075,55 @@ async function loadAdminClassBlog(cls) {
 }
 
 async function loadAdminClassPapers(cls) {
-  const items = await window.FB.loadCollection(cls+'-papers');
+  const folders = await window.FB.loadCollection(cls+'-papers-folders');
+  const items   = await window.FB.loadCollection(cls+'-papers');
   const el = document.getElementById('admin-'+cls+'-papers-list');
   if(!el) return;
-  el.innerHTML = !items.length ? emptyAdm : items.map(p=>`
-    <div class="item-row">
+  let html='';
+  if(!folders.length && !items.length){ el.innerHTML=emptyAdm; return; }
+  folders.forEach(f=>{
+    html+=`<div class="item-row">
+      <div class="item-row-info"><h4>📁 ${f.name}</h4><p>Folder · Parent: ${f.parentName||'Root'}</p></div>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+        <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+          onclick="adminOpenRenameModal('${cls}-papers-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button>
+        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers-folders','${f.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
+      </div>
+    </div>`;
+  });
+  items.forEach(p=>{
+    html+=`<div class="item-row">
       <div class="item-row-info"><h4>${p.title}</h4><p>${p.subject||''} · ${p.year||''} · 📁 ${p.folderName||'Root'}</p></div>
       <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers','${p.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
-    </div>`).join('');
+    </div>`;
+  });
+  el.innerHTML=html||emptyAdm;
 }
 
 async function loadAdminClassMaterial(cls) {
-  const items = await window.FB.loadCollection(cls+'-material');
+  const folders = await window.FB.loadCollection(cls+'-mat-folders');
+  const items   = await window.FB.loadCollection(cls+'-material');
   const el = document.getElementById('admin-'+cls+'-material-list');
   if(!el) return;
-  el.innerHTML = !items.length ? emptyAdm : items.map(m=>`
-    <div class="item-row">
+  let html='';
+  if(!folders.length && !items.length){ el.innerHTML=emptyAdm; return; }
+  folders.forEach(f=>{
+    html+=`<div class="item-row">
+      <div class="item-row-info"><h4>📁 ${f.name}</h4><p>Folder · Parent: ${f.parentName||'Root'}</p></div>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+        <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+          onclick="adminOpenRenameModal('${cls}-mat-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button>
+        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-mat-folders','${f.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
+      </div>
+    </div>`;
+  });
+  items.forEach(m=>{
+    html+=`<div class="item-row">
       <div class="item-row-info"><h4>${m.title}</h4><p>${m.type||''} · ${m.subject||''} · 📁 ${m.folderName||'Root'}</p></div>
       <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-material','${m.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
-    </div>`).join('');
+    </div>`;
+  });
+  el.innerHTML=html||emptyAdm;
 }
 
 async function loadAdminClassSyllabus(cls) {
@@ -2100,12 +2158,17 @@ async function loadAdminGrammar() {
   folders.forEach(f=>{
     html+=`<div class="item-row">
       <div class="item-row-info"><h4>📁 ${f.name}</h4><p>Folder · Parent: ${f.parentName||'Root'}</p></div>
-      <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-folders','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFolders(''))">Delete</button>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+        <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+          onclick="adminOpenRenameModal('grammar-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button>
+        <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-folders','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFolders(''))">Delete</button>
+      </div>
     </div>`;
   });
   files.forEach(f=>{
+    const src=f.source==='link'?'🔗 Link':'☁️ Uploaded';
     html+=`<div class="item-row">
-      <div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 ${f.folderName||'Root'}</p></div>
+      <div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 ${f.folderName||'Root'} · ${src}</p></div>
       <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-files','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFiles(''))">Delete</button>
     </div>`;
   });
@@ -2119,6 +2182,62 @@ async function delClassItem(col,id,rA,rP) {
     await rA(); rP();
   } catch(e) { toast('Error deleting: '+e.message, false); }
 }
+
+// ── FOLDER RENAME ──
+function adminOpenRenameModal(col, folderId, currentName) {
+  document.getElementById('rename-folder-id').value = folderId;
+  document.getElementById('rename-folder-col').value = col;
+  document.getElementById('rename-folder-name').value = currentName;
+  document.getElementById('folder-rename-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('rename-folder-name').focus(), 80);
+}
+
+function adminCloseRenameModal() {
+  document.getElementById('folder-rename-modal').classList.remove('open');
+}
+
+async function adminSaveRenameFolder() {
+  const col    = document.getElementById('rename-folder-col').value;
+  const id     = document.getElementById('rename-folder-id').value;
+  const newName= document.getElementById('rename-folder-name').value.trim();
+  if(!newName){ toast('Enter a folder name',false); return; }
+  try {
+    // Update only the 'name' field — files keep their folderName snapshot for display
+    // but the folder record itself gets the new name for navigation
+    await window.FB.updateItem(col, id, { name: newName });
+    adminCloseRenameModal();
+    toast('Folder renamed! ✅');
+    // Refresh the correct admin list and folder selects
+    const colToRefresh = {
+      'grammar-folders':    ()=>{ loadAdminGrammar(); refreshFolderSelects(); },
+      'c11-papers-folders': ()=>{ loadAdminClassPapers('c11'); refreshFolderSelects(); },
+      'c11-mat-folders':    ()=>{ loadAdminClassMaterial('c11'); refreshFolderSelects(); },
+      'c12-papers-folders': ()=>{ loadAdminClassPapers('c12'); refreshFolderSelects(); },
+      'c12-mat-folders':    ()=>{ loadAdminClassMaterial('c12'); refreshFolderSelects(); },
+    };
+    if(colToRefresh[col]) colToRefresh[col]();
+    // Also refresh public folder navigation
+    const pubRefresh = {
+      'grammar-folders':    ()=>{ loadPublicGrammarFolders(''); loadPublicGrammarFiles(''); },
+      'c11-papers-folders': ()=>loadPublicClassPapers('c11'),
+      'c11-mat-folders':    ()=>loadPublicClassMaterial('c11'),
+      'c12-papers-folders': ()=>loadPublicClassPapers('c12'),
+      'c12-mat-folders':    ()=>loadPublicClassMaterial('c12'),
+    };
+    if(pubRefresh[col]) pubRefresh[col]();
+  } catch(e){ toast('Rename failed: '+e.message,false); }
+}
+
+// Close rename modal on backdrop click or Escape
+document.addEventListener('click', function(e){
+  if(e.target.id==='folder-rename-modal') adminCloseRenameModal();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape' && document.getElementById('folder-rename-modal').classList.contains('open'))
+    adminCloseRenameModal();
+});
+
+
 
 // ── FOLDER HELPERS ──
 async function buildBreadcrumb(col, folderId) {
@@ -2213,20 +2332,39 @@ async function adminAddGrammarFile() {
   const folderId=document.getElementById('gram-folder-target').value;
   let folderName='Root';
   if(folderId){ const all=await window.FB.loadCollection('grammar-folders'); const f=all.find(x=>x.id===folderId); folderName=f?f.name:'Root'; }
-  const file=document.getElementById('gram-file-input').files[0];
-  if(!file){ toast('Select a file to upload',false); return; }
-  if(file.size>25*1024*1024){ toast('File too large — max 25 MB',false); return; }
+
+  // Determine upload vs link mode
+  const uploadWrap=document.getElementById('gram-upload-zone-wrap');
+  const isUpload=uploadWrap&&!uploadWrap.classList.contains('hidden-src');
+  let url='';
+
+  if(isUpload){
+    const file=document.getElementById('gram-file-input').files[0];
+    if(!file){ toast('Select a file to upload, or switch to Paste Link',false); return; }
+    if(file.size>25*1024*1024){ toast('File too large — max 25 MB',false); return; }
+    try {
+      showProgress('gram',0);
+      url=await uploadToCloudinary(file,pct=>showProgress('gram',pct));
+      hideProgress('gram');
+    } catch(e){ hideProgress('gram'); toast('Upload failed: '+e.message,false); return; }
+  } else {
+    url=sanitizeUrl(document.getElementById('gram-url').value);
+    if(!validateUrl(url,'Document link')) return;
+  }
+
   try {
-    showProgress('gram',0);
-    const url=await uploadToCloudinary(file,pct=>showProgress('gram',pct));
-    hideProgress('gram');
-    await window.FB.addItem('grammar-files',{title:t,url,folder:folderId,folderName});
+    await window.FB.addItem('grammar-files',{title:t,url,folder:folderId,folderName,source:isUpload?'cloudinary':'link'});
     document.getElementById('gram-title').value='';
-    document.getElementById('gram-file-input').value='';
-    document.getElementById('gram-file-name').style.display='none';
-    toast('File uploaded! ✅'); await loadAdminGrammar();
+    if(isUpload){
+      document.getElementById('gram-file-input').value='';
+      document.getElementById('gram-file-name').style.display='none';
+    } else {
+      const gu=document.getElementById('gram-url'); if(gu) gu.value='';
+      const gp=document.getElementById('gram-url-preview'); if(gp) gp.style.display='none';
+    }
+    toast('Document added! ✅'); await loadAdminGrammar();
     loadPublicGrammarFiles(folderId);
-  } catch(e){ hideProgress('gram'); toast('Upload failed: '+e.message,false); }
+  } catch(e){ toast('Save failed: '+e.message,false); }
 }
 
 // ── ADD CLASS FUNCTIONS ──
@@ -3186,6 +3324,29 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="bm-actions">
       <button class="bm-btn-cancel" onclick="blogCloseModals()">Cancel</button>
       <button class="bm-btn-insert" onclick="blogInsertYouTube()">Embed Video</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     FOLDER RENAME MODAL
+══════════════════════════════ -->
+<div class="blog-modal-overlay" id="folder-rename-modal">
+  <div class="blog-modal-box" style="max-width:400px;">
+    <h3>✏️ Rename Folder</h3>
+    <input type="hidden" id="rename-folder-id">
+    <input type="hidden" id="rename-folder-col">
+    <div class="bm-field">
+      <label>New Folder Name</label>
+      <input type="text" id="rename-folder-name" placeholder="Enter new name…"
+        onkeydown="if(event.key==='Enter') adminSaveRenameFolder()">
+    </div>
+    <p style="font-size:.75rem;color:var(--muted);margin-top:-.3rem;margin-bottom:1rem;">
+      ℹ️ Renaming only updates the folder label. All uploaded files stay safe.
+    </p>
+    <div class="bm-actions">
+      <button class="bm-btn-cancel" onclick="adminCloseRenameModal()">Cancel</button>
+      <button class="bm-btn-insert" onclick="adminSaveRenameFolder()">Save Name</button>
     </div>
   </div>
 </div>
