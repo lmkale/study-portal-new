@@ -6,7 +6,6 @@
 <title>LMK Teacher Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query }
@@ -387,13 +386,6 @@ tbody td{padding:.95rem 1.2rem;font-size:.88rem;color:var(--ink2);}
 }
 .mat-card a:hover{background:var(--deep);transform:scale(1.03);}
 
-
-
-
-
-
-
-  
 /* ════════════════════════════
    ADMIN PANEL — dark orange
 ════════════════════════════ */
@@ -507,14 +499,6 @@ tbody td{padding:.95rem 1.2rem;font-size:.88rem;color:var(--ink2);}
 .sidebar-item[onclick*="material"].active{background:rgba(5,150,105,.2)!important;color:#6ee7b7!important;}
 .sidebar-item[onclick*="material"]:hover{color:#6ee7b7;}
 
-/* ── 📚 SYLLABUS — Rose / Pink ── */
-.sidebar-item[onclick*="syllabus"].active{background:rgba(225,29,72,.2)!important;color:#fda4af!important;}
-.sidebar-item[onclick*="syllabus"]:hover{color:#fda4af;}
-
-/* ── 📅 PLANNING — Amber / Gold ── */
-.sidebar-item[onclick*="planning"].active{background:rgba(217,119,6,.2)!important;color:#fcd34d!important;}
-.sidebar-item[onclick*="planning"]:hover{color:#fcd34d;}
-
 /* ════════════ PDF VIEWER MODAL ════════════ */
 #pdf-modal{
   display:none;position:fixed;inset:0;z-index:800;
@@ -624,6 +608,56 @@ tbody td{padding:.95rem 1.2rem;font-size:.88rem;color:var(--ink2);}
 }
 .btn-dl-file:hover{background:var(--orange-lt);color:var(--deep);border-color:var(--orange);}
 .mat-card .file-btns{margin-top:.85rem;}
+
+/* ════════════ SORT CONTROLS ════════════ */
+.sort-bar {
+  display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;flex-wrap:wrap;
+  padding:.7rem 1rem;background:var(--surface);border:1.5px solid var(--border2);
+  border-radius:10px;
+}
+.sort-bar label{font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
+.sort-select{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:7px;
+  padding:.35rem .75rem;font-size:.8rem;color:var(--ink2);font-family:'Plus Jakarta Sans',sans-serif;
+  cursor:pointer;outline:none;transition:border .2s;
+}
+.sort-select:focus{border-color:var(--orange);}
+.sort-results{font-size:.75rem;color:var(--muted);margin-left:auto;}
+/* View More */
+.view-more-wrap{text-align:center;margin-top:1.4rem;}
+.btn-view-more{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:var(--surface);border:1.5px solid var(--orange-lt);
+  color:var(--orange);font-size:.82rem;font-weight:700;
+  padding:.6rem 1.6rem;border-radius:10px;cursor:pointer;
+  transition:all .2s;letter-spacing:.03em;
+}
+.btn-view-more:hover{background:var(--orange);color:#fff;border-color:var(--orange);}
+
+/* ════════════ SORT CONTROLS ════════════ */
+.sort-bar {
+  display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;flex-wrap:wrap;
+  padding:.7rem 1rem;background:var(--surface);border:1.5px solid var(--border2);
+  border-radius:10px;
+}
+.sort-bar label{font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
+.sort-select{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:7px;
+  padding:.35rem .75rem;font-size:.8rem;color:var(--ink2);font-family:'Plus Jakarta Sans',sans-serif;
+  cursor:pointer;outline:none;transition:border .2s;
+}
+.sort-select:focus{border-color:var(--orange);}
+.sort-results{font-size:.75rem;color:var(--muted);margin-left:auto;}
+/* View More */
+.view-more-wrap{text-align:center;margin-top:1.4rem;}
+.btn-view-more{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:var(--surface);border:1.5px solid var(--orange-lt);
+  color:var(--orange);font-size:.82rem;font-weight:700;
+  padding:.6rem 1.6rem;border-radius:10px;cursor:pointer;
+  transition:all .2s;letter-spacing:.03em;
+}
+.btn-view-more:hover{background:var(--orange);color:#fff;border-color:var(--orange);}
 
 /* ── FOOTER ── */
 footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
@@ -749,9 +783,6 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
 }
 
 /* Per-panel Quill accent colours */
-
-
-
 
 /* ════════════════════════════════════
    RICH CONTENT — public display
@@ -901,7 +932,6 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
   .rich-content table { font-size:.78rem; }
   .rich-content table th, .rich-content table td { padding:.45rem .6rem; }
 }
-
 
 /* ════════════════════════════════════
    FILE UPLOAD UI
@@ -1057,7 +1087,20 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
       <span id="grammar-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
     </div>
     <div id="grammar-folders" class="folder-grid"></div>
-    <div id="grammar-files" class="material-grid" style="margin-top:1.2rem;"></div>
+    <div class="sort-bar" id="grammar-sort-bar" style="display:none;">
+      <label>Sort by:</label>
+      <select class="sort-select" id="grammar-sort-select" onchange="applySortGrammar()">
+        <option value="newest">⬇️ Newest First</option>
+        <option value="oldest">⬆️ Oldest First</option>
+        <option value="az">🔤 A → Z</option>
+        <option value="za">🔤 Z → A</option>
+      </select>
+      <span class="sort-results" id="grammar-sort-results"></span>
+    </div>
+    <div id="grammar-files" class="material-grid" style="margin-top:.5rem;"></div>
+    <div class="view-more-wrap" id="grammar-view-more" style="display:none;">
+      <button class="btn-view-more" onclick="viewMoreGrammar()">View more files ↓</button>
+    </div>
   </div>
 </div>
 
@@ -1067,39 +1110,34 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
   <div class="section">
     <!-- Sub-nav tabs for Class 11 -->
     <div class="class-subnav" id="c11-subnav">
-      <button class="csn-btn active" onclick="showClassTab('c11','syllabus',this)">📚 Syllabus</button>
-      <button class="csn-btn" onclick="showClassTab('c11','planning',this)">📅 Annual Plan</button>
-      <button class="csn-btn" onclick="showClassTab('c11','material',this)">📂 Study Material</button>
+      <button class="csn-btn active" onclick="showClassTab('c11','material',this)">📂 Study Material</button>
       <button class="csn-btn" onclick="showClassTab('c11','papers',this)">📝 Papers</button>
       <button class="csn-btn" onclick="showClassTab('c11','videos',this)">🎬 Videos</button>
-      <button class="csn-btn" onclick="showClassTab('c11','blog',this)">✍️ Blog</button>
-    </div>
-
-    <!-- SYLLABUS -->
-    <div class="class-tab active" id="c11-syllabus">
-      <div class="sec-hdr"><span class="sec-tag">Class 11</span><h2 class="sec-title">Unit-wise <em>Syllabus</em></h2><div class="divider"></div></div>
-      <div class="accordion" id="c11-syllabus-list"><div class="empty-state"><span class="es-icon">📚</span>Syllabus will appear here once added by the teacher.</div></div>
-    </div>
-
-    <!-- ANNUAL PLANNING -->
-    <div class="class-tab" id="c11-planning">
-      <div class="sec-hdr"><span class="sec-tag">Academic Year</span><h2 class="sec-title">Lesson Plan <em>Calendar</em></h2><div class="divider"></div></div>
-      <div class="tbl-wrap">
-        <table><thead><tr><th>Month</th><th>Topics Covered</th><th>Chapter(s)</th><th>Status</th></tr></thead>
-        <tbody id="c11-planning-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No entries yet.</td></tr></tbody></table>
-      </div>
     </div>
 
     <!-- STUDY MATERIAL (with folders) -->
-    <div class="class-tab" id="c11-material">
+    <div class="class-tab active" id="c11-material">
       <div class="sec-hdr"><span class="sec-tag">Resources</span><h2 class="sec-title">Download & <em>Learn</em></h2><div class="divider"></div></div>
       <div id="c11-mat-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
         <span style="font-size:.78rem;color:var(--muted);">📁</span>
         <span id="c11-mat-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
       </div>
       <div id="c11-mat-folders" class="folder-grid"></div>
-      <div id="c11-material-list" class="material-grid" style="margin-top:1.2rem;">
+      <div class="sort-bar" id="c11-mat-sort-bar" style="display:none;">
+        <label>Sort by:</label>
+        <select class="sort-select" id="c11-mat-sort-select" onchange="applySortMaterial('c11')">
+          <option value="newest">⬇️ Newest First</option>
+          <option value="oldest">⬆️ Oldest First</option>
+          <option value="az">🔤 A → Z</option>
+          <option value="za">🔤 Z → A</option>
+        </select>
+        <span class="sort-results" id="c11-mat-sort-results"></span>
+      </div>
+      <div id="c11-material-list" class="material-grid" style="margin-top:.5rem;">
         <div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>Study materials will appear here once uploaded by the teacher.</div>
+      </div>
+      <div class="view-more-wrap" id="c11-mat-view-more" style="display:none;">
+        <button class="btn-view-more" onclick="viewMoreMaterial('c11')">View more files ↓</button>
       </div>
     </div>
 
@@ -1111,9 +1149,24 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
         <span id="c11-papers-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
       </div>
       <div id="c11-papers-folders" class="folder-grid"></div>
-      <div class="tbl-wrap" style="margin-top:1.2rem;">
+      <div class="sort-bar" id="c11-papers-sort-bar" style="display:none;margin-top:1.2rem;">
+        <label>Sort by:</label>
+        <select class="sort-select" id="c11-papers-sort-select" onchange="applySortPapers('c11')">
+          <option value="newest">⬇️ Newest First</option>
+          <option value="oldest">⬆️ Oldest First</option>
+          <option value="az">🔤 A → Z</option>
+          <option value="za">🔤 Z → A</option>
+          <option value="year-desc">📅 Year (New→Old)</option>
+          <option value="year-asc">📅 Year (Old→New)</option>
+        </select>
+        <span class="sort-results" id="c11-papers-sort-results"></span>
+      </div>
+      <div class="tbl-wrap" style="margin-top:.5rem;">
         <table><thead><tr><th>Paper Title</th><th>Subject</th><th>Year</th><th>Download</th></tr></thead>
         <tbody id="c11-papers-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No papers yet.</td></tr></tbody></table>
+      </div>
+      <div class="view-more-wrap" id="c11-papers-view-more" style="display:none;">
+        <button class="btn-view-more" onclick="viewMorePapers('c11')">View more papers ↓</button>
       </div>
     </div>
 
@@ -1123,11 +1176,6 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
       <div class="video-grid" id="c11-videos-list"><div class="empty-state"><span class="es-icon">🎬</span>No videos added yet.</div></div>
     </div>
 
-    <!-- BLOG -->
-    <div class="class-tab" id="c11-blog">
-      <div class="sec-hdr"><span class="sec-tag">Latest Posts</span><h2 class="sec-title">Thoughts & <em>Insights</em></h2><div class="divider"></div></div>
-      <div class="blog-list" id="c11-blog-list"><div class="empty-state"><span class="es-icon">✍️</span>No blog posts yet.</div></div>
-    </div>
   </div>
 </div>
 
@@ -1136,36 +1184,33 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
   <div class="page-hdr"><h1>📚 Class 12</h1><p>All resources for Class 12 students</p></div>
   <div class="section">
     <div class="class-subnav" id="c12-subnav">
-      <button class="csn-btn active" onclick="showClassTab('c12','syllabus',this)">📚 Syllabus</button>
-      <button class="csn-btn" onclick="showClassTab('c12','planning',this)">📅 Annual Plan</button>
-      <button class="csn-btn" onclick="showClassTab('c12','material',this)">📂 Study Material</button>
+      <button class="csn-btn active" onclick="showClassTab('c12','material',this)">📂 Study Material</button>
       <button class="csn-btn" onclick="showClassTab('c12','papers',this)">📝 Papers</button>
       <button class="csn-btn" onclick="showClassTab('c12','videos',this)">🎬 Videos</button>
-      <button class="csn-btn" onclick="showClassTab('c12','blog',this)">✍️ Blog</button>
     </div>
 
-    <div class="class-tab active" id="c12-syllabus">
-      <div class="sec-hdr"><span class="sec-tag">Class 12</span><h2 class="sec-title">Unit-wise <em>Syllabus</em></h2><div class="divider"></div></div>
-      <div class="accordion" id="c12-syllabus-list"><div class="empty-state"><span class="es-icon">📚</span>Syllabus will appear here once added by the teacher.</div></div>
-    </div>
-
-    <div class="class-tab" id="c12-planning">
-      <div class="sec-hdr"><span class="sec-tag">Academic Year</span><h2 class="sec-title">Lesson Plan <em>Calendar</em></h2><div class="divider"></div></div>
-      <div class="tbl-wrap">
-        <table><thead><tr><th>Month</th><th>Topics Covered</th><th>Chapter(s)</th><th>Status</th></tr></thead>
-        <tbody id="c12-planning-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No entries yet.</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <div class="class-tab" id="c12-material">
+    <div class="class-tab active" id="c12-material">
       <div class="sec-hdr"><span class="sec-tag">Resources</span><h2 class="sec-title">Download & <em>Learn</em></h2><div class="divider"></div></div>
       <div id="c12-mat-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
         <span style="font-size:.78rem;color:var(--muted);">📁</span>
         <span id="c12-mat-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
       </div>
       <div id="c12-mat-folders" class="folder-grid"></div>
-      <div id="c12-material-list" class="material-grid" style="margin-top:1.2rem;">
+      <div class="sort-bar" id="c12-mat-sort-bar" style="display:none;">
+        <label>Sort by:</label>
+        <select class="sort-select" id="c12-mat-sort-select" onchange="applySortMaterial('c12')">
+          <option value="newest">⬇️ Newest First</option>
+          <option value="oldest">⬆️ Oldest First</option>
+          <option value="az">🔤 A → Z</option>
+          <option value="za">🔤 Z → A</option>
+        </select>
+        <span class="sort-results" id="c12-mat-sort-results"></span>
+      </div>
+      <div id="c12-material-list" class="material-grid" style="margin-top:.5rem;">
         <div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>Study materials will appear here once uploaded by the teacher.</div>
+      </div>
+      <div class="view-more-wrap" id="c12-mat-view-more" style="display:none;">
+        <button class="btn-view-more" onclick="viewMoreMaterial('c12')">View more files ↓</button>
       </div>
     </div>
 
@@ -1187,15 +1232,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
       <div class="video-grid" id="c12-videos-list"><div class="empty-state"><span class="es-icon">🎬</span>No videos added yet.</div></div>
     </div>
 
-    <div class="class-tab" id="c12-blog">
-      <div class="sec-hdr"><span class="sec-tag">Latest Posts</span><h2 class="sec-title">Thoughts & <em>Insights</em></h2><div class="divider"></div></div>
-      <div class="blog-list" id="c12-blog-list"><div class="empty-state"><span class="es-icon">✍️</span>No blog posts yet.</div></div>
-    </div>
   </div>
 </div>
-  
-<footer>© 2025 LMK. Portal · Educator · All rights reserved</footer>
 
+<footer>© 2025 LMK. Portal · Educator · All rights reserved</footer>
 
 <!-- ══════════════════════════════
      ADMIN OVERLAY
@@ -1251,18 +1291,12 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
         <div class="sidebar-item active" onclick="switchPanel('grammar-admin-panel',this)"><span class="si-icon">📖</span>Grammar</div>
         <div class="sidebar-section">Class 11</div>
         <div class="sidebar-item" onclick="switchPanel('c11-videos-panel',this)"><span class="si-icon">🎬</span>Videos</div>
-        <div class="sidebar-item" onclick="switchPanel('c11-blog-panel',this)"><span class="si-icon">✍️</span>Blog</div>
         <div class="sidebar-item" onclick="switchPanel('c11-papers-panel',this)"><span class="si-icon">📝</span>Papers</div>
         <div class="sidebar-item" onclick="switchPanel('c11-material-panel',this)"><span class="si-icon">📂</span>Study Material</div>
-        <div class="sidebar-item" onclick="switchPanel('c11-syllabus-panel',this)"><span class="si-icon">📚</span>Syllabus</div>
-        <div class="sidebar-item" onclick="switchPanel('c11-planning-panel',this)"><span class="si-icon">📅</span>Planning</div>
         <div class="sidebar-section">Class 12</div>
         <div class="sidebar-item" onclick="switchPanel('c12-videos-panel',this)"><span class="si-icon">🎬</span>Videos</div>
-        <div class="sidebar-item" onclick="switchPanel('c12-blog-panel',this)"><span class="si-icon">✍️</span>Blog</div>
         <div class="sidebar-item" onclick="switchPanel('c12-papers-panel',this)"><span class="si-icon">📝</span>Papers</div>
         <div class="sidebar-item" onclick="switchPanel('c12-material-panel',this)"><span class="si-icon">📂</span>Study Material</div>
-        <div class="sidebar-item" onclick="switchPanel('c12-syllabus-panel',this)"><span class="si-icon">📚</span>Syllabus</div>
-        <div class="sidebar-item" onclick="switchPanel('c12-planning-panel',this)"><span class="si-icon">📅</span>Planning</div>
         <div class="sidebar-logout">
           <div class="sidebar-item" onclick="closeAdmin()"><span class="si-icon">👁</span>View Site</div>
           <div class="sidebar-item" onclick="doLogout()"><span class="si-icon">🚪</span>Logout</div>
@@ -1362,31 +1396,6 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           </div>
           <span class="items-label">Saved Videos</span>
           <div class="items-list" id="admin-c11-videos-list"></div>
-        </div>
-
-        <!-- C11 BLOG -->
-        <div class="admin-panel" id="c11-blog-panel">
-          <h2>✍️ Class 11 — Blog</h2>
-          <p class="panel-desc">Write articles for Class 11 students.</p>
-          <div class="add-form"><h3>+ Write Post</h3>
-            <div class="field"><label>Post Title</label><input id="c11-b-title" placeholder="e.g. How to prepare for exams"></div>
-            <div class="rich-editor-wrap">
-              <label>Content</label>
-              <div class="blog-media-bar">
-                <span class="mb-label">Insert:</span>
-                <button type="button" class="mb-btn img" onclick="blogInsertImage('c11-b-content-editor')">🖼️ Image</button>
-                <button type="button" class="mb-btn tbl" onclick="blogOpenTableModal()">📋 Table</button>
-                <button type="button" class="mb-btn chart" onclick="blogOpenChartModal()">📊 Chart</button>
-                <button type="button" class="mb-btn div" onclick="blogInsertDivider()">— Divider</button>
-              </div>
-              <input type="file" id="c11-b-img-input" accept="image/*" style="display:none" onchange="blogHandleImageUpload(this,'_qC11Blog')">
-              <div id="c11-b-content-editor"></div>
-            </div>
-            <div class="field"><label>Tags</label><input id="c11-b-tags" placeholder="e.g. Exam Tips, Grammar"></div>
-            <button class="btn btn-sm" onclick="adminAddBlog('c11')">Publish Post</button>
-          </div>
-          <span class="items-label">Published Posts</span>
-          <div class="items-list" id="admin-c11-blog-list"></div>
         </div>
 
         <!-- C11 PAPERS -->
@@ -1501,48 +1510,6 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           <div class="items-list" id="admin-c11-material-list"></div>
         </div>
 
-        <!-- C11 SYLLABUS -->
-        <div class="admin-panel" id="c11-syllabus-panel">
-          <h2>📚 Class 11 — Syllabus</h2>
-          <p class="panel-desc">Each entry becomes an expandable unit on the Class 11 Syllabus tab.</p>
-          <div class="add-form"><h3>+ Add Unit</h3>
-            <div class="field"><label>Unit / Chapter Title</label><input id="c11-s-title" placeholder="e.g. Unit 1: Prose"></div>
-            <div class="rich-editor-wrap">
-              <label>Topics &amp; Content</label>
-              <div id="c11-s-topics-editor"></div>
-            </div>
-            <button class="btn btn-sm" onclick="adminAddSyllabus('c11')">Add Unit</button>
-          </div>
-          <span class="items-label">Saved Units</span>
-          <div class="items-list" id="admin-c11-syllabus-list"></div>
-        </div>
-
-        <!-- C11 PLANNING -->
-        <div class="admin-panel" id="c11-planning-panel">
-          <h2>📅 Class 11 — Annual Planning</h2>
-          <p class="panel-desc">Add month-wise entries for Class 11.</p>
-          <div class="add-form"><h3>+ Add Month Entry</h3>
-            <div class="form-row">
-              <div class="field"><label>Month</label><input id="c11-pl-month" placeholder="e.g. June"></div>
-              <div class="field"><label>Chapter(s)</label><input id="c11-pl-chapter" placeholder="e.g. Ch. 1–2"></div>
-            </div>
-            <div class="rich-editor-wrap">
-              <label>Topics Covered</label>
-              <div id="c11-pl-topics-editor"></div>
-            </div>
-            <div class="field"><label>Status</label>
-              <select id="c11-pl-status">
-                <option value="completed">✅ Completed</option>
-                <option value="progress">🔄 In Progress</option>
-                <option value="upcoming">📌 Upcoming</option>
-              </select>
-            </div>
-            <button class="btn btn-sm" onclick="adminAddPlanning('c11')">Add Entry</button>
-          </div>
-          <span class="items-label">Planning Entries</span>
-          <div class="items-list" id="admin-c11-planning-list"></div>
-        </div>
-
         <!-- ══ CLASS 12 PANELS ══ -->
         <!-- C12 VIDEOS -->
         <div class="admin-panel" id="c12-videos-panel">
@@ -1558,31 +1525,6 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           </div>
           <span class="items-label">Saved Videos</span>
           <div class="items-list" id="admin-c12-videos-list"></div>
-        </div>
-
-        <!-- C12 BLOG -->
-        <div class="admin-panel" id="c12-blog-panel">
-          <h2>✍️ Class 12 — Blog</h2>
-          <p class="panel-desc">Write articles for Class 12 students.</p>
-          <div class="add-form"><h3>+ Write Post</h3>
-            <div class="field"><label>Post Title</label><input id="c12-b-title" placeholder="e.g. Board exam preparation tips"></div>
-            <div class="rich-editor-wrap">
-              <label>Content</label>
-              <div class="blog-media-bar">
-                <span class="mb-label">Insert:</span>
-                <button type="button" class="mb-btn img" onclick="blogInsertImage('c12-b-content-editor')">🖼️ Image</button>
-                <button type="button" class="mb-btn tbl" onclick="blogOpenTableModal()">📋 Table</button>
-                <button type="button" class="mb-btn chart" onclick="blogOpenChartModal()">📊 Chart</button>
-                <button type="button" class="mb-btn div" onclick="blogInsertDivider()">— Divider</button>
-              </div>
-              <input type="file" id="c12-b-img-input" accept="image/*" style="display:none" onchange="blogHandleImageUpload(this,'_qC12Blog')">
-              <div id="c12-b-content-editor"></div>
-            </div>
-            <div class="field"><label>Tags</label><input id="c12-b-tags" placeholder="e.g. Board Exam, Tips"></div>
-            <button class="btn btn-sm" onclick="adminAddBlog('c12')">Publish Post</button>
-          </div>
-          <span class="items-label">Published Posts</span>
-          <div class="items-list" id="admin-c12-blog-list"></div>
         </div>
 
         <!-- C12 PAPERS -->
@@ -1697,53 +1639,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           <div class="items-list" id="admin-c12-material-list"></div>
         </div>
 
-        <!-- C12 SYLLABUS -->
-        <div class="admin-panel" id="c12-syllabus-panel">
-          <h2>📚 Class 12 — Syllabus</h2>
-          <p class="panel-desc">Each entry becomes an expandable unit on the Class 12 Syllabus tab.</p>
-          <div class="add-form"><h3>+ Add Unit</h3>
-            <div class="field"><label>Unit / Chapter Title</label><input id="c12-s-title" placeholder="e.g. Unit 1: Flamingo"></div>
-            <div class="rich-editor-wrap">
-              <label>Topics &amp; Content</label>
-              <div id="c12-s-topics-editor"></div>
-            </div>
-            <button class="btn btn-sm" onclick="adminAddSyllabus('c12')">Add Unit</button>
-          </div>
-          <span class="items-label">Saved Units</span>
-          <div class="items-list" id="admin-c12-syllabus-list"></div>
-        </div>
-
-        <!-- C12 PLANNING -->
-        <div class="admin-panel" id="c12-planning-panel">
-          <h2>📅 Class 12 — Annual Planning</h2>
-          <p class="panel-desc">Add month-wise entries for Class 12.</p>
-          <div class="add-form"><h3>+ Add Month Entry</h3>
-            <div class="form-row">
-              <div class="field"><label>Month</label><input id="c12-pl-month" placeholder="e.g. June"></div>
-              <div class="field"><label>Chapter(s)</label><input id="c12-pl-chapter" placeholder="e.g. Ch. 1–2"></div>
-            </div>
-            <div class="rich-editor-wrap">
-              <label>Topics Covered</label>
-              <div id="c12-pl-topics-editor"></div>
-            </div>
-            <div class="field"><label>Status</label>
-              <select id="c12-pl-status">
-                <option value="completed">✅ Completed</option>
-                <option value="progress">🔄 In Progress</option>
-                <option value="upcoming">📌 Upcoming</option>
-              </select>
-            </div>
-            <button class="btn btn-sm" onclick="adminAddPlanning('c12')">Add Entry</button>
-          </div>
-          <span class="items-label">Planning Entries</span>
-          <div class="items-list" id="admin-c12-planning-list"></div>
-        </div>
-
       </div>
     </div>
   </div>
 </div><!-- /admin-overlay -->
-
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── NAV ──
@@ -1848,12 +1747,10 @@ async function loadAllPublic() {
   if (!window.FB) return;
   try {
     await Promise.all([
-      loadPublicClassVideos('c11'), loadPublicClassBlog('c11'),
+      loadPublicClassVideos('c11'),
       loadPublicClassPapers('c11'), loadPublicClassMaterial('c11'),
-      loadPublicClassSyllabus('c11'), loadPublicClassPlanning('c11'),
-      loadPublicClassVideos('c12'), loadPublicClassBlog('c12'),
+      loadPublicClassVideos('c12'),
       loadPublicClassPapers('c12'), loadPublicClassMaterial('c12'),
-      loadPublicClassSyllabus('c12'), loadPublicClassPlanning('c12'),
       loadPublicGrammarFolders(''), loadPublicGrammarFiles('')
     ]);
   } catch(e) { console.log('Firebase not configured yet.'); }
@@ -1888,7 +1785,10 @@ async function loadPublicClassBlog(cls) {
   }).join('');
 }
 
-// ─── PUBLIC: CLASS PAPERS (folder-aware) ───
+// ─── PUBLIC: CLASS PAPERS (folder-aware, sortable, view-more) ───
+const PAPERS_PAGE_SIZE = 8;
+window._papersCache = {}; // { cls: { items, folderId, shown } }
+
 async function loadPublicClassPapers(cls, folderId='') {
   const allItems = await window.FB.loadCollection(cls+'-papers');
   const allFolders = await window.FB.loadCollection(cls+'-papers-folders');
@@ -1900,11 +1800,9 @@ async function loadPublicClassPapers(cls, folderId='') {
   const bcEl = document.getElementById(cls+'-papers-breadcrumb');
   if(!foldersEl||!listEl) return;
 
-  // Build breadcrumb
   const trail = await buildBreadcrumb(cls+'-papers-folders', folderId);
   bcEl.innerHTML = renderBreadcrumb(trail, (id)=>loadPublicClassPapers(cls,id));
 
-  // Folders
   let fHtml = '';
   if(folderId) fHtml += `<div class="folder-card folder-back" onclick="loadPublicClassPapers('${cls}','${(await getParentFolder(cls+'-papers-folders',folderId))}')">
     <div class="fc-icon">⬅️</div><div class="fc-name">Back</div></div>`;
@@ -1912,26 +1810,74 @@ async function loadPublicClassPapers(cls, folderId='') {
     <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
   foldersEl.innerHTML = fHtml;
 
-  // Papers table
-  const icons={Notes:'📄',Worksheet:'📋',Reference:'📘','Formula Sheet':'🔢',Assignment:'✏️'};
-  if (!curItems.length) {
+  // Store cache for sort/view-more
+  window._papersCache[cls] = { items: curItems, folderId, shown: PAPERS_PAGE_SIZE };
+
+  const sortBar = document.getElementById(cls+'-papers-sort-bar');
+  if(sortBar) sortBar.style.display = curItems.length ? 'flex' : 'none';
+
+  renderPaperItems(cls);
+}
+
+function renderPaperItems(cls) {
+  const cache = window._papersCache[cls];
+  if(!cache) return;
+  const listEl = document.getElementById(cls+'-papers-list');
+  const vmWrap = document.getElementById(cls+'-papers-view-more');
+  const resultsEl = document.getElementById(cls+'-papers-sort-results');
+  if(!listEl) return;
+
+  const sortSel = document.getElementById(cls+'-papers-sort-select');
+  const sortVal = sortSel ? sortSel.value : 'newest';
+  const sorted = sortItems(cache.items, sortVal);
+  const total = sorted.length;
+  const shown = Math.min(cache.shown, total);
+
+  if(resultsEl) resultsEl.textContent = total ? `${total} paper${total!==1?'s':''}` : '';
+
+  if(!total) {
     listEl.innerHTML='<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No papers in this folder.</td></tr>';
-  } else {
-    listEl.innerHTML = curItems.map(p=>`<tr>
-      <td><strong>${p.title}</strong></td><td>${p.subject||''}</td><td>${p.year||''}</td>
-      <td class="file-btns">
-        ${p.url?`<a class="btn-view-file" href="${buildViewUrl(p.url)}" target="_blank">👁 View</a>
-        <a class="btn-dl-file" href="${buildDlUrl(p.url)}" target="_blank">↓ Get</a>`:'—'}
-      </td></tr>`).join('');
+    if(vmWrap) vmWrap.style.display='none';
+    return;
+  }
+
+  listEl.innerHTML = sorted.slice(0, shown).map(p=>`<tr>
+    <td><strong>${p.title}</strong></td><td>${p.subject||''}</td><td>${p.year||''}</td>
+    <td class="file-btns">
+      ${p.url?`<a class="btn-view-file" href="${buildViewUrl(p.url)}" target="_blank">👁 View</a>
+      <a class="btn-dl-file" href="${buildDlUrl(p.url)}" target="_blank">↓ Get</a>`:'—'}
+    </td></tr>`).join('');
+
+  if(vmWrap) {
+    vmWrap.style.display = shown < total ? 'block' : 'none';
+    const vmBtn = vmWrap.querySelector('button');
+    if(vmBtn) vmBtn.textContent = `View more papers (${total-shown} remaining) ↓`;
   }
 }
 
-// ─── PUBLIC: CLASS MATERIAL (folder-aware) ───
+function applySortPapers(cls) {
+  if(window._papersCache[cls]) {
+    window._papersCache[cls].shown = PAPERS_PAGE_SIZE;
+    renderPaperItems(cls);
+  }
+}
+
+function viewMorePapers(cls) {
+  if(window._papersCache[cls]) {
+    window._papersCache[cls].shown += PAPERS_PAGE_SIZE;
+    renderPaperItems(cls);
+  }
+}
+
+// ─── PUBLIC: CLASS MATERIAL (folder-aware, sortable, view-more) ───
+const MATERIAL_PAGE_SIZE = 6;
+window._matCache = {}; // { cls: { items, folderId } }
+
 async function loadPublicClassMaterial(cls, folderId='') {
   const allItems = await window.FB.loadCollection(cls+'-material');
   const allFolders = await window.FB.loadCollection(cls+'-mat-folders');
   const curFolders = allFolders.filter(f=>(f.parent||'')===(folderId||''));
-  const curItems = allItems.filter(m=>(m.folder||'')===(folderId||''));
+  let curItems = allItems.filter(m=>(m.folder||'')===(folderId||''));
 
   const foldersEl = document.getElementById(cls+'-mat-folders');
   const listEl = document.getElementById(cls+'-material-list');
@@ -1948,18 +1894,77 @@ async function loadPublicClassMaterial(cls, folderId='') {
     <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
   foldersEl.innerHTML = fHtml;
 
-  const icons={Notes:'📄',Worksheet:'📋',Reference:'📘','Formula Sheet':'🔢',Assignment:'✏️'};
-  if (!curItems.length) {
+  // Store cache for sort/view-more
+  window._matCache[cls] = { items: curItems, folderId, shown: MATERIAL_PAGE_SIZE };
+
+  const sortBar = document.getElementById(cls+'-mat-sort-bar');
+  if(sortBar) sortBar.style.display = curItems.length ? 'flex' : 'none';
+
+  // Apply default sort + render
+  renderMaterialItems(cls);
+}
+
+function sortItems(items, sortVal) {
+  const arr = [...items];
+  if(sortVal === 'newest') arr.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  else if(sortVal === 'oldest') arr.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  else if(sortVal === 'az') arr.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
+  else if(sortVal === 'za') arr.sort((a,b)=>(b.title||'').localeCompare(a.title||''));
+  else if(sortVal === 'year-desc') arr.sort((a,b)=>parseInt(b.year||0)-parseInt(a.year||0));
+  else if(sortVal === 'year-asc') arr.sort((a,b)=>parseInt(a.year||0)-parseInt(b.year||0));
+  return arr;
+}
+
+function renderMaterialItems(cls) {
+  const cache = window._matCache[cls];
+  if(!cache) return;
+  const listEl = document.getElementById(cls+'-material-list');
+  const vmWrap = document.getElementById(cls+'-mat-view-more');
+  const resultsEl = document.getElementById(cls+'-mat-sort-results');
+  if(!listEl) return;
+
+  const sortSel = document.getElementById(cls+'-mat-sort-select');
+  const sortVal = sortSel ? sortSel.value : 'newest';
+  const sorted = sortItems(cache.items, sortVal);
+  const total = sorted.length;
+  const shown = Math.min(cache.shown, total);
+
+  if(resultsEl) resultsEl.textContent = total ? `${total} file${total!==1?'s':''}` : '';
+
+  if(!total) {
     listEl.innerHTML='<div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>No materials in this folder.</div>';
-  } else {
-    listEl.innerHTML = curItems.map(m=>`<div class="mat-card">
-      <div class="mat-type">${icons[m.type]||'📄'} ${m.type||'Notes'}</div>
-      <h4>${m.title}</h4><p>${m.subject||''}</p>
-      ${m.url?`<div class="file-btns">
-        <a class="btn-view-file" href="${buildViewUrl(m.url)}" target="_blank">👁 View</a>
-        <a class="btn-dl-file" href="${buildDlUrl(m.url)}" target="_blank">↓ Download</a>
-      </div>`:''}
-    </div>`).join('');
+    if(vmWrap) vmWrap.style.display='none';
+    return;
+  }
+
+  const icons={Notes:'📄',Worksheet:'📋',Reference:'📘','Formula Sheet':'🔢',Assignment:'✏️'};
+  listEl.innerHTML = sorted.slice(0, shown).map(m=>`<div class="mat-card">
+    <div class="mat-type">${icons[m.type]||'📄'} ${m.type||'Notes'}</div>
+    <h4>${m.title}</h4><p>${m.subject||''}</p>
+    ${m.url?`<div class="file-btns">
+      <a class="btn-view-file" href="${buildViewUrl(m.url)}" target="_blank">👁 View</a>
+      <a class="btn-dl-file" href="${buildDlUrl(m.url)}" target="_blank">↓ Download</a>
+    </div>`:''}
+  </div>`).join('');
+
+  if(vmWrap) {
+    vmWrap.style.display = shown < total ? 'block' : 'none';
+    const vmBtn = vmWrap.querySelector('button');
+    if(vmBtn) vmBtn.textContent = `View more files (${total-shown} remaining) ↓`;
+  }
+}
+
+function applySortMaterial(cls) {
+  if(window._matCache[cls]) {
+    window._matCache[cls].shown = MATERIAL_PAGE_SIZE; // reset pagination
+    renderMaterialItems(cls);
+  }
+}
+
+function viewMoreMaterial(cls) {
+  if(window._matCache[cls]) {
+    window._matCache[cls].shown += MATERIAL_PAGE_SIZE;
+    renderMaterialItems(cls);
   }
 }
 
@@ -2013,14 +2018,43 @@ async function loadPublicGrammarFolders(folderId='') {
   foldersEl.innerHTML=fHtml;
 }
 
+const GRAMMAR_PAGE_SIZE = 6;
+window._grammarCache = { items: [], folderId: '', shown: GRAMMAR_PAGE_SIZE };
+
 async function loadPublicGrammarFiles(folderId='') {
   const allItems = await window.FB.loadCollection('grammar-files');
   const curItems = allItems.filter(f=>(f.folder||'')===(folderId||''));
+  window._grammarCache = { items: curItems, folderId, shown: GRAMMAR_PAGE_SIZE };
+
+  const sortBar = document.getElementById('grammar-sort-bar');
+  if(sortBar) sortBar.style.display = curItems.length ? 'flex' : 'none';
+
+  renderGrammarFiles();
+}
+
+function renderGrammarFiles() {
+  const cache = window._grammarCache;
   const listEl = document.getElementById('grammar-files');
+  const vmWrap = document.getElementById('grammar-view-more');
+  const resultsEl = document.getElementById('grammar-sort-results');
   if(!listEl) return;
+
+  const sortSel = document.getElementById('grammar-sort-select');
+  const sortVal = sortSel ? sortSel.value : 'newest';
+  const sorted = sortItems(cache.items, sortVal);
+  const total = sorted.length;
+  const shown = Math.min(cache.shown, total);
+
+  if(resultsEl) resultsEl.textContent = total ? `${total} file${total!==1?'s':''}` : '';
+
   const icons={pdf:'📄',ppt:'📊',pptx:'📊',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',jpg:'🖼️',jpeg:'🖼️',png:'🖼️',zip:'🗜️',txt:'📃'};
-  if(!curItems.length){ listEl.innerHTML='<div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>No files in this folder yet.</div>'; return; }
-  listEl.innerHTML=curItems.map(f=>{
+  if(!total) {
+    listEl.innerHTML='<div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>No files in this folder yet.</div>';
+    if(vmWrap) vmWrap.style.display='none';
+    return;
+  }
+
+  listEl.innerHTML = sorted.slice(0, shown).map(f=>{
     const ext=(f.title||'').split('.').pop().toLowerCase();
     const icon=icons[ext]||'📎';
     return `<div class="mat-card">
@@ -2032,18 +2066,32 @@ async function loadPublicGrammarFiles(folderId='') {
       </div>`:''}
     </div>`;
   }).join('');
+
+  if(vmWrap) {
+    vmWrap.style.display = shown < total ? 'block' : 'none';
+    const vmBtn = vmWrap.querySelector('button');
+    if(vmBtn) vmBtn.textContent = `View more files (${total-shown} remaining) ↓`;
+  }
+}
+
+function applySortGrammar() {
+  window._grammarCache.shown = GRAMMAR_PAGE_SIZE;
+  renderGrammarFiles();
+}
+
+function viewMoreGrammar() {
+  window._grammarCache.shown += GRAMMAR_PAGE_SIZE;
+  renderGrammarFiles();
 }
 
 // ── ADMIN LOADERS ──
 async function loadAllAdmin() {
   try {
     await Promise.all([
-      loadAdminClassVideos('c11'), loadAdminClassBlog('c11'),
+      loadAdminClassVideos('c11'),
       loadAdminClassPapers('c11'), loadAdminClassMaterial('c11'),
-      loadAdminClassSyllabus('c11'), loadAdminClassPlanning('c11'),
-      loadAdminClassVideos('c12'), loadAdminClassBlog('c12'),
+      loadAdminClassVideos('c12'),
       loadAdminClassPapers('c12'), loadAdminClassMaterial('c12'),
-      loadAdminClassSyllabus('c12'), loadAdminClassPlanning('c12'),
       loadAdminGrammar(),
       refreshFolderSelects()
     ]);
@@ -2236,8 +2284,6 @@ document.addEventListener('keydown', function(e){
   if(e.key==='Escape' && document.getElementById('folder-rename-modal').classList.contains('open'))
     adminCloseRenameModal();
 });
-
-
 
 // ── FOLDER HELPERS ──
 async function buildBreadcrumb(col, folderId) {
@@ -2556,7 +2602,6 @@ function uploadToCloudinary(file, onProgress) {
   });
 }
 
-
 // ════════════════════════════════════════════════════════
 //  BLOG MEDIA FUNCTIONS
 // ════════════════════════════════════════════════════════
@@ -2827,7 +2872,6 @@ function blogInsertChart() {
   }
 }
 
-
 // ── DIVIDER ──────────────────────────────────────────────
 function blogInsertDivider() {
   blogInsertDOM('<div class="blog-divider">* * *</div>');
@@ -3058,7 +3102,6 @@ function closePdfModal() {
   document.getElementById('pdf-modal-body').innerHTML = '';
 }
 
-
 // Close on backdrop click + Escape — wait for DOM
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('pdf-modal').addEventListener('click', function(e){
@@ -3135,24 +3178,9 @@ document.addEventListener('DOMContentLoaded', () => {
       ['link', 'clean']
     ];
     try {
-      window._qBlog     = new Quill('#b-content-editor',  { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Write your article here...' });
-      window._qSyllabus = new Quill('#s-topics-editor',   { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Enter topics, sub-topics, notes with full formatting...' });
-      window._qMDesc    = new Quill('#m-desc-editor',     { theme:'snow', modules:{toolbar:MINI_TB}, placeholder:'Brief description of this material...' });
-      window._qPlanning = new Quill('#pl-topics-editor',  { theme:'snow', modules:{toolbar:MINI_TB}, placeholder:'Topics covered this month...' });
-      // Class 11 editors
-      window._qC11Blog     = new Quill('#c11-b-content-editor', { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Write for Class 11...' });
-      window._qC11Syllabus = new Quill('#c11-s-topics-editor',  { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Enter topics...' });
-      window._qC11Planning = new Quill('#c11-pl-topics-editor',  { theme:'snow', modules:{toolbar:MINI_TB}, placeholder:'Topics covered this month...' });
-      // Class 12 editors
-      window._qC12Blog     = new Quill('#c12-b-content-editor', { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Write for Class 12...' });
-      window._qC12Syllabus = new Quill('#c12-s-topics-editor',  { theme:'snow', modules:{toolbar:FULL_TB}, placeholder:'Enter topics...' });
-      window._qC12Planning = new Quill('#c12-pl-topics-editor',  { theme:'snow', modules:{toolbar:MINI_TB}, placeholder:'Topics covered this month...' });
-      ['#m-desc-editor .ql-editor', '#pl-topics-editor .ql-editor',
-       '#c11-pl-topics-editor .ql-editor','#c12-pl-topics-editor .ql-editor'].forEach(function(sel) {
-        var el = document.querySelector(sel);
-        if (el) el.style.minHeight = '80px';
-      });
-      console.log('Quill editors initialized');
+      // Only initialize editors for panels that still exist
+      // (Blog, Syllabus, Annual Plan panels have been removed)
+      console.log('Quill loaded (no rich-text editors needed for current panels)');
     } catch(e) {
       console.error('Quill init error:', e);
     }
