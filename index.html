@@ -363,6 +363,22 @@ tbody td{padding:.95rem 1.2rem;font-size:.88rem;color:var(--ink2);}
 .unit-list li{padding:.38rem 0 .38rem 1.2rem;position:relative;}
 .unit-list li::before{content:'▸';position:absolute;left:0;color:var(--orange);font-size:.65rem;top:.55rem;}
 
+/* ── CLASS ACCORDION (for Class 11/12 sub-tabs) ── */
+.class-accordion{display:flex;flex-direction:column;gap:.75rem;}
+.class-acc-item{background:var(--surface);border:1.5px solid var(--border2);border-radius:12px;overflow:hidden;}
+.class-acc-header{display:flex;justify-content:space-between;align-items:center;padding:1.15rem 1.5rem;
+  cursor:pointer;font-weight:600;color:var(--ink);font-size:.95rem;transition:background .15s;user-select:none;}
+.class-acc-header:hover{background:var(--orange-dim);}
+.class-acc-header .cacc-arrow{font-size:.65rem;color:var(--orange);transition:transform .25s;
+  background:var(--orange-lt);width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;}
+.class-acc-item.open .class-acc-header .cacc-arrow{transform:rotate(180deg);}
+.class-acc-item.open .class-acc-header{background:var(--orange-dim);}
+.class-acc-body{display:none;border-top:1.5px solid var(--border2);padding:1.2rem 1.5rem;animation:fadeUp .3s ease;}
+.class-acc-item.open .class-acc-body{display:block;}
+.class-acc-body .sec-hdr{margin-bottom:1.2rem;}
+.class-acc-body .sec-title{font-size:clamp(1rem,2vw,1.3rem);}
+
 /* ════════════ STUDY MATERIAL ════════════ */
 .material-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.3rem;}
 .mat-card{
@@ -447,6 +463,14 @@ tbody td{padding:.95rem 1.2rem;font-size:.88rem;color:var(--ink2);}
 .sidebar-item .si-icon{font-size:.95rem;width:18px;text-align:center;}
 .sidebar-section{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;
   color:var(--muted);padding:.8rem .9rem .3rem;font-weight:700;}
+
+/* Sidebar accordion groups */
+.sidebar-group{width:100%;}
+.sidebar-group-items{overflow:hidden;transition:max-height .3s ease;max-height:2000px;}
+.sidebar-group.collapsed .sidebar-group-items{max-height:0;}
+.sidebar-section{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.section-arrow{font-size:.55rem;color:var(--muted);transition:transform .25s;}
+.sidebar-group.collapsed .section-arrow{transform:rotate(-90deg);}
 .sidebar-logout{margin-top:auto;padding-top:1rem;border-top:1.5px solid var(--border);}
 
 .admin-main{flex:1;padding:2rem 2.5rem;overflow-y:auto;background:linear-gradient(160deg,#fff8f2 0%,#fdf4ec 100%);overflow-x:hidden;min-width:0;}
@@ -469,6 +493,29 @@ tbody td{padding:.95rem 1.2rem;font-size:.88rem;color:var(--ink2);}
   padding:1rem 1.3rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;
   transition:background .15s;}
 .item-row:hover{background:var(--orange-dim);}
+
+/* Collapsible folder tree in admin lists */
+.folder-collapse{border:1.5px solid var(--border);border-radius:10px;margin-bottom:.5rem;overflow:hidden;background:#fff;}
+.folder-collapse-header{display:flex;align-items:center;gap:.5rem;padding:.85rem 1.2rem;
+  cursor:pointer;font-weight:700;font-size:.86rem;color:var(--ink);
+  transition:background .15s;user-select:none;background:var(--surface2);}
+.folder-collapse-header:hover{background:var(--orange-dim);}
+.folder-collapse-header .fc-arrow{font-size:.55rem;color:var(--orange);transition:transform .25s;}
+.folder-collapse.collapsed .folder-collapse-header .fc-arrow{transform:rotate(-90deg);}
+.folder-collapse-header .fc-count{margin-left:auto;font-size:.72rem;font-weight:600;color:var(--muted);}
+.folder-collapse-body{border-top:1.5px solid var(--border2);}
+.folder-collapse.collapsed .folder-collapse-body{display:none;}
+.folder-collapse .item-row{border:none;border-radius:0;}
+.folder-collapse .item-row:not(:last-child){border-bottom:1.5px solid var(--border2);}
+.folder-root-section{margin-bottom:.5rem;}
+.folder-root-section>.root-header{display:flex;align-items:center;gap:.5rem;
+  padding:.65rem 0;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;user-select:none;}
+.folder-root-section>.root-header .fc-arrow{font-size:.55rem;color:var(--muted);transition:transform .25s;}
+.folder-root-section.collapsed>.root-header .fc-arrow{transform:rotate(-90deg);}
+.folder-root-section.collapsed .root-body{display:none;}
+.folder-root-section .root-body{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;}
+.folder-root-section .root-body .item-row{border:none;border-radius:0;}
+.folder-root-section .root-body .item-row:not(:last-child){border-bottom:1.5px solid var(--border2);}
 .item-row-info h4{color:var(--ink);font-size:.9rem;margin-bottom:.2rem;}
 .item-row-info p{color:var(--muted);font-size:.76rem;}
 
@@ -676,7 +723,8 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
   .form-row{grid-template-columns:1fr;}
   .admin-layout{flex-direction:column;}
   .admin-sidebar{width:100%;flex-direction:row;flex-wrap:wrap;padding:.8rem;gap:.3rem;border-right:none;border-bottom:1.5px solid var(--border);}
-  .admin-sidebar .s-logo,.sidebar-section,.sidebar-logout{width:100%;}
+  .admin-sidebar .s-logo,.sidebar-group,.sidebar-logout{width:100%;}
+  .admin-sidebar .sidebar-section,.sidebar-group-items .sidebar-item{width:100%;}
   .admin-main{padding:1rem;min-width:0;}
   /* Prevent horizontal scroll everywhere */
   body{overflow-x:hidden;}
@@ -1023,6 +1071,9 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
       <a onclick="showPage('grammar',this)">Grammar</a>
       <a onclick="showPage('class11',this)">Class 11</a>
       <a onclick="showPage('class12',this)">Class 12</a>
+      <a onclick="showPage('writingskills',this)">Writing Skills</a>
+      <a onclick="showPage('drama',this)">Drama</a>
+      <a onclick="showPage('novel',this)">Novel</a>
       <a class="admin-btn" onclick="openAdmin()">⚙ Admin</a>
     </nav>
     <div class="hamburger" onclick="toggleMenu()">
@@ -1104,76 +1155,172 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
   </div>
 </div>
 
+<!-- ══════════ WRITING SKILLS ══════════ -->
+<div class="page" id="page-writingskills">
+  <div class="page-hdr"><h1>✍️ Writing Skills</h1><p>Writing skills resources, documents and study materials</p></div>
+  <div class="section">
+    <div class="sec-hdr">
+      <span class="sec-tag">Resources</span>
+      <h2 class="sec-title">Writing Skills <em>Materials</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div id="writingskills-folder-nav" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+      <span style="font-size:.78rem;color:var(--muted);">📁</span>
+      <span id="writingskills-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+    </div>
+    <div id="writingskills-folders" class="folder-grid"></div>
+    <div class="sort-bar" id="writingskills-sort-bar" style="display:none;">
+      <label>Sort by:</label>
+      <select class="sort-select" id="writingskills-sort-select" onchange="applySortWritingSkills()">
+        <option value="newest">⬇️ Newest First</option>
+        <option value="oldest">⬆️ Oldest First</option>
+        <option value="az">🔤 A → Z</option>
+        <option value="za">🔤 Z → A</option>
+      </select>
+      <span class="sort-results" id="writingskills-sort-results"></span>
+    </div>
+    <div id="writingskills-files" class="material-grid" style="margin-top:.5rem;"></div>
+    <div class="view-more-wrap" id="writingskills-view-more" style="display:none;">
+      <button class="btn-view-more" onclick="viewMoreWritingSkills()">View more files ↓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ DRAMA ══════════ -->
+<div class="page" id="page-drama">
+  <div class="page-hdr"><h1>🎭 Drama</h1><p>Drama resources, documents and study materials</p></div>
+  <div class="section">
+    <div class="sec-hdr">
+      <span class="sec-tag">Resources</span>
+      <h2 class="sec-title">Drama <em>Materials</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div id="drama-folder-nav" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+      <span style="font-size:.78rem;color:var(--muted);">📁</span>
+      <span id="drama-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+    </div>
+    <div id="drama-folders" class="folder-grid"></div>
+    <div class="sort-bar" id="drama-sort-bar" style="display:none;">
+      <label>Sort by:</label>
+      <select class="sort-select" id="drama-sort-select" onchange="applySortDrama()">
+        <option value="newest">⬇️ Newest First</option>
+        <option value="oldest">⬆️ Oldest First</option>
+        <option value="az">🔤 A → Z</option>
+        <option value="za">🔤 Z → A</option>
+      </select>
+      <span class="sort-results" id="drama-sort-results"></span>
+    </div>
+    <div id="drama-files" class="material-grid" style="margin-top:.5rem;"></div>
+    <div class="view-more-wrap" id="drama-view-more" style="display:none;">
+      <button class="btn-view-more" onclick="viewMoreDrama()">View more files ↓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ NOVEL ══════════ -->
+<div class="page" id="page-novel">
+  <div class="page-hdr"><h1>📖 Novel</h1><p>Novel resources, documents and study materials</p></div>
+  <div class="section">
+    <div class="sec-hdr">
+      <span class="sec-tag">Resources</span>
+      <h2 class="sec-title">Novel <em>Materials</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div id="novel-folder-nav" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+      <span style="font-size:.78rem;color:var(--muted);">📁</span>
+      <span id="novel-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+    </div>
+    <div id="novel-folders" class="folder-grid"></div>
+    <div class="sort-bar" id="novel-sort-bar" style="display:none;">
+      <label>Sort by:</label>
+      <select class="sort-select" id="novel-sort-select" onchange="applySortNovel()">
+        <option value="newest">⬇️ Newest First</option>
+        <option value="oldest">⬆️ Oldest First</option>
+        <option value="az">🔤 A → Z</option>
+        <option value="za">🔤 Z → A</option>
+      </select>
+      <span class="sort-results" id="novel-sort-results"></span>
+    </div>
+    <div id="novel-files" class="material-grid" style="margin-top:.5rem;"></div>
+    <div class="view-more-wrap" id="novel-view-more" style="display:none;">
+      <button class="btn-view-more" onclick="viewMoreNovel()">View more files ↓</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════ CLASS 11 ══════════ -->
 <div class="page" id="page-class11">
   <div class="page-hdr"><h1>📚 Class 11</h1><p>All resources for Class 11 students</p></div>
   <div class="section">
-    <!-- Sub-nav tabs for Class 11 -->
-    <div class="class-subnav" id="c11-subnav">
-      <button class="csn-btn active" onclick="showClassTab('c11','material',this)">📂 Study Material</button>
-      <button class="csn-btn" onclick="showClassTab('c11','papers',this)">📝 Papers</button>
-      <button class="csn-btn" onclick="showClassTab('c11','videos',this)">🎬 Videos</button>
-    </div>
-
-    <!-- STUDY MATERIAL (with folders) -->
-    <div class="class-tab active" id="c11-material">
-      <div class="sec-hdr"><span class="sec-tag">Resources</span><h2 class="sec-title">Download & <em>Learn</em></h2><div class="divider"></div></div>
-      <div id="c11-mat-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
-        <span style="font-size:.78rem;color:var(--muted);">📁</span>
-        <span id="c11-mat-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+    <!-- Class 11 accordion (Study Material / Papers / Videos) -->
+    <div class="class-accordion" id="c11-accordion">
+      <div class="class-acc-item open">
+        <div class="class-acc-header" onclick="toggleClassAccordion('c11','material',this)">
+          📂 Study Material <span class="cacc-arrow">▼</span>
+        </div>
+        <div class="class-acc-body" id="c11-material">
+          <div id="c11-mat-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+            <span style="font-size:.78rem;color:var(--muted);">📁</span>
+            <span id="c11-mat-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+          </div>
+          <div id="c11-mat-folders" class="folder-grid"></div>
+          <div class="sort-bar" id="c11-mat-sort-bar" style="display:none;">
+            <label>Sort by:</label>
+            <select class="sort-select" id="c11-mat-sort-select" onchange="applySortMaterial('c11')">
+              <option value="newest">⬇️ Newest First</option>
+              <option value="oldest">⬆️ Oldest First</option>
+              <option value="az">🔤 A → Z</option>
+              <option value="za">🔤 Z → A</option>
+            </select>
+            <span class="sort-results" id="c11-mat-sort-results"></span>
+          </div>
+          <div id="c11-material-list" class="material-grid" style="margin-top:.5rem;">
+            <div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>Study materials will appear here once uploaded by the teacher.</div>
+          </div>
+          <div class="view-more-wrap" id="c11-mat-view-more" style="display:none;">
+            <button class="btn-view-more" onclick="viewMoreMaterial('c11')">View more files ↓</button>
+          </div>
+        </div>
       </div>
-      <div id="c11-mat-folders" class="folder-grid"></div>
-      <div class="sort-bar" id="c11-mat-sort-bar" style="display:none;">
-        <label>Sort by:</label>
-        <select class="sort-select" id="c11-mat-sort-select" onchange="applySortMaterial('c11')">
-          <option value="newest">⬇️ Newest First</option>
-          <option value="oldest">⬆️ Oldest First</option>
-          <option value="az">🔤 A → Z</option>
-          <option value="za">🔤 Z → A</option>
-        </select>
-        <span class="sort-results" id="c11-mat-sort-results"></span>
+      <div class="class-acc-item">
+        <div class="class-acc-header" onclick="toggleClassAccordion('c11','papers',this)">
+          📝 Papers <span class="cacc-arrow">▼</span>
+        </div>
+        <div class="class-acc-body" id="c11-papers">
+          <div id="c11-papers-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+            <span style="font-size:.78rem;color:var(--muted);">📁</span>
+            <span id="c11-papers-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+          </div>
+          <div id="c11-papers-folders" class="folder-grid"></div>
+          <div class="sort-bar" id="c11-papers-sort-bar" style="display:none;margin-top:1.2rem;">
+            <label>Sort by:</label>
+            <select class="sort-select" id="c11-papers-sort-select" onchange="applySortPapers('c11')">
+              <option value="newest">⬇️ Newest First</option>
+              <option value="oldest">⬆️ Oldest First</option>
+              <option value="az">🔤 A → Z</option>
+              <option value="za">🔤 Z → A</option>
+              <option value="year-desc">📅 Year (New→Old)</option>
+              <option value="year-asc">📅 Year (Old→New)</option>
+            </select>
+            <span class="sort-results" id="c11-papers-sort-results"></span>
+          </div>
+          <div class="tbl-wrap" style="margin-top:.5rem;">
+            <table><thead><tr><th>Paper Title</th><th>Subject</th><th>Year</th><th>Download</th></tr></thead>
+            <tbody id="c11-papers-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No papers yet.</td></tr></tbody></table>
+          </div>
+          <div class="view-more-wrap" id="c11-papers-view-more" style="display:none;">
+            <button class="btn-view-more" onclick="viewMorePapers('c11')">View more papers ↓</button>
+          </div>
+        </div>
       </div>
-      <div id="c11-material-list" class="material-grid" style="margin-top:.5rem;">
-        <div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>Study materials will appear here once uploaded by the teacher.</div>
+      <div class="class-acc-item">
+        <div class="class-acc-header" onclick="toggleClassAccordion('c11','videos',this)">
+          🎬 Videos <span class="cacc-arrow">▼</span>
+        </div>
+        <div class="class-acc-body" id="c11-videos">
+          <div class="video-grid" id="c11-videos-list"><div class="empty-state"><span class="es-icon">🎬</span>No videos added yet.</div></div>
+        </div>
       </div>
-      <div class="view-more-wrap" id="c11-mat-view-more" style="display:none;">
-        <button class="btn-view-more" onclick="viewMoreMaterial('c11')">View more files ↓</button>
-      </div>
-    </div>
-
-    <!-- PAPERS (with folders) -->
-    <div class="class-tab" id="c11-papers">
-      <div class="sec-hdr"><span class="sec-tag">Downloads</span><h2 class="sec-title">Practice <em>Papers</em></h2><div class="divider"></div></div>
-      <div id="c11-papers-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
-        <span style="font-size:.78rem;color:var(--muted);">📁</span>
-        <span id="c11-papers-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
-      </div>
-      <div id="c11-papers-folders" class="folder-grid"></div>
-      <div class="sort-bar" id="c11-papers-sort-bar" style="display:none;margin-top:1.2rem;">
-        <label>Sort by:</label>
-        <select class="sort-select" id="c11-papers-sort-select" onchange="applySortPapers('c11')">
-          <option value="newest">⬇️ Newest First</option>
-          <option value="oldest">⬆️ Oldest First</option>
-          <option value="az">🔤 A → Z</option>
-          <option value="za">🔤 Z → A</option>
-          <option value="year-desc">📅 Year (New→Old)</option>
-          <option value="year-asc">📅 Year (Old→New)</option>
-        </select>
-        <span class="sort-results" id="c11-papers-sort-results"></span>
-      </div>
-      <div class="tbl-wrap" style="margin-top:.5rem;">
-        <table><thead><tr><th>Paper Title</th><th>Subject</th><th>Year</th><th>Download</th></tr></thead>
-        <tbody id="c11-papers-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No papers yet.</td></tr></tbody></table>
-      </div>
-      <div class="view-more-wrap" id="c11-papers-view-more" style="display:none;">
-        <button class="btn-view-more" onclick="viewMorePapers('c11')">View more papers ↓</button>
-      </div>
-    </div>
-
-    <!-- VIDEOS -->
-    <div class="class-tab" id="c11-videos">
-      <div class="sec-hdr"><span class="sec-tag">Library</span><h2 class="sec-title">Watch & <em>Learn</em></h2><div class="divider"></div></div>
-      <div class="video-grid" id="c11-videos-list"><div class="empty-state"><span class="es-icon">🎬</span>No videos added yet.</div></div>
     </div>
 
   </div>
@@ -1183,53 +1330,60 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
 <div class="page" id="page-class12">
   <div class="page-hdr"><h1>📚 Class 12</h1><p>All resources for Class 12 students</p></div>
   <div class="section">
-    <div class="class-subnav" id="c12-subnav">
-      <button class="csn-btn active" onclick="showClassTab('c12','material',this)">📂 Study Material</button>
-      <button class="csn-btn" onclick="showClassTab('c12','papers',this)">📝 Papers</button>
-      <button class="csn-btn" onclick="showClassTab('c12','videos',this)">🎬 Videos</button>
-    </div>
-
-    <div class="class-tab active" id="c12-material">
-      <div class="sec-hdr"><span class="sec-tag">Resources</span><h2 class="sec-title">Download & <em>Learn</em></h2><div class="divider"></div></div>
-      <div id="c12-mat-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
-        <span style="font-size:.78rem;color:var(--muted);">📁</span>
-        <span id="c12-mat-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+    <!-- Class 12 accordion (Study Material / Papers / Videos) -->
+    <div class="class-accordion" id="c12-accordion">
+      <div class="class-acc-item open">
+        <div class="class-acc-header" onclick="toggleClassAccordion('c12','material',this)">
+          📂 Study Material <span class="cacc-arrow">▼</span>
+        </div>
+        <div class="class-acc-body" id="c12-material">
+          <div id="c12-mat-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+            <span style="font-size:.78rem;color:var(--muted);">📁</span>
+            <span id="c12-mat-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+          </div>
+          <div id="c12-mat-folders" class="folder-grid"></div>
+          <div class="sort-bar" id="c12-mat-sort-bar" style="display:none;">
+            <label>Sort by:</label>
+            <select class="sort-select" id="c12-mat-sort-select" onchange="applySortMaterial('c12')">
+              <option value="newest">⬇️ Newest First</option>
+              <option value="oldest">⬆️ Oldest First</option>
+              <option value="az">🔤 A → Z</option>
+              <option value="za">🔤 Z → A</option>
+            </select>
+            <span class="sort-results" id="c12-mat-sort-results"></span>
+          </div>
+          <div id="c12-material-list" class="material-grid" style="margin-top:.5rem;">
+            <div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>Study materials will appear here once uploaded by the teacher.</div>
+          </div>
+          <div class="view-more-wrap" id="c12-mat-view-more" style="display:none;">
+            <button class="btn-view-more" onclick="viewMoreMaterial('c12')">View more files ↓</button>
+          </div>
+        </div>
       </div>
-      <div id="c12-mat-folders" class="folder-grid"></div>
-      <div class="sort-bar" id="c12-mat-sort-bar" style="display:none;">
-        <label>Sort by:</label>
-        <select class="sort-select" id="c12-mat-sort-select" onchange="applySortMaterial('c12')">
-          <option value="newest">⬇️ Newest First</option>
-          <option value="oldest">⬆️ Oldest First</option>
-          <option value="az">🔤 A → Z</option>
-          <option value="za">🔤 Z → A</option>
-        </select>
-        <span class="sort-results" id="c12-mat-sort-results"></span>
+      <div class="class-acc-item">
+        <div class="class-acc-header" onclick="toggleClassAccordion('c12','papers',this)">
+          📝 Papers <span class="cacc-arrow">▼</span>
+        </div>
+        <div class="class-acc-body" id="c12-papers">
+          <div id="c12-papers-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+            <span style="font-size:.78rem;color:var(--muted);">📁</span>
+            <span id="c12-papers-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+          </div>
+          <div id="c12-papers-folders" class="folder-grid"></div>
+          <div class="tbl-wrap" style="margin-top:1.2rem;">
+            <table><thead><tr><th>Paper Title</th><th>Subject</th><th>Year</th><th>Download</th></tr></thead>
+            <tbody id="c12-papers-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No papers yet.</td></tr></tbody></table>
+          </div>
+        </div>
       </div>
-      <div id="c12-material-list" class="material-grid" style="margin-top:.5rem;">
-        <div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>Study materials will appear here once uploaded by the teacher.</div>
+      <div class="class-acc-item">
+        <div class="class-acc-header" onclick="toggleClassAccordion('c12','videos',this)">
+          🎬 Videos <span class="cacc-arrow">▼</span>
+        </div>
+        <div class="class-acc-body" id="c12-videos">
+          <div class="video-grid" id="c12-videos-list"><div class="empty-state"><span class="es-icon">🎬</span>No videos added yet.</div></div>
+        </div>
       </div>
-      <div class="view-more-wrap" id="c12-mat-view-more" style="display:none;">
-        <button class="btn-view-more" onclick="viewMoreMaterial('c12')">View more files ↓</button>
-      </div>
-    </div>
-
-    <div class="class-tab" id="c12-papers">
-      <div class="sec-hdr"><span class="sec-tag">Downloads</span><h2 class="sec-title">Practice <em>Papers</em></h2><div class="divider"></div></div>
-      <div id="c12-papers-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
-        <span style="font-size:.78rem;color:var(--muted);">📁</span>
-        <span id="c12-papers-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
-      </div>
-      <div id="c12-papers-folders" class="folder-grid"></div>
-      <div class="tbl-wrap" style="margin-top:1.2rem;">
-        <table><thead><tr><th>Paper Title</th><th>Subject</th><th>Year</th><th>Download</th></tr></thead>
-        <tbody id="c12-papers-list"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No papers yet.</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <div class="class-tab" id="c12-videos">
-      <div class="sec-hdr"><span class="sec-tag">Library</span><h2 class="sec-title">Watch & <em>Learn</em></h2><div class="divider"></div></div>
-      <div class="video-grid" id="c12-videos-list"><div class="empty-state"><span class="es-icon">🎬</span>No videos added yet.</div></div>
     </div>
 
   </div>
@@ -1287,16 +1441,46 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           </svg>
           <span>LMK Admin</span>
         </div>
-        <div class="sidebar-section">Grammar</div>
-        <div class="sidebar-item active" onclick="switchPanel('grammar-admin-panel',this)"><span class="si-icon">📖</span>Grammar</div>
-        <div class="sidebar-section">Class 11</div>
-        <div class="sidebar-item" onclick="switchPanel('c11-videos-panel',this)"><span class="si-icon">🎬</span>Videos</div>
-        <div class="sidebar-item" onclick="switchPanel('c11-papers-panel',this)"><span class="si-icon">📝</span>Papers</div>
-        <div class="sidebar-item" onclick="switchPanel('c11-material-panel',this)"><span class="si-icon">📂</span>Study Material</div>
-        <div class="sidebar-section">Class 12</div>
-        <div class="sidebar-item" onclick="switchPanel('c12-videos-panel',this)"><span class="si-icon">🎬</span>Videos</div>
-        <div class="sidebar-item" onclick="switchPanel('c12-papers-panel',this)"><span class="si-icon">📝</span>Papers</div>
-        <div class="sidebar-item" onclick="switchPanel('c12-material-panel',this)"><span class="si-icon">📂</span>Study Material</div>
+        <div class="sidebar-group">
+          <div class="sidebar-section" onclick="toggleSidebarGroup(this)">Grammar <span class="section-arrow">▼</span></div>
+          <div class="sidebar-group-items">
+            <div class="sidebar-item active" onclick="switchPanel('grammar-admin-panel',this)"><span class="si-icon">📖</span>Grammar</div>
+          </div>
+        </div>
+        <div class="sidebar-group">
+          <div class="sidebar-section" onclick="toggleSidebarGroup(this)">Writing Skills <span class="section-arrow">▼</span></div>
+          <div class="sidebar-group-items">
+            <div class="sidebar-item" onclick="switchPanel('writingskills-admin-panel',this)"><span class="si-icon">✍️</span>Writing Skills</div>
+          </div>
+        </div>
+        <div class="sidebar-group">
+          <div class="sidebar-section" onclick="toggleSidebarGroup(this)">Drama <span class="section-arrow">▼</span></div>
+          <div class="sidebar-group-items">
+            <div class="sidebar-item" onclick="switchPanel('drama-admin-panel',this)"><span class="si-icon">🎭</span>Drama</div>
+          </div>
+        </div>
+        <div class="sidebar-group">
+          <div class="sidebar-section" onclick="toggleSidebarGroup(this)">Novel <span class="section-arrow">▼</span></div>
+          <div class="sidebar-group-items">
+            <div class="sidebar-item" onclick="switchPanel('novel-admin-panel',this)"><span class="si-icon">📖</span>Novel</div>
+          </div>
+        </div>
+        <div class="sidebar-group">
+          <div class="sidebar-section" onclick="toggleSidebarGroup(this)">Class 11 <span class="section-arrow">▼</span></div>
+          <div class="sidebar-group-items">
+            <div class="sidebar-item" onclick="switchPanel('c11-videos-panel',this)"><span class="si-icon">🎬</span>Videos</div>
+            <div class="sidebar-item" onclick="switchPanel('c11-papers-panel',this)"><span class="si-icon">📝</span>Papers</div>
+            <div class="sidebar-item" onclick="switchPanel('c11-material-panel',this)"><span class="si-icon">📂</span>Study Material</div>
+          </div>
+        </div>
+        <div class="sidebar-group">
+          <div class="sidebar-section" onclick="toggleSidebarGroup(this)">Class 12 <span class="section-arrow">▼</span></div>
+          <div class="sidebar-group-items">
+            <div class="sidebar-item" onclick="switchPanel('c12-videos-panel',this)"><span class="si-icon">🎬</span>Videos</div>
+            <div class="sidebar-item" onclick="switchPanel('c12-papers-panel',this)"><span class="si-icon">📝</span>Papers</div>
+            <div class="sidebar-item" onclick="switchPanel('c12-material-panel',this)"><span class="si-icon">📂</span>Study Material</div>
+          </div>
+        </div>
         <div class="sidebar-logout">
           <div class="sidebar-item" onclick="closeAdmin()"><span class="si-icon">👁</span>View Site</div>
           <div class="sidebar-item" onclick="doLogout()"><span class="si-icon">🚪</span>Logout</div>
@@ -1379,6 +1563,198 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
 
           <span class="items-label">Folders & Files</span>
           <div class="items-list" id="admin-grammar-list"></div>
+        </div>
+
+        <!-- ══ WRITING SKILLS PANEL ══ -->
+        <div class="admin-panel" id="writingskills-admin-panel">
+          <h2>✍️ Writing Skills</h2>
+          <p class="panel-desc">Create folders/subfolders and upload any documents to the Writing Skills section.</p>
+          <div class="add-form">
+            <h3>📁 Create Folder</h3>
+            <div class="form-row">
+              <div class="field"><label>Parent Folder</label>
+                <select id="writingskills-parent-folder"><option value="">— Root (top level) —</option></select>
+              </div>
+              <div class="field"><label>New Folder Name</label>
+                <input id="writingskills-new-folder" placeholder="e.g. Notice Writing, Email…">
+              </div>
+            </div>
+            <button class="btn btn-sm" onclick="adminCreateFolder('writingskills')">Create Folder</button>
+          </div>
+          <div class="add-form" style="margin-top:1rem;">
+            <h3>+ Add Document</h3>
+            <div class="field"><label>Title</label><input id="writingskills-title" placeholder="e.g. Notice Format PDF"></div>
+            <div class="field"><label>Upload to Folder</label>
+              <select id="writingskills-folder-target"><option value="">— Root —</option></select>
+            </div>
+            <div style="margin-bottom:.5rem">
+              <label style="display:block;font-size:.72rem;color:var(--adm-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;font-weight:600;">File / Document</label>
+              <div class="src-tabs">
+                <button class="src-tab active" onclick="srcSwitch('writingskills','upload',this)">📎 Upload from Device</button>
+                <button class="src-tab" onclick="srcSwitch('writingskills','link',this)">🔗 Paste Link</button>
+              </div>
+            </div>
+            <div id="writingskills-upload-zone-wrap">
+              <div class="drop-zone" id="writingskills-drop-zone"
+                ondragover="dzDragOver(event,'writingskills-drop-zone')"
+                ondragleave="dzDragLeave('writingskills-drop-zone')"
+                ondrop="dzDrop(event,'writingskills-file-input','writingskills-drop-zone','writingskills-file-name')">
+                <input type="file" id="writingskills-file-input"
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.txt,.csv"
+                  onchange="dzPick(this,'writingskills-file-name')">
+                <span class="drop-zone-icon">📎</span>
+                <div class="drop-zone-text">
+                  <strong>Click to browse</strong> or drag &amp; drop<br>
+                  <small>PDF, Word, PPT, Excel, Images, ZIP, TXT · Max 25 MB</small>
+                </div>
+                <div class="drop-zone-file-name" id="writingskills-file-name" style="display:none"></div>
+              </div>
+              <div class="upload-progress-wrap" id="writingskills-progress-wrap">
+                <div class="upload-progress-bar-bg"><div class="upload-progress-bar-fill" id="writingskills-progress-fill"></div></div>
+                <div class="upload-progress-label">Uploading… <span id="writingskills-progress-pct">0%</span></div>
+              </div>
+            </div>
+            <div class="url-source" id="writingskills-link-wrap">
+              <div class="field" style="margin-bottom:0">
+                <label style="margin-bottom:.4rem">File / Document Link</label>
+                <input id="writingskills-url" placeholder="https://drive.google.com/… or any direct link"
+                  oninput="previewUrl(this.value,'writingskills-url-preview')">
+                <div id="writingskills-url-preview" style="font-size:.7rem;margin-top:.4rem;color:var(--orange);word-break:break-all;display:none"></div>
+              </div>
+            </div>
+            <br>
+            <button class="btn btn-sm" onclick="adminAddWritingSkillsFile()">Add Document</button>
+          </div>
+          <span class="items-label">Folders & Files</span>
+          <div class="items-list" id="admin-writingskills-list"></div>
+        </div>
+
+        <!-- ══ DRAMA PANEL ══ -->
+        <div class="admin-panel" id="drama-admin-panel">
+          <h2>🎭 Drama</h2>
+          <p class="panel-desc">Create folders/subfolders and upload any documents to the Drama section.</p>
+          <div class="add-form">
+            <h3>📁 Create Folder</h3>
+            <div class="form-row">
+              <div class="field"><label>Parent Folder</label>
+                <select id="drama-parent-folder"><option value="">— Root (top level) —</option></select>
+              </div>
+              <div class="field"><label>New Folder Name</label>
+                <input id="drama-new-folder" placeholder="e.g. Plays, Monologues…">
+              </div>
+            </div>
+            <button class="btn btn-sm" onclick="adminCreateFolder('drama')">Create Folder</button>
+          </div>
+          <div class="add-form" style="margin-top:1rem;">
+            <h3>+ Add Document</h3>
+            <div class="field"><label>Title</label><input id="drama-title" placeholder="e.g. Act 1 Summary PDF"></div>
+            <div class="field"><label>Upload to Folder</label>
+              <select id="drama-folder-target"><option value="">— Root —</option></select>
+            </div>
+            <div style="margin-bottom:.5rem">
+              <label style="display:block;font-size:.72rem;color:var(--adm-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;font-weight:600;">File / Document</label>
+              <div class="src-tabs">
+                <button class="src-tab active" onclick="srcSwitch('drama','upload',this)">📎 Upload from Device</button>
+                <button class="src-tab" onclick="srcSwitch('drama','link',this)">🔗 Paste Link</button>
+              </div>
+            </div>
+            <div id="drama-upload-zone-wrap">
+              <div class="drop-zone" id="drama-drop-zone"
+                ondragover="dzDragOver(event,'drama-drop-zone')"
+                ondragleave="dzDragLeave('drama-drop-zone')"
+                ondrop="dzDrop(event,'drama-file-input','drama-drop-zone','drama-file-name')">
+                <input type="file" id="drama-file-input"
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.txt,.csv"
+                  onchange="dzPick(this,'drama-file-name')">
+                <span class="drop-zone-icon">📎</span>
+                <div class="drop-zone-text">
+                  <strong>Click to browse</strong> or drag &amp; drop<br>
+                  <small>PDF, Word, PPT, Excel, Images, ZIP, TXT · Max 25 MB</small>
+                </div>
+                <div class="drop-zone-file-name" id="drama-file-name" style="display:none"></div>
+              </div>
+              <div class="upload-progress-wrap" id="drama-progress-wrap">
+                <div class="upload-progress-bar-bg"><div class="upload-progress-bar-fill" id="drama-progress-fill"></div></div>
+                <div class="upload-progress-label">Uploading… <span id="drama-progress-pct">0%</span></div>
+              </div>
+            </div>
+            <div class="url-source" id="drama-link-wrap">
+              <div class="field" style="margin-bottom:0">
+                <label style="margin-bottom:.4rem">File / Document Link</label>
+                <input id="drama-url" placeholder="https://drive.google.com/… or any direct link"
+                  oninput="previewUrl(this.value,'drama-url-preview')">
+                <div id="drama-url-preview" style="font-size:.7rem;margin-top:.4rem;color:var(--orange);word-break:break-all;display:none"></div>
+              </div>
+            </div>
+            <br>
+            <button class="btn btn-sm" onclick="adminAddDramaFile()">Add Document</button>
+          </div>
+          <span class="items-label">Folders & Files</span>
+          <div class="items-list" id="admin-drama-list"></div>
+        </div>
+
+        <!-- ══ NOVEL PANEL ══ -->
+        <div class="admin-panel" id="novel-admin-panel">
+          <h2>📖 Novel</h2>
+          <p class="panel-desc">Create folders/subfolders and upload any documents to the Novel section.</p>
+          <div class="add-form">
+            <h3>📁 Create Folder</h3>
+            <div class="form-row">
+              <div class="field"><label>Parent Folder</label>
+                <select id="novel-parent-folder"><option value="">— Root (top level) —</option></select>
+              </div>
+              <div class="field"><label>New Folder Name</label>
+                <input id="novel-new-folder" placeholder="e.g. Chapters, Summaries…">
+              </div>
+            </div>
+            <button class="btn btn-sm" onclick="adminCreateFolder('novel')">Create Folder</button>
+          </div>
+          <div class="add-form" style="margin-top:1rem;">
+            <h3>+ Add Document</h3>
+            <div class="field"><label>Title</label><input id="novel-title" placeholder="e.g. Chapter 1 Notes PDF"></div>
+            <div class="field"><label>Upload to Folder</label>
+              <select id="novel-folder-target"><option value="">— Root —</option></select>
+            </div>
+            <div style="margin-bottom:.5rem">
+              <label style="display:block;font-size:.72rem;color:var(--adm-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;font-weight:600;">File / Document</label>
+              <div class="src-tabs">
+                <button class="src-tab active" onclick="srcSwitch('novel','upload',this)">📎 Upload from Device</button>
+                <button class="src-tab" onclick="srcSwitch('novel','link',this)">🔗 Paste Link</button>
+              </div>
+            </div>
+            <div id="novel-upload-zone-wrap">
+              <div class="drop-zone" id="novel-drop-zone"
+                ondragover="dzDragOver(event,'novel-drop-zone')"
+                ondragleave="dzDragLeave('novel-drop-zone')"
+                ondrop="dzDrop(event,'novel-file-input','novel-drop-zone','novel-file-name')">
+                <input type="file" id="novel-file-input"
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip,.txt,.csv"
+                  onchange="dzPick(this,'novel-file-name')">
+                <span class="drop-zone-icon">📎</span>
+                <div class="drop-zone-text">
+                  <strong>Click to browse</strong> or drag &amp; drop<br>
+                  <small>PDF, Word, PPT, Excel, Images, ZIP, TXT · Max 25 MB</small>
+                </div>
+                <div class="drop-zone-file-name" id="novel-file-name" style="display:none"></div>
+              </div>
+              <div class="upload-progress-wrap" id="novel-progress-wrap">
+                <div class="upload-progress-bar-bg"><div class="upload-progress-bar-fill" id="novel-progress-fill"></div></div>
+                <div class="upload-progress-label">Uploading… <span id="novel-progress-pct">0%</span></div>
+              </div>
+            </div>
+            <div class="url-source" id="novel-link-wrap">
+              <div class="field" style="margin-bottom:0">
+                <label style="margin-bottom:.4rem">File / Document Link</label>
+                <input id="novel-url" placeholder="https://drive.google.com/… or any direct link"
+                  oninput="previewUrl(this.value,'novel-url-preview')">
+                <div id="novel-url-preview" style="font-size:.7rem;margin-top:.4rem;color:var(--orange);word-break:break-all;display:none"></div>
+              </div>
+            </div>
+            <br>
+            <button class="btn btn-sm" onclick="adminAddNovelFile()">Add Document</button>
+          </div>
+          <span class="items-label">Folders & Files</span>
+          <div class="items-list" id="admin-novel-list"></div>
         </div>
 
         <!-- ══ CLASS 11 PANELS ══ -->
@@ -1732,6 +2108,29 @@ function switchPanel(id, el) {
   el.classList.add('active');
 }
 
+// ── SIDEBAR ACCORDION ──
+function toggleSidebarGroup(el) {
+  const group = el.closest('.sidebar-group');
+  if(group) group.classList.toggle('collapsed');
+}
+
+// ── FOLDER COLLAPSE ──
+function toggleFolderCollapse(el) {
+  const parent = el.closest('.folder-collapse');
+  if(parent) parent.classList.toggle('collapsed');
+}
+
+// ── CLASS ACCORDION (only one section open at a time) ──
+function toggleClassAccordion(cls, tab, el) {
+  const container = document.getElementById(cls+'-accordion');
+  if(!container) return;
+  const items = container.querySelectorAll('.class-acc-item');
+  const clickedItem = el.closest('.class-acc-item');
+  const isOpen = clickedItem.classList.contains('open');
+  items.forEach(item => item.classList.remove('open'));
+  if (!isOpen) clickedItem.classList.add('open');
+}
+
 // ── YOUTUBE ──
 function ytThumb(url) {
   const m = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
@@ -1751,7 +2150,10 @@ async function loadAllPublic() {
       loadPublicClassPapers('c11'), loadPublicClassMaterial('c11'),
       loadPublicClassVideos('c12'),
       loadPublicClassPapers('c12'), loadPublicClassMaterial('c12'),
-      loadPublicGrammarFolders(''), loadPublicGrammarFiles('')
+      loadPublicGrammarFolders(''), loadPublicGrammarFiles(''),
+      loadPublicWritingSkillsFolders(''), loadPublicWritingSkillsFiles(''),
+      loadPublicDramaFolders(''), loadPublicDramaFiles(''),
+      loadPublicNovelFolders(''), loadPublicNovelFiles('')
     ]);
   } catch(e) { console.log('Firebase not configured yet.'); }
 }
@@ -2084,6 +2486,240 @@ function viewMoreGrammar() {
   renderGrammarFiles();
 }
 
+// ════════════════════════════════
+//  PUBLIC: WRITING SKILLS
+// ════════════════════════════════
+async function loadPublicWritingSkillsFolders(folderId='') {
+  const allFolders = await window.FB.loadCollection('writingskills-folders');
+  const curFolders = allFolders.filter(f=>(f.parent||'')===(folderId||''));
+  const foldersEl = document.getElementById('writingskills-folders');
+  const bcEl = document.getElementById('writingskills-breadcrumb');
+  if(!foldersEl) return;
+  const trail = await buildBreadcrumb('writingskills-folders', folderId);
+  bcEl.innerHTML = renderBreadcrumb(trail, (id)=>{ loadPublicWritingSkillsFolders(id); loadPublicWritingSkillsFiles(id); });
+  let fHtml='';
+  if(folderId) fHtml+=`<div class="folder-card folder-back" onclick="(async()=>{const p=await getParentFolder('writingskills-folders','${folderId}');loadPublicWritingSkillsFolders(p);loadPublicWritingSkillsFiles(p);})()">
+    <div class="fc-icon">⬅️</div><div class="fc-name">Back</div></div>`;
+  fHtml+=curFolders.map(f=>`<div class="folder-card" onclick="loadPublicWritingSkillsFolders('${f.id}');loadPublicWritingSkillsFiles('${f.id}')">
+    <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
+  foldersEl.innerHTML=fHtml;
+}
+
+const WRITINGSKILLS_PAGE_SIZE = 6;
+window._writingskillsCache = { items: [], folderId: '', shown: WRITINGSKILLS_PAGE_SIZE };
+
+async function loadPublicWritingSkillsFiles(folderId='') {
+  const allItems = await window.FB.loadCollection('writingskills-files');
+  const curItems = allItems.filter(f=>(f.folder||'')===(folderId||''));
+  window._writingskillsCache = { items: curItems, folderId, shown: WRITINGSKILLS_PAGE_SIZE };
+  const sortBar = document.getElementById('writingskills-sort-bar');
+  if(sortBar) sortBar.style.display = curItems.length ? 'flex' : 'none';
+  renderWritingSkillsFiles();
+}
+
+function renderWritingSkillsFiles() {
+  const cache = window._writingskillsCache;
+  const listEl = document.getElementById('writingskills-files');
+  const vmWrap = document.getElementById('writingskills-view-more');
+  const resultsEl = document.getElementById('writingskills-sort-results');
+  if(!listEl) return;
+  const sortSel = document.getElementById('writingskills-sort-select');
+  const sortVal = sortSel ? sortSel.value : 'newest';
+  const sorted = sortItems(cache.items, sortVal);
+  const total = sorted.length;
+  const shown = Math.min(cache.shown, total);
+  if(resultsEl) resultsEl.textContent = total ? `${total} file${total!==1?'s':''}` : '';
+  const icons={pdf:'📄',ppt:'📊',pptx:'📊',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',jpg:'🖼️',jpeg:'🖼️',png:'🖼️',zip:'🗜️',txt:'📃'};
+  if(!total) {
+    listEl.innerHTML='<div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>No files in this folder yet.</div>';
+    if(vmWrap) vmWrap.style.display='none';
+    return;
+  }
+  listEl.innerHTML = sorted.slice(0, shown).map(f=>{
+    const ext=(f.title||'').split('.').pop().toLowerCase();
+    const icon=icons[ext]||'📎';
+    return `<div class="mat-card">
+      <div class="mat-type">${icon} Writing Skills</div>
+      <h4>${f.title}</h4>
+      ${f.url?`<div class="file-btns">
+        <a class="btn-view-file" href="${buildViewUrl(f.url)}" target="_blank">👁 View</a>
+        <a class="btn-dl-file" href="${buildDlUrl(f.url)}" target="_blank">↓ Download</a>
+      </div>`:''}
+    </div>`;
+  }).join('');
+  if(vmWrap) {
+    vmWrap.style.display = shown < total ? 'block' : 'none';
+    const vmBtn = vmWrap.querySelector('button');
+    if(vmBtn) vmBtn.textContent = `View more files (${total-shown} remaining) ↓`;
+  }
+}
+
+function applySortWritingSkills() {
+  window._writingskillsCache.shown = WRITINGSKILLS_PAGE_SIZE;
+  renderWritingSkillsFiles();
+}
+
+function viewMoreWritingSkills() {
+  window._writingskillsCache.shown += WRITINGSKILLS_PAGE_SIZE;
+  renderWritingSkillsFiles();
+}
+
+// ════════════════════════════════
+//  PUBLIC: DRAMA
+// ════════════════════════════════
+async function loadPublicDramaFolders(folderId='') {
+  const allFolders = await window.FB.loadCollection('drama-folders');
+  const curFolders = allFolders.filter(f=>(f.parent||'')===(folderId||''));
+  const foldersEl = document.getElementById('drama-folders');
+  const bcEl = document.getElementById('drama-breadcrumb');
+  if(!foldersEl) return;
+  const trail = await buildBreadcrumb('drama-folders', folderId);
+  bcEl.innerHTML = renderBreadcrumb(trail, (id)=>{ loadPublicDramaFolders(id); loadPublicDramaFiles(id); });
+  let fHtml='';
+  if(folderId) fHtml+=`<div class="folder-card folder-back" onclick="(async()=>{const p=await getParentFolder('drama-folders','${folderId}');loadPublicDramaFolders(p);loadPublicDramaFiles(p);})()">
+    <div class="fc-icon">⬅️</div><div class="fc-name">Back</div></div>`;
+  fHtml+=curFolders.map(f=>`<div class="folder-card" onclick="loadPublicDramaFolders('${f.id}');loadPublicDramaFiles('${f.id}')">
+    <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
+  foldersEl.innerHTML=fHtml;
+}
+
+const DRAMA_PAGE_SIZE = 6;
+window._dramaCache = { items: [], folderId: '', shown: DRAMA_PAGE_SIZE };
+
+async function loadPublicDramaFiles(folderId='') {
+  const allItems = await window.FB.loadCollection('drama-files');
+  const curItems = allItems.filter(f=>(f.folder||'')===(folderId||''));
+  window._dramaCache = { items: curItems, folderId, shown: DRAMA_PAGE_SIZE };
+  const sortBar = document.getElementById('drama-sort-bar');
+  if(sortBar) sortBar.style.display = curItems.length ? 'flex' : 'none';
+  renderDramaFiles();
+}
+
+function renderDramaFiles() {
+  const cache = window._dramaCache;
+  const listEl = document.getElementById('drama-files');
+  const vmWrap = document.getElementById('drama-view-more');
+  const resultsEl = document.getElementById('drama-sort-results');
+  if(!listEl) return;
+  const sortSel = document.getElementById('drama-sort-select');
+  const sortVal = sortSel ? sortSel.value : 'newest';
+  const sorted = sortItems(cache.items, sortVal);
+  const total = sorted.length;
+  const shown = Math.min(cache.shown, total);
+  if(resultsEl) resultsEl.textContent = total ? `${total} file${total!==1?'s':''}` : '';
+  const icons={pdf:'📄',ppt:'📊',pptx:'📊',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',jpg:'🖼️',jpeg:'🖼️',png:'🖼️',zip:'🗜️',txt:'📃'};
+  if(!total) {
+    listEl.innerHTML='<div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>No files in this folder yet.</div>';
+    if(vmWrap) vmWrap.style.display='none';
+    return;
+  }
+  listEl.innerHTML = sorted.slice(0, shown).map(f=>{
+    const ext=(f.title||'').split('.').pop().toLowerCase();
+    const icon=icons[ext]||'📎';
+    return `<div class="mat-card">
+      <div class="mat-type">${icon} Drama</div>
+      <h4>${f.title}</h4>
+      ${f.url?`<div class="file-btns">
+        <a class="btn-view-file" href="${buildViewUrl(f.url)}" target="_blank">👁 View</a>
+        <a class="btn-dl-file" href="${buildDlUrl(f.url)}" target="_blank">↓ Download</a>
+      </div>`:''}
+    </div>`;
+  }).join('');
+  if(vmWrap) {
+    vmWrap.style.display = shown < total ? 'block' : 'none';
+    const vmBtn = vmWrap.querySelector('button');
+    if(vmBtn) vmBtn.textContent = `View more files (${total-shown} remaining) ↓`;
+  }
+}
+
+function applySortDrama() {
+  window._dramaCache.shown = DRAMA_PAGE_SIZE;
+  renderDramaFiles();
+}
+
+function viewMoreDrama() {
+  window._dramaCache.shown += DRAMA_PAGE_SIZE;
+  renderDramaFiles();
+}
+
+// ════════════════════════════════
+//  PUBLIC: NOVEL
+// ════════════════════════════════
+async function loadPublicNovelFolders(folderId='') {
+  const allFolders = await window.FB.loadCollection('novel-folders');
+  const curFolders = allFolders.filter(f=>(f.parent||'')===(folderId||''));
+  const foldersEl = document.getElementById('novel-folders');
+  const bcEl = document.getElementById('novel-breadcrumb');
+  if(!foldersEl) return;
+  const trail = await buildBreadcrumb('novel-folders', folderId);
+  bcEl.innerHTML = renderBreadcrumb(trail, (id)=>{ loadPublicNovelFolders(id); loadPublicNovelFiles(id); });
+  let fHtml='';
+  if(folderId) fHtml+=`<div class="folder-card folder-back" onclick="(async()=>{const p=await getParentFolder('novel-folders','${folderId}');loadPublicNovelFolders(p);loadPublicNovelFiles(p);})()">
+    <div class="fc-icon">⬅️</div><div class="fc-name">Back</div></div>`;
+  fHtml+=curFolders.map(f=>`<div class="folder-card" onclick="loadPublicNovelFolders('${f.id}');loadPublicNovelFiles('${f.id}')">
+    <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
+  foldersEl.innerHTML=fHtml;
+}
+
+const NOVEL_PAGE_SIZE = 6;
+window._novelCache = { items: [], folderId: '', shown: NOVEL_PAGE_SIZE };
+
+async function loadPublicNovelFiles(folderId='') {
+  const allItems = await window.FB.loadCollection('novel-files');
+  const curItems = allItems.filter(f=>(f.folder||'')===(folderId||''));
+  window._novelCache = { items: curItems, folderId, shown: NOVEL_PAGE_SIZE };
+  const sortBar = document.getElementById('novel-sort-bar');
+  if(sortBar) sortBar.style.display = curItems.length ? 'flex' : 'none';
+  renderNovelFiles();
+}
+
+function renderNovelFiles() {
+  const cache = window._novelCache;
+  const listEl = document.getElementById('novel-files');
+  const vmWrap = document.getElementById('novel-view-more');
+  const resultsEl = document.getElementById('novel-sort-results');
+  if(!listEl) return;
+  const sortSel = document.getElementById('novel-sort-select');
+  const sortVal = sortSel ? sortSel.value : 'newest';
+  const sorted = sortItems(cache.items, sortVal);
+  const total = sorted.length;
+  const shown = Math.min(cache.shown, total);
+  if(resultsEl) resultsEl.textContent = total ? `${total} file${total!==1?'s':''}` : '';
+  const icons={pdf:'📄',ppt:'📊',pptx:'📊',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',jpg:'🖼️',jpeg:'🖼️',png:'🖼️',zip:'🗜️',txt:'📃'};
+  if(!total) {
+    listEl.innerHTML='<div class="empty-state" style="grid-column:1/-1"><span class="es-icon">📂</span>No files in this folder yet.</div>';
+    if(vmWrap) vmWrap.style.display='none';
+    return;
+  }
+  listEl.innerHTML = sorted.slice(0, shown).map(f=>{
+    const ext=(f.title||'').split('.').pop().toLowerCase();
+    const icon=icons[ext]||'📎';
+    return `<div class="mat-card">
+      <div class="mat-type">${icon} Novel</div>
+      <h4>${f.title}</h4>
+      ${f.url?`<div class="file-btns">
+        <a class="btn-view-file" href="${buildViewUrl(f.url)}" target="_blank">👁 View</a>
+        <a class="btn-dl-file" href="${buildDlUrl(f.url)}" target="_blank">↓ Download</a>
+      </div>`:''}
+    </div>`;
+  }).join('');
+  if(vmWrap) {
+    vmWrap.style.display = shown < total ? 'block' : 'none';
+    const vmBtn = vmWrap.querySelector('button');
+    if(vmBtn) vmBtn.textContent = `View more files (${total-shown} remaining) ↓`;
+  }
+}
+
+function applySortNovel() {
+  window._novelCache.shown = NOVEL_PAGE_SIZE;
+  renderNovelFiles();
+}
+
+function viewMoreNovel() {
+  window._novelCache.shown += NOVEL_PAGE_SIZE;
+  renderNovelFiles();
+}
+
 // ── ADMIN LOADERS ──
 async function loadAllAdmin() {
   try {
@@ -2093,6 +2729,9 @@ async function loadAllAdmin() {
       loadAdminClassVideos('c12'),
       loadAdminClassPapers('c12'), loadAdminClassMaterial('c12'),
       loadAdminGrammar(),
+      loadAdminWritingSkills(),
+      loadAdminDrama(),
+      loadAdminNovel(),
       refreshFolderSelects()
     ]);
   } catch(e) { console.log('Admin load error:', e); }
@@ -2127,24 +2766,57 @@ async function loadAdminClassPapers(cls) {
   const items   = await window.FB.loadCollection(cls+'-papers');
   const el = document.getElementById('admin-'+cls+'-papers-list');
   if(!el) return;
-  let html='';
   if(!folders.length && !items.length){ el.innerHTML=emptyAdm; return; }
-  folders.forEach(f=>{
-    html+=`<div class="item-row">
-      <div class="item-row-info"><h4>📁 ${f.name}</h4><p>Folder · Parent: ${f.parentName||'Root'}</p></div>
-      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
-        <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
-          onclick="adminOpenRenameModal('${cls}-papers-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button>
-        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers-folders','${f.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
+
+  const grouped = {};
+  items.forEach(p => {
+    const key = p.folder || '';
+    if(!grouped[key]) grouped[key] = [];
+    grouped[key].push(p);
+  });
+
+  let html='';
+
+  if(grouped['']) {
+    html+=`<div class="folder-root-section">
+      <div class="root-header" onclick="this.closest('.folder-root-section').classList.toggle('collapsed')">
+        <span class="fc-arrow">▼</span> 📁 Root Level <span class="fc-count">(${grouped[''].length} paper${grouped[''].length!==1?'s':''})</span>
       </div>
-    </div>`;
+      <div class="root-body">`;
+    grouped[''].forEach(p=>{
+      html+=`<div class="item-row">
+        <div class="item-row-info"><h4>${p.title}</h4><p>${p.subject||''} · ${p.year||''} · 📁 Root</p></div>
+        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers','${p.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  }
+
+  folders.forEach(f=>{
+    const pts=grouped[f.id]||[];
+    html+=`<div class="folder-collapse">
+      <div class="folder-collapse-header" onclick="toggleFolderCollapse(this)">
+        <span class="fc-arrow">▼</span> 📁 ${f.name}
+        <span class="fc-count">${pts.length} paper${pts.length!==1?'s':''} · ${f.parentName||'Root'}</span>
+      </div>
+      <div class="folder-collapse-body">
+        <div class="item-row" style="background:var(--orange-dim);border-bottom:1.5px solid var(--border2);">
+          <div class="item-row-info"><p style="font-size:.8rem;color:var(--muted);">Folder actions</p></div>
+          <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+            <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+              onclick="adminOpenRenameModal('${cls}-papers-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button>
+            <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers-folders','${f.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
+          </div>
+        </div>`;
+    pts.forEach(p=>{
+      html+=`<div class="item-row">
+        <div class="item-row-info"><h4>${p.title}</h4><p>${p.subject||''} · ${p.year||''} · 📁 ${f.name}</p></div>
+        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers','${p.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
+      </div>`;
+    });
+    html+=`</div></div>`;
   });
-  items.forEach(p=>{
-    html+=`<div class="item-row">
-      <div class="item-row-info"><h4>${p.title}</h4><p>${p.subject||''} · ${p.year||''} · 📁 ${p.folderName||'Root'}</p></div>
-      <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers','${p.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
-    </div>`;
-  });
+
   el.innerHTML=html||emptyAdm;
 }
 
@@ -2153,24 +2825,57 @@ async function loadAdminClassMaterial(cls) {
   const items   = await window.FB.loadCollection(cls+'-material');
   const el = document.getElementById('admin-'+cls+'-material-list');
   if(!el) return;
-  let html='';
   if(!folders.length && !items.length){ el.innerHTML=emptyAdm; return; }
-  folders.forEach(f=>{
-    html+=`<div class="item-row">
-      <div class="item-row-info"><h4>📁 ${f.name}</h4><p>Folder · Parent: ${f.parentName||'Root'}</p></div>
-      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
-        <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
-          onclick="adminOpenRenameModal('${cls}-mat-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button>
-        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-mat-folders','${f.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
+
+  const grouped = {};
+  items.forEach(m => {
+    const key = m.folder || '';
+    if(!grouped[key]) grouped[key] = [];
+    grouped[key].push(m);
+  });
+
+  let html='';
+
+  if(grouped['']) {
+    html+=`<div class="folder-root-section">
+      <div class="root-header" onclick="this.closest('.folder-root-section').classList.toggle('collapsed')">
+        <span class="fc-arrow">▼</span> 📁 Root Level <span class="fc-count">(${grouped[''].length} item${grouped[''].length!==1?'s':''})</span>
       </div>
-    </div>`;
+      <div class="root-body">`;
+    grouped[''].forEach(m=>{
+      html+=`<div class="item-row">
+        <div class="item-row-info"><h4>${m.title}</h4><p>${m.type||''} · ${m.subject||''} · 📁 Root</p></div>
+        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-material','${m.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  }
+
+  folders.forEach(f=>{
+    const mats=grouped[f.id]||[];
+    html+=`<div class="folder-collapse">
+      <div class="folder-collapse-header" onclick="toggleFolderCollapse(this)">
+        <span class="fc-arrow">▼</span> 📁 ${f.name}
+        <span class="fc-count">${mats.length} item${mats.length!==1?'s':''} · ${f.parentName||'Root'}</span>
+      </div>
+      <div class="folder-collapse-body">
+        <div class="item-row" style="background:var(--orange-dim);border-bottom:1.5px solid var(--border2);">
+          <div class="item-row-info"><p style="font-size:.8rem;color:var(--muted);">Folder actions</p></div>
+          <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+            <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+              onclick="adminOpenRenameModal('${cls}-mat-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button>
+            <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-mat-folders','${f.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
+          </div>
+        </div>`;
+    mats.forEach(m=>{
+      html+=`<div class="item-row">
+        <div class="item-row-info"><h4>${m.title}</h4><p>${m.type||''} · ${m.subject||''} · 📁 ${f.name}</p></div>
+        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-material','${m.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
+      </div>`;
+    });
+    html+=`</div></div>`;
   });
-  items.forEach(m=>{
-    html+=`<div class="item-row">
-      <div class="item-row-info"><h4>${m.title}</h4><p>${m.type||''} · ${m.subject||''} · 📁 ${m.folderName||'Root'}</p></div>
-      <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-material','${m.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
-    </div>`;
-  });
+
   el.innerHTML=html||emptyAdm;
 }
 
@@ -2201,26 +2906,135 @@ async function loadAdminGrammar() {
   const files = await window.FB.loadCollection('grammar-files');
   const el = document.getElementById('admin-grammar-list');
   if(!el) return;
-  let html='';
   if(!folders.length && !files.length){ el.innerHTML=emptyAdm; return; }
-  folders.forEach(f=>{
-    html+=`<div class="item-row">
-      <div class="item-row-info"><h4>📁 ${f.name}</h4><p>Folder · Parent: ${f.parentName||'Root'}</p></div>
-      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
-        <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
-          onclick="adminOpenRenameModal('grammar-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button>
-        <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-folders','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFolders(''))">Delete</button>
+
+  // Group files by folder
+  const grouped = {};
+  files.forEach(f => {
+    const key = f.folder || '';
+    if(!grouped[key]) grouped[key] = [];
+    grouped[key].push(f);
+  });
+
+  let html='';
+
+  // Root-level files
+  if(grouped['']) {
+    html+=`<div class="folder-root-section">
+      <div class="root-header" onclick="this.closest('.folder-root-section').classList.toggle('collapsed')">
+        <span class="fc-arrow">▼</span> 📁 Root Level <span class="fc-count">(${grouped[''].length} file${grouped[''].length!==1?'s':''})</span>
       </div>
-    </div>`;
+      <div class="root-body">`;
+    grouped[''].forEach(f=>{
+      const src=f.source==='link'?'🔗 Link':'☁️ Uploaded';
+      html+=`<div class="item-row">
+        <div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div>
+        <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-files','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFiles(''))">Delete</button>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  }
+
+  // Each folder with its files
+  folders.forEach(f=>{
+    const items=grouped[f.id]||[];
+    html+=`<div class="folder-collapse">
+      <div class="folder-collapse-header" onclick="toggleFolderCollapse(this)">
+        <span class="fc-arrow">▼</span> 📁 ${f.name}
+        <span class="fc-count">${items.length} file${items.length!==1?'s':''} · ${f.parentName||'Root'}</span>
+      </div>
+      <div class="folder-collapse-body">
+        <div class="item-row" style="background:var(--orange-dim);border-bottom:1.5px solid var(--border2);">
+          <div class="item-row-info"><p style="font-size:.8rem;color:var(--muted);">Folder actions</p></div>
+          <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+            <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+              onclick="adminOpenRenameModal('grammar-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button>
+            <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-folders','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFolders(''))">Delete</button>
+          </div>
+        </div>`;
+    items.forEach(fi=>{
+      const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded';
+      html+=`<div class="item-row">
+        <div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div>
+        <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-files','${fi.id}',loadAdminGrammar,()=>loadPublicGrammarFiles(''))">Delete</button>
+      </div>`;
+    });
+    html+=`</div></div>`;
   });
-  files.forEach(f=>{
-    const src=f.source==='link'?'🔗 Link':'☁️ Uploaded';
-    html+=`<div class="item-row">
-      <div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 ${f.folderName||'Root'} · ${src}</p></div>
-      <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-files','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFiles(''))">Delete</button>
-    </div>`;
+
+  el.innerHTML=html||emptyAdm;
+}
+
+// ── ADMIN: WRITING SKILLS ──
+async function loadAdminWritingSkills() {
+  const folders = await window.FB.loadCollection('writingskills-folders');
+  const files = await window.FB.loadCollection('writingskills-files');
+  const el = document.getElementById('admin-writingskills-list');
+  if(!el) return;
+  if(!folders.length && !files.length){ el.innerHTML=emptyAdm; return; }
+  const grouped = {};
+  files.forEach(f => { const k = f.folder || ''; if(!grouped[k]) grouped[k] = []; grouped[k].push(f); });
+  let html='';
+  if(grouped['']) {
+    html+=`<div class="folder-root-section"><div class="root-header" onclick="this.closest('.folder-root-section').classList.toggle('collapsed')"><span class="fc-arrow">▼</span> 📁 Root Level <span class="fc-count">(${grouped[''].length} file${grouped[''].length!==1?'s':''})</span></div><div class="root-body">`;
+    grouped[''].forEach(f=>{ const src=f.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('writingskills-files','${f.id}',loadAdminWritingSkills,()=>loadPublicWritingSkillsFiles(''))">Delete</button></div>`; });
+    html+=`</div></div>`;
+  }
+  folders.forEach(f=>{
+    const items=grouped[f.id]||[];
+    html+=`<div class="folder-collapse"><div class="folder-collapse-header" onclick="toggleFolderCollapse(this)"><span class="fc-arrow">▼</span> 📁 ${f.name}<span class="fc-count">${items.length} file${items.length!==1?'s':''} · ${f.parentName||'Root'}</span></div><div class="folder-collapse-body"><div class="item-row" style="background:var(--orange-dim);border-bottom:1.5px solid var(--border2);"><div class="item-row-info"><p style="font-size:.8rem;color:var(--muted);">Folder actions</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameModal('writingskills-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('writingskills-folders','${f.id}',loadAdminWritingSkills,()=>loadPublicWritingSkillsFolders(''))">Delete</button></div></div>`;
+    items.forEach(fi=>{ const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('writingskills-files','${fi.id}',loadAdminWritingSkills,()=>loadPublicWritingSkillsFiles(''))">Delete</button></div>`; });
+    html+=`</div></div>`;
   });
-  el.innerHTML=html;
+  el.innerHTML=html||emptyAdm;
+}
+
+// ── ADMIN: DRAMA ──
+async function loadAdminDrama() {
+  const folders = await window.FB.loadCollection('drama-folders');
+  const files = await window.FB.loadCollection('drama-files');
+  const el = document.getElementById('admin-drama-list');
+  if(!el) return;
+  if(!folders.length && !files.length){ el.innerHTML=emptyAdm; return; }
+  const grouped = {};
+  files.forEach(f => { const k = f.folder || ''; if(!grouped[k]) grouped[k] = []; grouped[k].push(f); });
+  let html='';
+  if(grouped['']) {
+    html+=`<div class="folder-root-section"><div class="root-header" onclick="this.closest('.folder-root-section').classList.toggle('collapsed')"><span class="fc-arrow">▼</span> 📁 Root Level <span class="fc-count">(${grouped[''].length} file${grouped[''].length!==1?'s':''})</span></div><div class="root-body">`;
+    grouped[''].forEach(f=>{ const src=f.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('drama-files','${f.id}',loadAdminDrama,()=>loadPublicDramaFiles(''))">Delete</button></div>`; });
+    html+=`</div></div>`;
+  }
+  folders.forEach(f=>{
+    const items=grouped[f.id]||[];
+    html+=`<div class="folder-collapse"><div class="folder-collapse-header" onclick="toggleFolderCollapse(this)"><span class="fc-arrow">▼</span> 📁 ${f.name}<span class="fc-count">${items.length} file${items.length!==1?'s':''} · ${f.parentName||'Root'}</span></div><div class="folder-collapse-body"><div class="item-row" style="background:var(--orange-dim);border-bottom:1.5px solid var(--border2);"><div class="item-row-info"><p style="font-size:.8rem;color:var(--muted);">Folder actions</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameModal('drama-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('drama-folders','${f.id}',loadAdminDrama,()=>loadPublicDramaFolders(''))">Delete</button></div></div>`;
+    items.forEach(fi=>{ const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('drama-files','${fi.id}',loadAdminDrama,()=>loadPublicDramaFiles(''))">Delete</button></div>`; });
+    html+=`</div></div>`;
+  });
+  el.innerHTML=html||emptyAdm;
+}
+
+// ── ADMIN: NOVEL ──
+async function loadAdminNovel() {
+  const folders = await window.FB.loadCollection('novel-folders');
+  const files = await window.FB.loadCollection('novel-files');
+  const el = document.getElementById('admin-novel-list');
+  if(!el) return;
+  if(!folders.length && !files.length){ el.innerHTML=emptyAdm; return; }
+  const grouped = {};
+  files.forEach(f => { const k = f.folder || ''; if(!grouped[k]) grouped[k] = []; grouped[k].push(f); });
+  let html='';
+  if(grouped['']) {
+    html+=`<div class="folder-root-section"><div class="root-header" onclick="this.closest('.folder-root-section').classList.toggle('collapsed')"><span class="fc-arrow">▼</span> 📁 Root Level <span class="fc-count">(${grouped[''].length} file${grouped[''].length!==1?'s':''})</span></div><div class="root-body">`;
+    grouped[''].forEach(f=>{ const src=f.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('novel-files','${f.id}',loadAdminNovel,()=>loadPublicNovelFiles(''))">Delete</button></div>`; });
+    html+=`</div></div>`;
+  }
+  folders.forEach(f=>{
+    const items=grouped[f.id]||[];
+    html+=`<div class="folder-collapse"><div class="folder-collapse-header" onclick="toggleFolderCollapse(this)"><span class="fc-arrow">▼</span> 📁 ${f.name}<span class="fc-count">${items.length} file${items.length!==1?'s':''} · ${f.parentName||'Root'}</span></div><div class="folder-collapse-body"><div class="item-row" style="background:var(--orange-dim);border-bottom:1.5px solid var(--border2);"><div class="item-row-info"><p style="font-size:.8rem;color:var(--muted);">Folder actions</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameModal('novel-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('novel-folders','${f.id}',loadAdminNovel,()=>loadPublicNovelFolders(''))">Delete</button></div></div>`;
+    items.forEach(fi=>{ const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('novel-files','${fi.id}',loadAdminNovel,()=>loadPublicNovelFiles(''))">Delete</button></div>`; });
+    html+=`</div></div>`;
+  });
+  el.innerHTML=html||emptyAdm;
 }
 
 async function delClassItem(col,id,rA,rP) {
@@ -2258,6 +3072,9 @@ async function adminSaveRenameFolder() {
     // Refresh the correct admin list and folder selects
     const colToRefresh = {
       'grammar-folders':    ()=>{ loadAdminGrammar(); refreshFolderSelects(); },
+      'writingskills-folders':()=>{ loadAdminWritingSkills(); refreshFolderSelects(); },
+      'drama-folders':       ()=>{ loadAdminDrama(); refreshFolderSelects(); },
+      'novel-folders':       ()=>{ loadAdminNovel(); refreshFolderSelects(); },
       'c11-papers-folders': ()=>{ loadAdminClassPapers('c11'); refreshFolderSelects(); },
       'c11-mat-folders':    ()=>{ loadAdminClassMaterial('c11'); refreshFolderSelects(); },
       'c12-papers-folders': ()=>{ loadAdminClassPapers('c12'); refreshFolderSelects(); },
@@ -2267,6 +3084,9 @@ async function adminSaveRenameFolder() {
     // Also refresh public folder navigation
     const pubRefresh = {
       'grammar-folders':    ()=>{ loadPublicGrammarFolders(''); loadPublicGrammarFiles(''); },
+      'writingskills-folders':()=>{ loadPublicWritingSkillsFolders(''); loadPublicWritingSkillsFiles(''); },
+      'drama-folders':       ()=>{ loadPublicDramaFolders(''); loadPublicDramaFiles(''); },
+      'novel-folders':       ()=>{ loadPublicNovelFolders(''); loadPublicNovelFiles(''); },
       'c11-papers-folders': ()=>loadPublicClassPapers('c11'),
       'c11-mat-folders':    ()=>loadPublicClassMaterial('c11'),
       'c12-papers-folders': ()=>loadPublicClassPapers('c12'),
@@ -2337,6 +3157,9 @@ async function refreshFolderSelects() {
     });
   }
   await fillSelect('grammar-folders','gram-parent-folder','gram-folder-target');
+  await fillSelect('writingskills-folders','writingskills-parent-folder','writingskills-folder-target');
+  await fillSelect('drama-folders','drama-parent-folder','drama-folder-target');
+  await fillSelect('novel-folders','novel-parent-folder','novel-folder-target');
   await fillSelect('c11-papers-folders','c11-papers-parent-folder','c11-papers-folder-target');
   await fillSelect('c11-mat-folders','c11-mat-parent-folder','c11-mat-folder-target');
   await fillSelect('c12-papers-folders','c12-papers-parent-folder','c12-papers-folder-target');
@@ -2346,11 +3169,14 @@ async function refreshFolderSelects() {
 // ── CREATE FOLDER ──
 async function adminCreateFolder(section) {
   const configs={
-    'grammar':      {nameId:'gram-new-folder',    parentId:'gram-parent-folder',    col:'grammar-folders'},
-    'c11-papers':   {nameId:'c11-papers-new-folder',parentId:'c11-papers-parent-folder',col:'c11-papers-folders'},
-    'c11-material': {nameId:'c11-mat-new-folder',  parentId:'c11-mat-parent-folder',  col:'c11-mat-folders'},
-    'c12-papers':   {nameId:'c12-papers-new-folder',parentId:'c12-papers-parent-folder',col:'c12-papers-folders'},
-    'c12-material': {nameId:'c12-mat-new-folder',  parentId:'c12-mat-parent-folder',  col:'c12-mat-folders'},
+    'grammar':      {nameId:'gram-new-folder',    parentId:'gram-parent-folder',    col:'grammar-folders',        adminFn:'loadAdminGrammar',        pubFn:'loadPublicGrammarFolders'},
+    'writingskills':{nameId:'writingskills-new-folder',parentId:'writingskills-parent-folder',col:'writingskills-folders',adminFn:'loadAdminWritingSkills',pubFn:'loadPublicWritingSkillsFolders'},
+    'drama':        {nameId:'drama-new-folder',   parentId:'drama-parent-folder',   col:'drama-folders',         adminFn:'loadAdminDrama',          pubFn:'loadPublicDramaFolders'},
+    'novel':        {nameId:'novel-new-folder',   parentId:'novel-parent-folder',   col:'novel-folders',         adminFn:'loadAdminNovel',          pubFn:'loadPublicNovelFolders'},
+    'c11-papers':   {nameId:'c11-papers-new-folder',parentId:'c11-papers-parent-folder',col:'c11-papers-folders',adminFn:'loadAdminClassPapers',pubFn:'loadPublicClassPapers'},
+    'c11-material': {nameId:'c11-mat-new-folder',  parentId:'c11-mat-parent-folder',  col:'c11-mat-folders',    adminFn:'loadAdminClassMaterial',pubFn:'loadPublicClassMaterial'},
+    'c12-papers':   {nameId:'c12-papers-new-folder',parentId:'c12-papers-parent-folder',col:'c12-papers-folders',adminFn:'loadAdminClassPapers',pubFn:'loadPublicClassPapers'},
+    'c12-material': {nameId:'c12-mat-new-folder',  parentId:'c12-mat-parent-folder',  col:'c12-mat-folders',    adminFn:'loadAdminClassMaterial',pubFn:'loadPublicClassMaterial'},
   };
   const cfg=configs[section];
   if(!cfg) return;
@@ -2367,7 +3193,10 @@ async function adminCreateFolder(section) {
   try {
     await window.FB.addItem(cfg.col,{name,parent:parentId,parentName});
     document.getElementById(cfg.nameId).value='';
-    toast('Folder created! 📁'); await loadAdminGrammar(); await refreshFolderSelects();
+    toast('Folder created! 📁');
+    if(cfg.adminFn) await window[cfg.adminFn]();
+    if(cfg.pubFn) await window[cfg.pubFn]('');
+    await refreshFolderSelects();
   } catch(e){ toast('Error: '+e.message,false); }
 }
 
@@ -2410,6 +3239,96 @@ async function adminAddGrammarFile() {
     }
     toast('Document added! ✅'); await loadAdminGrammar();
     loadPublicGrammarFiles(folderId);
+  } catch(e){ toast('Save failed: '+e.message,false); }
+}
+
+// ── ADD WRITING SKILLS FILE ──
+async function adminAddWritingSkillsFile() {
+  const t=document.getElementById('writingskills-title').value.trim();
+  if(!t){ toast('Enter a title',false); return; }
+  const folderId=document.getElementById('writingskills-folder-target').value;
+  let folderName='Root';
+  if(folderId){ const all=await window.FB.loadCollection('writingskills-folders'); const f=all.find(x=>x.id===folderId); folderName=f?f.name:'Root'; }
+  const uploadWrap=document.getElementById('writingskills-upload-zone-wrap');
+  const isUpload=uploadWrap&&!uploadWrap.classList.contains('hidden-src');
+  let url='';
+  if(isUpload){
+    const file=document.getElementById('writingskills-file-input').files[0];
+    if(!file){ toast('Select a file to upload, or switch to Paste Link',false); return; }
+    if(file.size>25*1024*1024){ toast('File too large — max 25 MB',false); return; }
+    try{ showProgress('writingskills',0); url=await uploadToCloudinary(file,pct=>showProgress('writingskills',pct)); hideProgress('writingskills'); }
+    catch(e){ hideProgress('writingskills'); toast('Upload failed: '+e.message,false); return; }
+  } else {
+    url=sanitizeUrl(document.getElementById('writingskills-url').value);
+    if(!validateUrl(url,'Document link')) return;
+  }
+  try {
+    await window.FB.addItem('writingskills-files',{title:t,url,folder:folderId,folderName,source:isUpload?'cloudinary':'link'});
+    document.getElementById('writingskills-title').value='';
+    if(isUpload){ document.getElementById('writingskills-file-input').value=''; document.getElementById('writingskills-file-name').style.display='none'; }
+    else { const u=document.getElementById('writingskills-url'); if(u) u.value=''; const p=document.getElementById('writingskills-url-preview'); if(p) p.style.display='none'; }
+    toast('Document added! ✅'); await loadAdminWritingSkills();
+    loadPublicWritingSkillsFiles(folderId);
+  } catch(e){ toast('Save failed: '+e.message,false); }
+}
+
+// ── ADD DRAMA FILE ──
+async function adminAddDramaFile() {
+  const t=document.getElementById('drama-title').value.trim();
+  if(!t){ toast('Enter a title',false); return; }
+  const folderId=document.getElementById('drama-folder-target').value;
+  let folderName='Root';
+  if(folderId){ const all=await window.FB.loadCollection('drama-folders'); const f=all.find(x=>x.id===folderId); folderName=f?f.name:'Root'; }
+  const uploadWrap=document.getElementById('drama-upload-zone-wrap');
+  const isUpload=uploadWrap&&!uploadWrap.classList.contains('hidden-src');
+  let url='';
+  if(isUpload){
+    const file=document.getElementById('drama-file-input').files[0];
+    if(!file){ toast('Select a file to upload, or switch to Paste Link',false); return; }
+    if(file.size>25*1024*1024){ toast('File too large — max 25 MB',false); return; }
+    try{ showProgress('drama',0); url=await uploadToCloudinary(file,pct=>showProgress('drama',pct)); hideProgress('drama'); }
+    catch(e){ hideProgress('drama'); toast('Upload failed: '+e.message,false); return; }
+  } else {
+    url=sanitizeUrl(document.getElementById('drama-url').value);
+    if(!validateUrl(url,'Document link')) return;
+  }
+  try {
+    await window.FB.addItem('drama-files',{title:t,url,folder:folderId,folderName,source:isUpload?'cloudinary':'link'});
+    document.getElementById('drama-title').value='';
+    if(isUpload){ document.getElementById('drama-file-input').value=''; document.getElementById('drama-file-name').style.display='none'; }
+    else { const u=document.getElementById('drama-url'); if(u) u.value=''; const p=document.getElementById('drama-url-preview'); if(p) p.style.display='none'; }
+    toast('Document added! ✅'); await loadAdminDrama();
+    loadPublicDramaFiles(folderId);
+  } catch(e){ toast('Save failed: '+e.message,false); }
+}
+
+// ── ADD NOVEL FILE ──
+async function adminAddNovelFile() {
+  const t=document.getElementById('novel-title').value.trim();
+  if(!t){ toast('Enter a title',false); return; }
+  const folderId=document.getElementById('novel-folder-target').value;
+  let folderName='Root';
+  if(folderId){ const all=await window.FB.loadCollection('novel-folders'); const f=all.find(x=>x.id===folderId); folderName=f?f.name:'Root'; }
+  const uploadWrap=document.getElementById('novel-upload-zone-wrap');
+  const isUpload=uploadWrap&&!uploadWrap.classList.contains('hidden-src');
+  let url='';
+  if(isUpload){
+    const file=document.getElementById('novel-file-input').files[0];
+    if(!file){ toast('Select a file to upload, or switch to Paste Link',false); return; }
+    if(file.size>25*1024*1024){ toast('File too large — max 25 MB',false); return; }
+    try{ showProgress('novel',0); url=await uploadToCloudinary(file,pct=>showProgress('novel',pct)); hideProgress('novel'); }
+    catch(e){ hideProgress('novel'); toast('Upload failed: '+e.message,false); return; }
+  } else {
+    url=sanitizeUrl(document.getElementById('novel-url').value);
+    if(!validateUrl(url,'Document link')) return;
+  }
+  try {
+    await window.FB.addItem('novel-files',{title:t,url,folder:folderId,folderName,source:isUpload?'cloudinary':'link'});
+    document.getElementById('novel-title').value='';
+    if(isUpload){ document.getElementById('novel-file-input').value=''; document.getElementById('novel-file-name').style.display='none'; }
+    else { const u=document.getElementById('novel-url'); if(u) u.value=''; const p=document.getElementById('novel-url-preview'); if(p) p.style.display='none'; }
+    toast('Document added! ✅'); await loadAdminNovel();
+    loadPublicNovelFiles(folderId);
   } catch(e){ toast('Save failed: '+e.message,false); }
 }
 
