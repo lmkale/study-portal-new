@@ -153,9 +153,12 @@ nav a.active{color:var(--orange);background:var(--orange-lt);}
 /* ════════════ HERO ════════════ */
 .hero{
   background:linear-gradient(135deg, #fff2e6 0%, #ffe0c0 40%, #ffd0a0 100%);
-  padding:5rem 1.5rem 4.5rem;text-align:center;position:relative;overflow:hidden;
+  padding:4rem 1.5rem;position:relative;overflow:hidden;
   border-bottom:2px solid var(--border);
 }
+.hero-inner{max-width:1280px;margin:0 auto;display:flex;gap:4rem;align-items:center;position:relative;justify-content:center;}
+.hero-side{width:270px;flex-shrink:0;}
+.hero-main{text-align:center;flex:1;max-width:650px;}
 .hero::before{
   content:'';position:absolute;inset:0;
   background:radial-gradient(circle 600px at 70% 50%, rgba(232,97,10,.08), transparent);
@@ -196,6 +199,26 @@ nav a.active{color:var(--orange);background:var(--orange-lt);}
   background:#fff;border:1.5px solid var(--border);border-radius:16px;
   display:inline-flex;box-shadow:0 4px 20px var(--shadow);
 }
+
+/* Hero vertical quick links (left side) */
+.hero-links{display:flex;flex-direction:column;gap:.75rem;}
+.hero-links-title{
+  font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--orange-mid);margin-bottom:.15rem;padding-left:.15rem;
+}
+.hero-link{
+  display:flex;align-items:center;gap:.75rem;
+  background:#fff;border:1.5px solid var(--border2);border-radius:12px;
+  padding:.95rem 1.5rem;font-size:.92rem;font-weight:700;color:var(--ink2);
+  text-decoration:none;cursor:pointer;transition:all .22s;
+  width:100%;box-sizing:border-box;
+}
+.hero-link:hover{
+  background:linear-gradient(135deg,var(--orange),var(--orange-mid));color:#fff;
+  border-color:var(--orange);transform:translateX(4px);
+  box-shadow:0 6px 20px var(--shadow2);
+}
+.hero-link .hl-icon{font-size:1.15rem;}
 
 /* ════════════ PAGE HEADER ════════════ */
 .page-hdr{
@@ -720,6 +743,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
   .b-card{grid-template-columns:1fr;}
   .hero-stats{gap:0;}
   .stat{padding:.9rem 1.2rem;}
+  .hero-inner{flex-direction:column;gap:2rem;}
+  .hero-links{flex-direction:row;flex-wrap:wrap;justify-content:center;}
+  .hero-link{min-width:auto;padding:.55rem 1rem;font-size:.78rem;white-space:nowrap;}
+  .hero-side{width:100%;}
   .form-row{grid-template-columns:1fr;}
   .admin-layout{flex-direction:column;}
   .admin-sidebar{width:100%;flex-direction:row;flex-wrap:wrap;padding:.8rem;gap:.3rem;border-right:none;border-bottom:1.5px solid var(--border);}
@@ -1085,41 +1112,43 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
 <!-- ══════════ HOME ══════════ -->
 <div class="page active" id="page-home">
   <div class="hero">
-    <div class="hero-pill">🎓 Welcome to my classroom</div>
-    <!-- Hero LMK Logo Badge -->
-    <div style="display:flex;justify-content:center;margin-bottom:1.2rem;">
-      <svg style="width:68px;height:68px;filter:drop-shadow(0 6px 18px rgba(232,97,10,.35));" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M22 2 L40 9 L40 24 C40 33 32 40 22 43 C12 40 4 33 4 24 L4 9 Z" fill="url(#lgH)"/>
-        <path d="M22 5.5 L37.5 11.5 L37.5 24 C37.5 31.8 30.8 37.8 22 40.5 C13.2 37.8 6.5 31.8 6.5 24 L6.5 11.5 Z" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-        <text x="22" y="31" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="14.5" fill="white" letter-spacing="1">LMK</text>
-        <circle cx="22" cy="12" r="2" fill="rgba(255,220,140,0.95)"/>
-        <defs>
-          <linearGradient id="lgH" x1="4" y1="2" x2="40" y2="44" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#f5943a"/>
-            <stop offset="55%" stop-color="#e8610a"/>
-            <stop offset="100%" stop-color="#6e2600"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-    <h1>Inspiring Minds,<br><em>Shaping Futures</em></h1>
-    <p>Your one-stop destination for study materials, video lectures, question papers, and everything you need to excel.</p>
-    <div class="hero-stat-wrap">
-      <div class="stat"><span class="stat-num">15+</span><span class="stat-label">Years Teaching</span></div>
-      <div class="stat"><span class="stat-num">1200+</span><span class="stat-label">Students</span></div>
-      <div class="stat"><span class="stat-num">98%</span><span class="stat-label">Pass Rate</span></div>
-    </div>
-  </div>
-  <div class="section">
-    <div class="sec-hdr">
-      <span class="sec-tag">Quick Access</span>
-      <h2 class="sec-title">Everything You <em>Need</em></h2>
-      <div class="divider"></div>
-    </div>
-    <div class="cards">
-      <div class="card"><div class="card-icon">📖</div><h3>Grammar</h3><p>Grammar resources, documents, and study materials for students.</p><span class="card-link" onclick="showPage('grammar')">View Grammar →</span></div>
-      <div class="card"><div class="card-icon">📚</div><h3>Class 11</h3><p>Syllabus, study materials, question papers, videos and more for Class 11.</p><span class="card-link" onclick="showPage('class11')">Go to Class 11 →</span></div>
-      <div class="card"><div class="card-icon">🎓</div><h3>Class 12</h3><p>Syllabus, study materials, question papers, videos and more for Class 12.</p><span class="card-link" onclick="showPage('class12')">Go to Class 12 →</span></div>
+    <div class="hero-inner">
+      <div class="hero-side">
+        <div class="hero-links">
+          <div class="hero-links-title">⚡ Quick Menu</div>
+          <a class="hero-link" onclick="showPage('grammar')"><span class="hl-icon">📖</span> Grammar</a>
+          <a class="hero-link" onclick="showPage('writingskills')"><span class="hl-icon">✍️</span> Writing Skills</a>
+          <a class="hero-link" onclick="showPage('drama')"><span class="hl-icon">🎭</span> Drama</a>
+          <a class="hero-link" onclick="showPage('novel')"><span class="hl-icon">📖</span> Novel</a>
+          <a class="hero-link" onclick="showPage('class11')"><span class="hl-icon">📚</span> Class 11</a>
+          <a class="hero-link" onclick="showPage('class12')"><span class="hl-icon">🎓</span> Class 12</a>
+        </div>
+      </div>
+      <div class="hero-main">
+        <div class="hero-pill">🎓 Welcome to my classroom</div>
+        <div style="display:flex;justify-content:center;margin-bottom:1.2rem;">
+          <svg style="width:68px;height:68px;filter:drop-shadow(0 6px 18px rgba(232,97,10,.35));" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 2 L40 9 L40 24 C40 33 32 40 22 43 C12 40 4 33 4 24 L4 9 Z" fill="url(#lgH)"/>
+            <path d="M22 5.5 L37.5 11.5 L37.5 24 C37.5 31.8 30.8 37.8 22 40.5 C13.2 37.8 6.5 31.8 6.5 24 L6.5 11.5 Z" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <text x="22" y="31" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="14.5" fill="white" letter-spacing="1">LMK</text>
+            <circle cx="22" cy="12" r="2" fill="rgba(255,220,140,0.95)"/>
+            <defs>
+              <linearGradient id="lgH" x1="4" y1="2" x2="40" y2="44" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#f5943a"/>
+                <stop offset="55%" stop-color="#e8610a"/>
+                <stop offset="100%" stop-color="#6e2600"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h1>Inspiring Minds,<br><em>Shaping Futures</em></h1>
+        <p>Your one-stop destination for study materials, video lectures, question papers, and everything you need to excel.</p>
+        <div class="hero-stat-wrap">
+          <div class="stat"><span class="stat-num">15+</span><span class="stat-label">Years Teaching</span></div>
+          <div class="stat"><span class="stat-num">1200+</span><span class="stat-label">Students</span></div>
+          <div class="stat"><span class="stat-num">98%</span><span class="stat-label">Pass Rate</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
