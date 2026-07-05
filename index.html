@@ -155,8 +155,9 @@ nav a.active{color:var(--orange);background:var(--orange-lt);}
   background:linear-gradient(135deg, #fff2e6 0%, #ffe0c0 40%, #ffd0a0 100%);
   padding:4rem 1.5rem;position:relative;overflow:hidden;
   border-bottom:2px solid var(--border);
+  min-height:calc(100vh - 66px);display:flex;align-items:center;
 }
-.hero-inner{max-width:1280px;margin:0 auto;display:flex;gap:4rem;align-items:center;position:relative;justify-content:center;}
+.hero-inner{max-width:1280px;margin:0 auto;display:flex;gap:4rem;align-items:center;position:relative;justify-content:center;width:100%;}
 .hero-side{width:270px;flex-shrink:0;}
 .hero-main{text-align:center;flex:1;max-width:650px;}
 .hero::before{
@@ -693,31 +694,43 @@ tbody td{padding:.95rem 1.2rem;font-size:.88rem;color:var(--ink2);}
 }
 .sort-select:focus{border-color:var(--orange);}
 .sort-results{font-size:.75rem;color:var(--muted);margin-left:auto;}
-/* View More */
-.view-more-wrap{text-align:center;margin-top:1.4rem;}
-.btn-view-more{
-  display:inline-flex;align-items:center;gap:.45rem;
-  background:var(--surface);border:1.5px solid var(--orange-lt);
-  color:var(--orange);font-size:.82rem;font-weight:700;
-  padding:.6rem 1.6rem;border-radius:10px;cursor:pointer;
-  transition:all .2s;letter-spacing:.03em;
+/* View toggle (grid / list) */
+.view-toggle{display:inline-flex;gap:3px;background:var(--border2);border-radius:7px;padding:2px;}
+.vt-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:28px;border-radius:6px;cursor:pointer;transition:all .2s;
+  font-size:1rem;color:var(--muted);user-select:none;line-height:1;
 }
-.btn-view-more:hover{background:var(--orange);color:#fff;border-color:var(--orange);}
-
-/* ════════════ SORT CONTROLS ════════════ */
-.sort-bar {
-  display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;flex-wrap:wrap;
-  padding:.7rem 1rem;background:var(--surface);border:1.5px solid var(--border2);
+.vt-btn:hover{color:var(--ink2);}
+.vt-btn.active{background:#fff;color:var(--orange);box-shadow:0 1px 4px var(--shadow);}
+/* List layout for material */
+.material-list-layout{display:flex;flex-direction:column;gap:.65rem;}
+.material-list-layout .mat-card{
+  flex-direction:row;align-items:center;padding:1rem 1.4rem;gap:1.2rem;
   border-radius:10px;
 }
-.sort-bar label{font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
-.sort-select{
-  background:var(--surface);border:1.5px solid var(--border);border-radius:7px;
-  padding:.35rem .75rem;font-size:.8rem;color:var(--ink2);font-family:'Plus Jakarta Sans',sans-serif;
-  cursor:pointer;outline:none;transition:border .2s;
+.material-list-layout .mat-card h4{flex:1;font-size:.92rem;margin:0;}
+.material-list-layout .mat-card p{flex:0 0 140px;margin:0;font-size:.8rem;}
+.material-list-layout .mat-type{flex-shrink:0;padding:.25rem .65rem;font-size:.7rem;}
+.material-list-layout .mat-card .file-btns{flex-shrink:0;}
+.material-list-layout .empty-state{grid-column:unset;}
+/* Folder list layout */
+.folder-list-layout{display:flex;flex-direction:column;gap:.5rem;}
+.folder-list-layout .folder-card{
+  flex-direction:row;align-items:center;padding:.7rem 1.2rem;gap:.75rem;
+  border-radius:10px;
 }
-.sort-select:focus{border-color:var(--orange);}
-.sort-results{font-size:.75rem;color:var(--muted);margin-left:auto;}
+.folder-list-layout .folder-card .fc-icon{font-size:1rem;width:auto;}
+.folder-list-layout .folder-card .fc-name{font-size:.88rem;}
+.folder-list-layout .folder-card.folder-back .fc-icon{font-size:1rem;}
+/* Video list layout */
+.video-list-layout{display:flex;flex-direction:column;gap:.75rem;}
+.video-list-layout .v-card{flex-direction:row;padding:.8rem 1.2rem;gap:1rem;align-items:center;}
+.video-list-layout .v-card .v-thumb{width:100px;height:56px;flex-shrink:0;}
+.video-list-layout .v-card .v-info{flex:1;}
+.video-list-layout .v-card .v-info h4{font-size:.85rem;}
+.video-list-layout .v-card .v-info p{font-size:.78rem;}
+.video-list-layout .v-card .v-info a{width:fit-content;}
 /* View More */
 .view-more-wrap{text-align:center;margin-top:1.4rem;}
 .btn-view-more{
@@ -759,6 +772,13 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
   .hero{padding:3rem 1rem 2.5rem;}
   .cards{grid-template-columns:1fr;}
   .material-grid{grid-template-columns:1fr;}
+  .material-list-layout .mat-card{flex-wrap:wrap;gap:.6rem;}
+  .material-list-layout .mat-card p{flex:1 1 100%;order:1;}
+  .material-list-layout .mat-card h4{flex:1 1 100%;}
+  .material-list-layout .mat-card .file-btns{width:100%;}
+  .folder-list-layout .folder-card{padding:.55rem 1rem;}
+  .video-list-layout .v-card{flex-wrap:wrap;}
+  .video-list-layout .v-card .v-thumb{width:100%;height:auto;aspect-ratio:16/9;}
   /* Tables scroll horizontally within container, not whole page */
   .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   table{min-width:500px;}
@@ -1165,6 +1185,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
     <div id="grammar-folder-nav" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
       <span style="font-size:.78rem;color:var(--muted);">📁</span>
       <span id="grammar-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+      <span class="view-toggle" style="margin-left:auto;" id="grammar-folder-view-toggle">
+        <span class="vt-btn vt-grid active" onclick="setGridView('grammar-folders','grid','grammar-folders')" title="Grid view">▦</span>
+        <span class="vt-btn vt-list" onclick="setGridView('grammar-folders','list','grammar-folders')" title="List view">☰</span>
+      </span>
     </div>
     <div id="grammar-folders" class="folder-grid"></div>
     <div class="sort-bar" id="grammar-sort-bar" style="display:none;">
@@ -1175,6 +1199,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
         <option value="az">🔤 A → Z</option>
         <option value="za">🔤 Z → A</option>
       </select>
+      <span class="view-toggle" id="grammar-file-view-toggle">
+        <span class="vt-btn vt-grid active" onclick="setGridView('grammar-files','grid','grammar-files')" title="Grid view">▦</span>
+        <span class="vt-btn vt-list" onclick="setGridView('grammar-files','list','grammar-files')" title="List view">☰</span>
+      </span>
       <span class="sort-results" id="grammar-sort-results"></span>
     </div>
     <div id="grammar-files" class="material-grid" style="margin-top:.5rem;"></div>
@@ -1196,6 +1224,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
     <div id="writingskills-folder-nav" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
       <span style="font-size:.78rem;color:var(--muted);">📁</span>
       <span id="writingskills-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+      <span class="view-toggle" style="margin-left:auto;" id="writingskills-folder-view-toggle">
+        <span class="vt-btn vt-grid active" onclick="setGridView('writingskills-folders','grid','writingskills-folders')" title="Grid view">▦</span>
+        <span class="vt-btn vt-list" onclick="setGridView('writingskills-folders','list','writingskills-folders')" title="List view">☰</span>
+      </span>
     </div>
     <div id="writingskills-folders" class="folder-grid"></div>
     <div class="sort-bar" id="writingskills-sort-bar" style="display:none;">
@@ -1206,6 +1238,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
         <option value="az">🔤 A → Z</option>
         <option value="za">🔤 Z → A</option>
       </select>
+      <span class="view-toggle" id="writingskills-file-view-toggle">
+        <span class="vt-btn vt-grid active" onclick="setGridView('writingskills-files','grid','writingskills-files')" title="Grid view">▦</span>
+        <span class="vt-btn vt-list" onclick="setGridView('writingskills-files','list','writingskills-files')" title="List view">☰</span>
+      </span>
       <span class="sort-results" id="writingskills-sort-results"></span>
     </div>
     <div id="writingskills-files" class="material-grid" style="margin-top:.5rem;"></div>
@@ -1227,6 +1263,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
     <div id="drama-folder-nav" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
       <span style="font-size:.78rem;color:var(--muted);">📁</span>
       <span id="drama-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+      <span class="view-toggle" style="margin-left:auto;" id="drama-folder-view-toggle">
+        <span class="vt-btn vt-grid active" onclick="setGridView('drama-folders','grid','drama-folders')" title="Grid view">▦</span>
+        <span class="vt-btn vt-list" onclick="setGridView('drama-folders','list','drama-folders')" title="List view">☰</span>
+      </span>
     </div>
     <div id="drama-folders" class="folder-grid"></div>
     <div class="sort-bar" id="drama-sort-bar" style="display:none;">
@@ -1237,6 +1277,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
         <option value="az">🔤 A → Z</option>
         <option value="za">🔤 Z → A</option>
       </select>
+      <span class="view-toggle" id="drama-file-view-toggle">
+        <span class="vt-btn vt-grid active" onclick="setGridView('drama-files','grid','drama-files')" title="Grid view">▦</span>
+        <span class="vt-btn vt-list" onclick="setGridView('drama-files','list','drama-files')" title="List view">☰</span>
+      </span>
       <span class="sort-results" id="drama-sort-results"></span>
     </div>
     <div id="drama-files" class="material-grid" style="margin-top:.5rem;"></div>
@@ -1258,6 +1302,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
     <div id="novel-folder-nav" style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
       <span style="font-size:.78rem;color:var(--muted);">📁</span>
       <span id="novel-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+      <span class="view-toggle" style="margin-left:auto;" id="novel-folder-view-toggle">
+        <span class="vt-btn vt-grid active" onclick="setGridView('novel-folders','grid','novel-folders')" title="Grid view">▦</span>
+        <span class="vt-btn vt-list" onclick="setGridView('novel-folders','list','novel-folders')" title="List view">☰</span>
+      </span>
     </div>
     <div id="novel-folders" class="folder-grid"></div>
     <div class="sort-bar" id="novel-sort-bar" style="display:none;">
@@ -1268,6 +1316,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
         <option value="az">🔤 A → Z</option>
         <option value="za">🔤 Z → A</option>
       </select>
+      <span class="view-toggle" id="novel-file-view-toggle">
+        <span class="vt-btn vt-grid active" onclick="setGridView('novel-files','grid','novel-files')" title="Grid view">▦</span>
+        <span class="vt-btn vt-list" onclick="setGridView('novel-files','list','novel-files')" title="List view">☰</span>
+      </span>
       <span class="sort-results" id="novel-sort-results"></span>
     </div>
     <div id="novel-files" class="material-grid" style="margin-top:.5rem;"></div>
@@ -1291,6 +1343,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           <div id="c11-mat-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
             <span style="font-size:.78rem;color:var(--muted);">📁</span>
             <span id="c11-mat-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+            <span class="view-toggle" style="margin-left:auto;" id="c11-mat-folder-view-toggle">
+              <span class="vt-btn vt-grid active" onclick="setGridView('c11-mat-folders','grid','c11-mat-folders')" title="Grid view">▦</span>
+              <span class="vt-btn vt-list" onclick="setGridView('c11-mat-folders','list','c11-mat-folders')" title="List view">☰</span>
+            </span>
           </div>
           <div id="c11-mat-folders" class="folder-grid"></div>
           <div class="sort-bar" id="c11-mat-sort-bar" style="display:none;">
@@ -1301,6 +1357,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
               <option value="az">🔤 A → Z</option>
               <option value="za">🔤 Z → A</option>
             </select>
+            <span class="view-toggle" id="c11-mat-view-toggle">
+              <span class="vt-btn vt-grid active" onclick="setMaterialView('c11','grid')" title="Grid view">▦</span>
+              <span class="vt-btn vt-list" onclick="setMaterialView('c11','list')" title="List view">☰</span>
+            </span>
             <span class="sort-results" id="c11-mat-sort-results"></span>
           </div>
           <div id="c11-material-list" class="material-grid" style="margin-top:.5rem;">
@@ -1319,6 +1379,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           <div id="c11-papers-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
             <span style="font-size:.78rem;color:var(--muted);">📁</span>
             <span id="c11-papers-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+            <span class="view-toggle" style="margin-left:auto;" id="c11-papers-folder-view-toggle">
+              <span class="vt-btn vt-grid active" onclick="setGridView('c11-papers-folders','grid','c11-papers-folders')" title="Grid view">▦</span>
+              <span class="vt-btn vt-list" onclick="setGridView('c11-papers-folders','list','c11-papers-folders')" title="List view">☰</span>
+            </span>
           </div>
           <div id="c11-papers-folders" class="folder-grid"></div>
           <div class="sort-bar" id="c11-papers-sort-bar" style="display:none;margin-top:1.2rem;">
@@ -1347,6 +1411,12 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           🎬 Videos <span class="cacc-arrow">▼</span>
         </div>
         <div class="class-acc-body" id="c11-videos">
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;justify-content:flex-end;">
+            <span class="view-toggle" id="c11-videos-view-toggle">
+              <span class="vt-btn vt-grid active" onclick="setGridView('c11-videos-list','grid','c11-videos-list')" title="Grid view">▦</span>
+              <span class="vt-btn vt-list" onclick="setGridView('c11-videos-list','list','c11-videos-list')" title="List view">☰</span>
+            </span>
+          </div>
           <div class="video-grid" id="c11-videos-list"><div class="empty-state"><span class="es-icon">🎬</span>No videos added yet.</div></div>
         </div>
       </div>
@@ -1369,6 +1439,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           <div id="c12-mat-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
             <span style="font-size:.78rem;color:var(--muted);">📁</span>
             <span id="c12-mat-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+            <span class="view-toggle" style="margin-left:auto;" id="c12-mat-folder-view-toggle">
+              <span class="vt-btn vt-grid active" onclick="setGridView('c12-mat-folders','grid','c12-mat-folders')" title="Grid view">▦</span>
+              <span class="vt-btn vt-list" onclick="setGridView('c12-mat-folders','list','c12-mat-folders')" title="List view">☰</span>
+            </span>
           </div>
           <div id="c12-mat-folders" class="folder-grid"></div>
           <div class="sort-bar" id="c12-mat-sort-bar" style="display:none;">
@@ -1379,6 +1453,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
               <option value="az">🔤 A → Z</option>
               <option value="za">🔤 Z → A</option>
             </select>
+            <span class="view-toggle" id="c12-mat-view-toggle">
+              <span class="vt-btn vt-grid active" onclick="setMaterialView('c12','grid')" title="Grid view">▦</span>
+              <span class="vt-btn vt-list" onclick="setMaterialView('c12','list')" title="List view">☰</span>
+            </span>
             <span class="sort-results" id="c12-mat-sort-results"></span>
           </div>
           <div id="c12-material-list" class="material-grid" style="margin-top:.5rem;">
@@ -1397,6 +1475,10 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           <div id="c12-papers-folder-nav" style="margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
             <span style="font-size:.78rem;color:var(--muted);">📁</span>
             <span id="c12-papers-breadcrumb" style="font-size:.82rem;color:var(--ink2);">Root</span>
+            <span class="view-toggle" style="margin-left:auto;" id="c12-papers-folder-view-toggle">
+              <span class="vt-btn vt-grid active" onclick="setGridView('c12-papers-folders','grid','c12-papers-folders')" title="Grid view">▦</span>
+              <span class="vt-btn vt-list" onclick="setGridView('c12-papers-folders','list','c12-papers-folders')" title="List view">☰</span>
+            </span>
           </div>
           <div id="c12-papers-folders" class="folder-grid"></div>
           <div class="tbl-wrap" style="margin-top:1.2rem;">
@@ -1410,6 +1492,12 @@ footer{background:var(--ink);color:#5a4534;text-align:center;padding:1.5rem;
           🎬 Videos <span class="cacc-arrow">▼</span>
         </div>
         <div class="class-acc-body" id="c12-videos">
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;justify-content:flex-end;">
+            <span class="view-toggle" id="c12-videos-view-toggle">
+              <span class="vt-btn vt-grid active" onclick="setGridView('c12-videos-list','grid','c12-videos-list')" title="Grid view">▦</span>
+              <span class="vt-btn vt-list" onclick="setGridView('c12-videos-list','list','c12-videos-list')" title="List view">☰</span>
+            </span>
+          </div>
           <div class="video-grid" id="c12-videos-list"><div class="empty-state"><span class="es-icon">🎬</span>No videos added yet.</div></div>
         </div>
       </div>
@@ -2198,6 +2286,7 @@ async function loadPublicClassVideos(cls) {
       <div class="v-thumb">${ytThumb(v.url)?`<img src="${ytThumb(v.url)}" alt="">`:''}<div class="play-btn"></div></div>
       <div class="v-meta"><h4>${v.title}</h4><p>${v.subject||''}</p></div>
     </div>`).join('');
+  restoreGridView(cls+'-videos-list', cls+'-videos-list');
 }
 
 // ─── PUBLIC: CLASS BLOG ───
@@ -2240,6 +2329,7 @@ async function loadPublicClassPapers(cls, folderId='') {
   fHtml += curFolders.map(f=>`<div class="folder-card" onclick="loadPublicClassPapers('${cls}','${f.id}')">
     <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
   foldersEl.innerHTML = fHtml;
+  restoreGridView(cls+'-papers-folders', cls+'-papers-folders');
 
   // Store cache for sort/view-more
   window._papersCache[cls] = { items: curItems, folderId, shown: PAPERS_PAGE_SIZE };
@@ -2324,6 +2414,7 @@ async function loadPublicClassMaterial(cls, folderId='') {
   fHtml += curFolders.map(f=>`<div class="folder-card" onclick="loadPublicClassMaterial('${cls}','${f.id}')">
     <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
   foldersEl.innerHTML = fHtml;
+  restoreGridView(cls+'-mat-folders', cls+'-mat-folders');
 
   // Store cache for sort/view-more
   window._matCache[cls] = { items: curItems, folderId, shown: MATERIAL_PAGE_SIZE };
@@ -2333,6 +2424,7 @@ async function loadPublicClassMaterial(cls, folderId='') {
 
   // Apply default sort + render
   renderMaterialItems(cls);
+  restoreMaterialView(cls);
 }
 
 function sortItems(items, sortVal) {
@@ -2344,6 +2436,42 @@ function sortItems(items, sortVal) {
   else if(sortVal === 'year-desc') arr.sort((a,b)=>parseInt(b.year||0)-parseInt(a.year||0));
   else if(sortVal === 'year-asc') arr.sort((a,b)=>parseInt(a.year||0)-parseInt(b.year||0));
   return arr;
+}
+
+function setGridView(containerId, view, storageKey) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  let listClass = 'material-list-layout';
+  if (el.classList.contains('folder-grid')) listClass = 'folder-list-layout';
+  else if (el.classList.contains('video-grid')) listClass = 'video-list-layout';
+  el.classList.toggle(listClass, view === 'list');
+  const tId = containerId.replace('-folders','-folder-view-toggle')
+    .replace('-files','-file-view-toggle')
+    .replace('-videos-list','-videos-view-toggle')
+    .replace('-material-list','-mat-view-toggle');
+  const toggle = document.getElementById(tId);
+  if (toggle) toggle.querySelectorAll('.vt-btn').forEach(b=>b.classList.toggle('active',b.classList.contains('vt-'+view)));
+  localStorage.setItem('gridView-'+(storageKey||containerId), view);
+}
+
+function restoreGridView(containerId, storageKey) {
+  const saved = localStorage.getItem('gridView-'+(storageKey||containerId));
+  if (saved) setGridView(containerId, saved, storageKey);
+}
+
+function setMaterialView(cls, view) {
+  const listEl = document.getElementById(cls+'-material-list');
+  const toggle = document.getElementById(cls+'-mat-view-toggle');
+  if(!listEl || !toggle) return;
+  listEl.classList.toggle('material-list-layout', view==='list');
+  toggle.querySelectorAll('.vt-btn').forEach(b=>b.classList.toggle('active', b.classList.contains('vt-'+view)));
+  localStorage.setItem('matView-'+cls, view);
+}
+
+// Restore saved view on page load
+function restoreMaterialView(cls) {
+  const saved = localStorage.getItem('matView-'+cls);
+  if(saved) setMaterialView(cls, saved);
 }
 
 function renderMaterialItems(cls) {
@@ -2447,6 +2575,7 @@ async function loadPublicGrammarFolders(folderId='') {
   fHtml+=curFolders.map(f=>`<div class="folder-card" onclick="loadPublicGrammarFolders('${f.id}');loadPublicGrammarFiles('${f.id}')">
     <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
   foldersEl.innerHTML=fHtml;
+  restoreGridView('grammar-folders','grammar-folders');
 }
 
 const GRAMMAR_PAGE_SIZE = 6;
@@ -2461,6 +2590,7 @@ async function loadPublicGrammarFiles(folderId='') {
   if(sortBar) sortBar.style.display = curItems.length ? 'flex' : 'none';
 
   renderGrammarFiles();
+  restoreGridView('grammar-files','grammar-files');
 }
 
 function renderGrammarFiles() {
@@ -2532,6 +2662,7 @@ async function loadPublicWritingSkillsFolders(folderId='') {
   fHtml+=curFolders.map(f=>`<div class="folder-card" onclick="loadPublicWritingSkillsFolders('${f.id}');loadPublicWritingSkillsFiles('${f.id}')">
     <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
   foldersEl.innerHTML=fHtml;
+  restoreGridView('writingskills-folders','writingskills-folders');
 }
 
 const WRITINGSKILLS_PAGE_SIZE = 6;
@@ -2544,6 +2675,7 @@ async function loadPublicWritingSkillsFiles(folderId='') {
   const sortBar = document.getElementById('writingskills-sort-bar');
   if(sortBar) sortBar.style.display = curItems.length ? 'flex' : 'none';
   renderWritingSkillsFiles();
+  restoreGridView('writingskills-files','writingskills-files');
 }
 
 function renderWritingSkillsFiles() {
@@ -2610,6 +2742,7 @@ async function loadPublicDramaFolders(folderId='') {
   fHtml+=curFolders.map(f=>`<div class="folder-card" onclick="loadPublicDramaFolders('${f.id}');loadPublicDramaFiles('${f.id}')">
     <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
   foldersEl.innerHTML=fHtml;
+  restoreGridView('drama-folders','drama-folders');
 }
 
 const DRAMA_PAGE_SIZE = 6;
@@ -2622,6 +2755,7 @@ async function loadPublicDramaFiles(folderId='') {
   const sortBar = document.getElementById('drama-sort-bar');
   if(sortBar) sortBar.style.display = curItems.length ? 'flex' : 'none';
   renderDramaFiles();
+  restoreGridView('drama-files','drama-files');
 }
 
 function renderDramaFiles() {
@@ -2688,6 +2822,7 @@ async function loadPublicNovelFolders(folderId='') {
   fHtml+=curFolders.map(f=>`<div class="folder-card" onclick="loadPublicNovelFolders('${f.id}');loadPublicNovelFiles('${f.id}')">
     <div class="fc-icon">📁</div><div class="fc-name">${f.name}</div></div>`).join('');
   foldersEl.innerHTML=fHtml;
+  restoreGridView('novel-folders','novel-folders');
 }
 
 const NOVEL_PAGE_SIZE = 6;
@@ -2700,6 +2835,7 @@ async function loadPublicNovelFiles(folderId='') {
   const sortBar = document.getElementById('novel-sort-bar');
   if(sortBar) sortBar.style.display = curItems.length ? 'flex' : 'none';
   renderNovelFiles();
+  restoreGridView('novel-files','novel-files');
 }
 
 function renderNovelFiles() {
