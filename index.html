@@ -2909,7 +2909,11 @@ async function loadAdminClassVideos(cls) {
   el.innerHTML = !items.length ? emptyAdm : items.map(v=>`
     <div class="item-row">
       <div class="item-row-info"><h4>${v.title}</h4><p>${v.subject||v.url}</p></div>
-      <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-videos','${v.id}',()=>loadAdminClassVideos('${cls}'),()=>loadPublicClassVideos('${cls}'))">Delete</button>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+        <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+          onclick="adminOpenRenameItemModal('${cls}-videos','${v.id}','${v.title.replace(/'/g,"\\'")}')">✏️ Rename</button>
+        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-videos','${v.id}',()=>loadAdminClassVideos('${cls}'),()=>loadPublicClassVideos('${cls}'))">Delete</button>
+      </div>
     </div>`).join('');
 }
 
@@ -2949,7 +2953,11 @@ async function loadAdminClassPapers(cls) {
     grouped[''].forEach(p=>{
       html+=`<div class="item-row">
         <div class="item-row-info"><h4>${p.title}</h4><p>${p.subject||''} · ${p.year||''} · 📁 Root</p></div>
-        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers','${p.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+          <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+            onclick="adminOpenRenameItemModal('${cls}-papers','${p.id}','${p.title.replace(/'/g,"\\'")}')">✏️ Rename</button>
+          <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers','${p.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
+        </div>
       </div>`;
     });
     html+=`</div></div>`;
@@ -2974,7 +2982,11 @@ async function loadAdminClassPapers(cls) {
     pts.forEach(p=>{
       html+=`<div class="item-row">
         <div class="item-row-info"><h4>${p.title}</h4><p>${p.subject||''} · ${p.year||''} · 📁 ${f.name}</p></div>
-        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers','${p.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+          <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+            onclick="adminOpenRenameItemModal('${cls}-papers','${p.id}','${p.title.replace(/'/g,"\\'")}')">✏️ Rename</button>
+          <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-papers','${p.id}',()=>loadAdminClassPapers('${cls}'),()=>loadPublicClassPapers('${cls}'))">Delete</button>
+        </div>
       </div>`;
     });
     html+=`</div></div>`;
@@ -3008,7 +3020,11 @@ async function loadAdminClassMaterial(cls) {
     grouped[''].forEach(m=>{
       html+=`<div class="item-row">
         <div class="item-row-info"><h4>${m.title}</h4><p>${m.type||''} · ${m.subject||''} · 📁 Root</p></div>
-        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-material','${m.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+          <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+            onclick="adminOpenRenameItemModal('${cls}-material','${m.id}','${m.title.replace(/'/g,"\\'")}')">✏️ Rename</button>
+          <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-material','${m.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
+        </div>
       </div>`;
     });
     html+=`</div></div>`;
@@ -3033,7 +3049,11 @@ async function loadAdminClassMaterial(cls) {
     mats.forEach(m=>{
       html+=`<div class="item-row">
         <div class="item-row-info"><h4>${m.title}</h4><p>${m.type||''} · ${m.subject||''} · 📁 ${f.name}</p></div>
-        <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-material','${m.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+          <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+            onclick="adminOpenRenameItemModal('${cls}-material','${m.id}','${m.title.replace(/'/g,"\\'")}')">✏️ Rename</button>
+          <button class="btn btn-danger btn-sm" onclick="delClassItem('${cls}-material','${m.id}',()=>loadAdminClassMaterial('${cls}'),()=>loadPublicClassMaterial('${cls}'))">Delete</button>
+        </div>
       </div>`;
     });
     html+=`</div></div>`;
@@ -3092,7 +3112,11 @@ async function loadAdminGrammar() {
       const src=f.source==='link'?'🔗 Link':'☁️ Uploaded';
       html+=`<div class="item-row">
         <div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div>
-        <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-files','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFiles(''))">Delete</button>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+          <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+            onclick="adminOpenRenameItemModal('grammar-files','${f.id}','${f.title.replace(/'/g,"\\'")}')">✏️ Rename</button>
+          <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-files','${f.id}',loadAdminGrammar,()=>loadPublicGrammarFiles(''))">Delete</button>
+        </div>
       </div>`;
     });
     html+=`</div></div>`;
@@ -3119,7 +3143,11 @@ async function loadAdminGrammar() {
       const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded';
       html+=`<div class="item-row">
         <div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div>
-        <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-files','${fi.id}',loadAdminGrammar,()=>loadPublicGrammarFiles(''))">Delete</button>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+          <button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);"
+            onclick="adminOpenRenameItemModal('grammar-files','${fi.id}','${fi.title.replace(/'/g,"\\'")}')">✏️ Rename</button>
+          <button class="btn btn-danger btn-sm" onclick="delClassItem('grammar-files','${fi.id}',loadAdminGrammar,()=>loadPublicGrammarFiles(''))">Delete</button>
+        </div>
       </div>`;
     });
     html+=`</div></div>`;
@@ -3140,13 +3168,13 @@ async function loadAdminWritingSkills() {
   let html='';
   if(grouped['']) {
     html+=`<div class="folder-root-section"><div class="root-header" onclick="this.closest('.folder-root-section').classList.toggle('collapsed')"><span class="fc-arrow">▼</span> 📁 Root Level <span class="fc-count">(${grouped[''].length} file${grouped[''].length!==1?'s':''})</span></div><div class="root-body">`;
-    grouped[''].forEach(f=>{ const src=f.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('writingskills-files','${f.id}',loadAdminWritingSkills,()=>loadPublicWritingSkillsFiles(''))">Delete</button></div>`; });
+    grouped[''].forEach(f=>{ const src=f.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameItemModal('writingskills-files','${f.id}','${f.title.replace(/'/g,"\\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('writingskills-files','${f.id}',loadAdminWritingSkills,()=>loadPublicWritingSkillsFiles(''))">Delete</button></div></div>`; });
     html+=`</div></div>`;
   }
   folders.forEach(f=>{
     const items=grouped[f.id]||[];
     html+=`<div class="folder-collapse"><div class="folder-collapse-header" onclick="toggleFolderCollapse(this)"><span class="fc-arrow">▼</span> 📁 ${f.name}<span class="fc-count">${items.length} file${items.length!==1?'s':''} · ${f.parentName||'Root'}</span></div><div class="folder-collapse-body"><div class="item-row" style="background:var(--orange-dim);border-bottom:1.5px solid var(--border2);"><div class="item-row-info"><p style="font-size:.8rem;color:var(--muted);">Folder actions</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameModal('writingskills-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('writingskills-folders','${f.id}',loadAdminWritingSkills,()=>loadPublicWritingSkillsFolders(''))">Delete</button></div></div>`;
-    items.forEach(fi=>{ const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('writingskills-files','${fi.id}',loadAdminWritingSkills,()=>loadPublicWritingSkillsFiles(''))">Delete</button></div>`; });
+    items.forEach(fi=>{ const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameItemModal('writingskills-files','${fi.id}','${fi.title.replace(/'/g,"\\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('writingskills-files','${fi.id}',loadAdminWritingSkills,()=>loadPublicWritingSkillsFiles(''))">Delete</button></div></div>`; });
     html+=`</div></div>`;
   });
   el.innerHTML=html||emptyAdm;
@@ -3164,13 +3192,13 @@ async function loadAdminDrama() {
   let html='';
   if(grouped['']) {
     html+=`<div class="folder-root-section"><div class="root-header" onclick="this.closest('.folder-root-section').classList.toggle('collapsed')"><span class="fc-arrow">▼</span> 📁 Root Level <span class="fc-count">(${grouped[''].length} file${grouped[''].length!==1?'s':''})</span></div><div class="root-body">`;
-    grouped[''].forEach(f=>{ const src=f.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('drama-files','${f.id}',loadAdminDrama,()=>loadPublicDramaFiles(''))">Delete</button></div>`; });
+    grouped[''].forEach(f=>{ const src=f.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameItemModal('drama-files','${f.id}','${f.title.replace(/'/g,"\\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('drama-files','${f.id}',loadAdminDrama,()=>loadPublicDramaFiles(''))">Delete</button></div></div>`; });
     html+=`</div></div>`;
   }
   folders.forEach(f=>{
     const items=grouped[f.id]||[];
     html+=`<div class="folder-collapse"><div class="folder-collapse-header" onclick="toggleFolderCollapse(this)"><span class="fc-arrow">▼</span> 📁 ${f.name}<span class="fc-count">${items.length} file${items.length!==1?'s':''} · ${f.parentName||'Root'}</span></div><div class="folder-collapse-body"><div class="item-row" style="background:var(--orange-dim);border-bottom:1.5px solid var(--border2);"><div class="item-row-info"><p style="font-size:.8rem;color:var(--muted);">Folder actions</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameModal('drama-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('drama-folders','${f.id}',loadAdminDrama,()=>loadPublicDramaFolders(''))">Delete</button></div></div>`;
-    items.forEach(fi=>{ const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('drama-files','${fi.id}',loadAdminDrama,()=>loadPublicDramaFiles(''))">Delete</button></div>`; });
+    items.forEach(fi=>{ const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameItemModal('drama-files','${fi.id}','${fi.title.replace(/'/g,"\\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('drama-files','${fi.id}',loadAdminDrama,()=>loadPublicDramaFiles(''))">Delete</button></div></div>`; });
     html+=`</div></div>`;
   });
   el.innerHTML=html||emptyAdm;
@@ -3188,13 +3216,13 @@ async function loadAdminNovel() {
   let html='';
   if(grouped['']) {
     html+=`<div class="folder-root-section"><div class="root-header" onclick="this.closest('.folder-root-section').classList.toggle('collapsed')"><span class="fc-arrow">▼</span> 📁 Root Level <span class="fc-count">(${grouped[''].length} file${grouped[''].length!==1?'s':''})</span></div><div class="root-body">`;
-    grouped[''].forEach(f=>{ const src=f.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('novel-files','${f.id}',loadAdminNovel,()=>loadPublicNovelFiles(''))">Delete</button></div>`; });
+    grouped[''].forEach(f=>{ const src=f.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${f.title}</h4><p>📁 Root · ${src}</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameItemModal('novel-files','${f.id}','${f.title.replace(/'/g,"\\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('novel-files','${f.id}',loadAdminNovel,()=>loadPublicNovelFiles(''))">Delete</button></div></div>`; });
     html+=`</div></div>`;
   }
   folders.forEach(f=>{
     const items=grouped[f.id]||[];
     html+=`<div class="folder-collapse"><div class="folder-collapse-header" onclick="toggleFolderCollapse(this)"><span class="fc-arrow">▼</span> 📁 ${f.name}<span class="fc-count">${items.length} file${items.length!==1?'s':''} · ${f.parentName||'Root'}</span></div><div class="folder-collapse-body"><div class="item-row" style="background:var(--orange-dim);border-bottom:1.5px solid var(--border2);"><div class="item-row-info"><p style="font-size:.8rem;color:var(--muted);">Folder actions</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameModal('novel-folders','${f.id}','${f.name.replace(/'/g,"\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('novel-folders','${f.id}',loadAdminNovel,()=>loadPublicNovelFolders(''))">Delete</button></div></div>`;
-    items.forEach(fi=>{ const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div><button class="btn btn-danger btn-sm" onclick="delClassItem('novel-files','${fi.id}',loadAdminNovel,()=>loadPublicNovelFiles(''))">Delete</button></div>`; });
+    items.forEach(fi=>{ const src=fi.source==='link'?'🔗 Link':'☁️ Uploaded'; html+=`<div class="item-row"><div class="item-row-info"><h4>📎 ${fi.title}</h4><p>📁 ${f.name} · ${src}</p></div><div style="display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-sm" style="background:var(--orange-lt);color:var(--orange);border:1.5px solid var(--orange-lt);" onclick="adminOpenRenameItemModal('novel-files','${fi.id}','${fi.title.replace(/'/g,"\\'")}')">✏️ Rename</button><button class="btn btn-danger btn-sm" onclick="delClassItem('novel-files','${fi.id}',loadAdminNovel,()=>loadPublicNovelFiles(''))">Delete</button></div></div>`; });
     html+=`</div></div>`;
   });
   el.innerHTML=html||emptyAdm;
@@ -3266,6 +3294,51 @@ document.addEventListener('click', function(e){
 document.addEventListener('keydown', function(e){
   if(e.key==='Escape' && document.getElementById('folder-rename-modal').classList.contains('open'))
     adminCloseRenameModal();
+});
+
+// ── ITEM RENAME (files, videos, papers, material) ──
+function adminOpenRenameItemModal(col, id, currentTitle) {
+  document.getElementById('rename-item-col').value = col;
+  document.getElementById('rename-item-id').value = id;
+  document.getElementById('rename-item-title').value = currentTitle;
+  document.getElementById('item-rename-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('rename-item-title').focus(), 80);
+}
+function adminCloseRenameItemModal() {
+  document.getElementById('item-rename-modal').classList.remove('open');
+}
+async function adminSaveRenameItem() {
+  const col = document.getElementById('rename-item-col').value;
+  const id  = document.getElementById('rename-item-id').value;
+  const title = document.getElementById('rename-item-title').value.trim();
+  if(!title){ toast('Enter a title',false); return; }
+  try {
+    await window.FB.updateItem(col, id, { title });
+    adminCloseRenameItemModal();
+    toast('Item renamed! ✅');
+    // Refresh the correct admin list
+    const adminRefresh = {
+      'grammar-files':       ()=>{ loadAdminGrammar(); loadPublicGrammarFiles(''); },
+      'writingskills-files': ()=>{ loadAdminWritingSkills(); loadPublicWritingSkillsFiles(''); },
+      'drama-files':         ()=>{ loadAdminDrama(); loadPublicDramaFiles(''); },
+      'novel-files':         ()=>{ loadAdminNovel(); loadPublicNovelFiles(''); },
+      'c11-material': ()=>{ loadAdminClassMaterial('c11'); loadPublicClassMaterial('c11'); },
+      'c12-material': ()=>{ loadAdminClassMaterial('c12'); loadPublicClassMaterial('c12'); },
+      'c11-papers':   ()=>{ loadAdminClassPapers('c11'); loadPublicClassPapers('c11'); },
+      'c12-papers':   ()=>{ loadAdminClassPapers('c12'); loadPublicClassPapers('c12'); },
+      'c11-videos':   ()=>{ loadAdminClassVideos('c11'); loadPublicClassVideos('c11'); },
+      'c12-videos':   ()=>{ loadAdminClassVideos('c12'); loadPublicClassVideos('c12'); },
+    };
+    if(adminRefresh[col]) adminRefresh[col]();
+  } catch(e){ toast('Rename failed: '+e.message,false); }
+}
+// Close item rename modal on backdrop click or Escape
+document.addEventListener('click', function(e){
+  if(e.target.id==='item-rename-modal') adminCloseRenameItemModal();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape' && document.getElementById('item-rename-modal').classList.contains('open'))
+    adminCloseRenameItemModal();
 });
 
 // ── FOLDER HELPERS ──
@@ -4457,6 +4530,30 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="bm-actions">
       <button class="bm-btn-cancel" onclick="adminCloseRenameModal()">Cancel</button>
       <button class="bm-btn-insert" onclick="adminSaveRenameFolder()">Save Name</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════
+     ITEM RENAME MODAL (files, videos, papers, material)
+══════════════════════════════ -->
+<div class="blog-modal-overlay" id="item-rename-modal">
+  <div class="blog-modal-box" style="max-width:400px;">
+    <h3>✏️ Rename Item</h3>
+    <input type="hidden" id="rename-item-col">
+    <input type="hidden" id="rename-item-id">
+    <div class="bm-field">
+      <label>New Title</label>
+      <input type="text" id="rename-item-title" placeholder="Enter new title…"
+        onkeydown="if(event.key==='Enter') adminSaveRenameItem()">
+    </div>
+    <p style="font-size:.75rem;color:var(--muted);margin-top:-.3rem;margin-bottom:1rem;">
+      ℹ️ Renaming only updates the display title. The uploaded file stays as-is.
+    </p>
+    <div class="bm-actions">
+      <button class="bm-btn-cancel" onclick="adminCloseRenameItemModal()">Cancel</button>
+      <button class="bm-btn-insert" onclick="adminSaveRenameItem()">Save Name</button>
     </div>
   </div>
 </div>
